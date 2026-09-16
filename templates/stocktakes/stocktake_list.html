@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Quản lý Biên bản Kiểm kê Kho | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-clipboard2-check me-2"></i>Danh sách Biên Bản Kiểm Kê Kho (UC-6.1 đến UC-6.10)</h4>
+    <p class="text-muted small mb-0">
+      Đối chiếu số lượng tồn hệ thống và số lượng kiểm đếm thực tế; Chủ cửa hàng (Admin) phê duyệt hoặc từ chối biên bản kiểm kê
+    </p>
+  </div>
+  <a href="{% url 'stocktakes:stocktake_create' %}" class="btn btn-sm btn-os-primary">
+    <i class="bi bi-plus-lg me-1"></i>Tạo biên bản kiểm kê mới
+  </a>
+</div>
+
+<!-- Filter Bar -->
+<div class="os-card p-3 mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold mb-1">Tìm kiếm (Mã biên bản / Người kiểm / Mục đích)</label>
+      <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="VD: KK-...">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Trạng thái</label>
+      <select name="status" class="form-select form-select-sm">
+        <option value="">-- Tất cả --</option>
+        {% for st_code, st_label in status_choices %}
+        <option value="{{ st_code }}" {% if filters.status == st_code %}selected{% endif %}>{{ st_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Từ ngày</label>
+      <input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Đến ngày</label>
+      <input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+      <button type="submit" class="btn btn-sm btn-os-primary flex-grow-1"><i class="bi bi-funnel me-1"></i>Lọc</button>
+      <a href="{% url 'stocktakes:stocktake_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+</div>
+
+<div class="os-card">
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Mã biên bản</th>
+          <th>Cơ sở kiểm kê</th>
+          <th>Ngày kiểm</th>
+          <th>Nhân sự kiểm đếm</th>
+          <th>Mục đích</th>
+          <th>Kết quả đối chiếu</th>
+          <th class="text-center">Trạng thái</th>
+          <th class="text-end">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for st in stocktakes %}
+        <tr>
+          <td class="fw-bold">
+            <a href="{% url 'stocktakes:stocktake_detail' st.id %}" class="text-decoration-none text-dark">{{ st.ma_kiem_ke }}</a>
+          </td>
+          <td><span class="badge bg-dark">{{ st.co_so.ma_co_so }}</span> {{ st.co_so.ten_co_so }}</td>
+          <td>{{ st.ngay_kiem|date:"d/m/Y" }}</td>
+          <td>{{ st.nguoi_kiem_ke }}</td>
+          <td>{{ st.muc_dich }}</td>
+          <td class="small">
+            {% with s=st.summary_counts %}
+              <span class="badge bg-success-subtle text-success border">Khớp: {{ s.match }}</span>
+              {% if s.shortage > 0 %}<span class="badge bg-danger-subtle text-danger border">Thiếu: {{ s.shortage }}</span>{% endif %}
+              {% if s.excess > 0 %}<span class="badge bg-warning-subtle text-warning-emphasis border">Thừa: {{ s.excess }}</span>{% endif %}
+            {% endwith %}
+          </td>
+          <td class="text-center">
+            {% if st.trang_thai == 'APPROVED' %}
+              <span class="badge-os badge-status-approved">Đã duyệt</span>
+            {% elif st.trang_thai == 'PENDING' %}
+              <span class="badge-os badge-status-pending">Chờ duyệt</span>
+            {% else %}
+              <span class="badge-os badge-status-rejected">Từ chối</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="{% url 'stocktakes:stocktake_detail' st.id %}" class="btn btn-outline-dark" title="Xem chi tiết"><i class="bi bi-eye"></i></a>
+              {% if st.is_editable %}
+              <a href="{% url 'stocktakes:stocktake_update' st.id %}" class="btn btn-outline-primary" title="Chỉnh sửa"><i class="bi bi-pencil"></i></a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">Chưa có biên bản kiểm kê nào.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

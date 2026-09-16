@@ -1,0 +1,17 @@
+# Python & Django
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+db.sqlite3
+media/products/*
+!media/products/.gitkeep
+staticfiles/
+.pytest_cache/
+htmlcov/
+.coverage
+test-results/
+playwright-report/

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Biên bản kiểm kê {{ stocktake.ma_kiem_ke }} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1 small">
+        <li class="breadcrumb-item"><a href="{% url 'stocktakes:stocktake_list' %}">Biên bản kiểm kê</a></li>
+        <li class="breadcrumb-item active">{{ stocktake.ma_kiem_ke }}</li>
+      </ol>
+    </nav>
+    <h4 class="fw-bold mb-0">
+      Biên bản kiểm kê: {{ stocktake.ma_kiem_ke }}
+      {% if stocktake.trang_thai == 'APPROVED' %}
+        <span class="badge-os badge-status-approved ms-2">Đã duyệt</span>
+      {% elif stocktake.trang_thai == 'PENDING' %}
+        <span class="badge-os badge-status-pending ms-2">Chờ Chủ cửa hàng phê duyệt</span>
+      {% else %}
+        <span class="badge-os badge-status-rejected ms-2">Từ chối</span>
+      {% endif %}
+    </h4>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'stocktakes:stocktake_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Danh sách</a>
+    {% if stocktake.is_editable %}
+    <a href="{% url 'stocktakes:stocktake_update' stocktake.id %}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-pencil-square me-1"></i>Chỉnh sửa (UC-6.8)
+    </a>
+    {% endif %}
+    {% if stocktake.is_deletable %}
+    <form method="post" action="{% url 'stocktakes:stocktake_delete' stocktake.id %}" class="d-inline" onsubmit="return confirm('Xác nhận xóa biên bản kiểm kê {{ stocktake.ma_kiem_ke }}?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Xóa biên bản (UC-6.9)</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if stocktake.ly_do_tu_choi %}
+<div class="alert alert-danger">
+  <strong><i class="bi bi-exclamation-octagon-fill me-1"></i>Lý do từ chối biên bản:</strong> {{ stocktake.ly_do_tu_choi }}
+</div>
+{% endif %}
+
+<!-- Admin Approval Bar (UC-6.10) -->
+{% if request.user.role == 'ADMIN' and stocktake.trang_thai == 'PENDING' %}
+<div class="os-card p-3 mb-4 border-warning bg-warning-subtle">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h6 class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Phê duyệt Biên bản kiểm kê (Chủ cửa hàng — UC-6.10)</h6>
+      <p class="small mb-0 text-muted">
+        Theo quy định kiểm soát nội bộ (DEC-03 / UC-6.10), phê duyệt biên bản kiểm kê sẽ xác nhận kết quả đối chiếu mà <strong>không tự động ghi đè số lượng tồn kho vật lý</strong>.
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <form method="post" action="{% url 'stocktakes:stocktake_approve' stocktake.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success fw-semibold">
+          <i class="bi bi-check-circle-fill me-1"></i>Phê duyệt biên bản
+        </button>
+      </form>
+      <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#rejectReasonBox">
+        <i class="bi bi-x-circle me-1"></i>Từ chối biên bản
+      </button>
+    </div>
+  </div>
+  <div class="collapse mt-3" id="rejectReasonBox">
+    <form method="post" action="{% url 'stocktakes:stocktake_reject' stocktake.id %}" class="d-flex gap-2">
+      {% csrf_token %}
+      <input type="text" name="ly_do_tu_choi" class="form-control form-control-sm" placeholder="Nhập lý do từ chối và yêu cầu kiểm đếm lại..." required>
+      <button type="submit" class="btn btn-sm btn-danger text-nowrap">Xác nhận từ chối</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="os-card p-3 mb-4">
+  <div class="row small g-2">
+    <div class="col-md-3"><strong>Cơ sở kiểm kê:</strong> {{ stocktake.co_so.ma_co_so }} — {{ stocktake.co_so.ten_co_so }}</div>
+    <div class="col-md-3"><strong>Ngày kiểm kê:</strong> {{ stocktake.ngay_kiem|date:"d/m/Y" }}</div>
+    <div class="col-md-3"><strong>Nhân sự kiểm đếm:</strong> {{ stocktake.nguoi_kiem_ke }}</div>
+    <div class="col-md-3"><strong>Người lập biên bản:</strong> {{ stocktake.tao_boi.display_name }}</div>
+    <div class="col-md-3"><strong>Mục đích:</strong> {{ stocktake.muc_dich }}</div>
+    <div class="col-md-3"><strong>Người phê duyệt:</strong> {{ stocktake.duyet_boi.display_name|default:"Chưa duyệt" }}</div>
+    <div class="col-md-6"><strong>Ghi chú:</strong> {{ stocktake.ghi_chu|default:"—" }}</div>
+  </div>
+</div>
+
+<div class="os-card">
+  <div class="os-card-header d-flex justify-content-between align-items-center">
+    <span>Bảng đối chiếu Tồn hệ thống & Tồn thực tế</span>
+    <div class="d-flex gap-2 small">
+      <span class="badge bg-success">Khớp: {{ summary.match }}</span>
+      <span class="badge bg-danger">Thiếu: {{ summary.shortage }}</span>
+      <span class="badge bg-warning text-dark">Thừa: {{ summary.excess }}</span>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Mã SKU</th>
+          <th>Tên hàng hóa (Màu / Size)</th>
+          <th>ĐVT</th>
+          <th class="text-end">Đơn giá</th>
+          <th class="text-center">SL Hệ thống</th>
+          <th class="text-center">SL Thực tế</th>
+          <th class="text-center">Chênh lệch</th>
+          <th class="text-center">Đối chiếu</th>
+          <th>Hướng xử lý</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in lines %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><code>{{ line.bien_the.ma_sku }}</code></td>
+          <td class="fw-semibold">{{ line.bien_the.full_display_name }}</td>
+          <td>{{ line.don_vi_tinh }}</td>
+          <td class="text-end">{{ line.don_gia|intcomma }} đ</td>
+          <td class="text-center">{{ line.so_luong_he_thong }}</td>
+          <td class="text-center fw-bold">{{ line.so_luong_thuc_te }}</td>
+          <td class="text-center fw-bold {% if line.chenh_lech < 0 %}text-danger{% elif line.chenh_lech > 0 %}text-primary{% else %}text-success{% endif %}">
+            {% if line.chenh_lech > 0 %}+{% endif %}{{ line.chenh_lech }}
+          </td>
+          <td class="text-center">
+            {% if line.trang_thai_doi_chieu == 'MATCH' %}
+              <span class="badge-os badge-in-stock">Khớp</span>
+            {% elif line.trang_thai_doi_chieu == 'SHORTAGE' %}
+              <span class="badge-os badge-out-of-stock">Thiếu</span>
+            {% else %}
+              <span class="badge-os badge-low-stock">Thừa</span>
+            {% endif %}
+          </td>
+          <td>{{ line.xu_ly }}</td>
+          <td class="small text-muted">{{ line.ghi_chu }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Quản lý Phiếu Nhập Kho | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-box-arrow-in-down me-2"></i>Danh sách Phiếu Nhập Kho (Kho tổng CS1)</h4>
+    <p class="text-muted small mb-0">
+      Quản lý chứng từ nhập hàng từ Nhà cung cấp. Tồn kho chỉ tăng sau khi Chủ cửa hàng (Admin) phê duyệt (UC-4.1 đến UC-4.10)
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'purchasing:import_report_export' %}?q={{ filters.q }}&supplier={{ filters.supplier }}&status={{ filters.status }}&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}" class="btn btn-sm btn-success">
+      <i class="bi bi-file-earmark-excel-fill me-1"></i>Xuất báo cáo nhập kho (UC-4.10)
+    </a>
+    <a href="{% url 'purchasing:supplier_list' %}" class="btn btn-sm btn-os-tan">
+      <i class="bi bi-building me-1"></i>Nhà cung cấp (UC-4.11)
+    </a>
+    <a href="{% url 'purchasing:import_create' %}" class="btn btn-sm btn-os-primary">
+      <i class="bi bi-plus-lg me-1"></i>Tạo phiếu nhập kho
+    </a>
+  </div>
+</div>
+
+<!-- Import Activity Summary KPIs (UC-4.11) -->
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Tổng số phiếu nhập trong kỳ</div>
+      <div class="os-kpi-value">{{ summary.total_count }} phiếu</div>
+      <div class="small text-muted">Đã duyệt: <strong>{{ summary.approved_count }}</strong> | Chờ duyệt: <strong>{{ summary.pending_count }}</strong></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Tổng SL nhập kho đã duyệt</div>
+      <div class="os-kpi-value text-success">+{{ summary.approved_quantity|intcomma }} SP</div>
+      <div class="small text-muted">Đã cộng vào tồn kho Kho tổng CS1</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Tổng giá trị nhập đã duyệt</div>
+      <div class="os-kpi-value text-primary">{{ summary.approved_amount|intcomma }} đ</div>
+      <div class="small text-muted">Tổng giá trị mọi phiếu: {{ summary.total_amount|intcomma }} đ</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Phiếu trả lại cần chỉnh sửa</div>
+      <div class="os-kpi-value text-danger">{{ summary.returned_count }} phiếu</div>
+      <div class="small text-muted">Chờ Quản lý CS1 cập nhật lại</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="os-card p-3 mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold mb-1">Tìm kiếm (Mã phiếu / NCC / Lý do)</label>
+      <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="VD: PNK-...">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Nhà cung cấp</label>
+      <select name="supplier" class="form-select form-select-sm">
+        <option value="">-- Tất cả NCC --</option>
+        {% for s in suppliers %}
+        <option value="{{ s.id }}" {% if filters.supplier == s.id|stringformat:"s" %}selected{% endif %}>{{ s.ma_nha_cung_cap }} - {{ s.ten_nha_cung_cap }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Trạng thái</label>
+      <select name="status" class="form-select form-select-sm">
+        <option value="">-- Tất cả --</option>
+        {% for st_code, st_label in status_choices %}
+        <option value="{{ st_code }}" {% if filters.status == st_code %}selected{% endif %}>{{ st_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Từ ngày</label>
+      <input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Đến ngày</label>
+      <input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-1 d-flex gap-1">
+      <button type="submit" class="btn btn-sm btn-os-primary flex-grow-1" title="Lọc dữ liệu"><i class="bi bi-funnel"></i></button>
+      <a href="{% url 'purchasing:import_list' %}" class="btn btn-sm btn-outline-secondary" title="Đặt lại"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+</div>
+
+<div class="os-card">
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Mã phiếu nhập</th>
+          <th>Ngày lập</th>
+          <th>Nhà cung cấp</th>
+          <th>Cơ sở nhận</th>
+          <th>Người lập</th>
+          <th class="text-end">Tổng tiền (VNĐ)</th>
+          <th class="text-center">Trạng thái</th>
+          <th class="text-end">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in receipts %}
+        <tr>
+          <td class="fw-bold">
+            <a href="{% url 'purchasing:import_detail' r.id %}" class="text-decoration-none text-dark">{{ r.ma_phieu_nhap_kho }}</a>
+          </td>
+          <td>{{ r.ngay_nhap|date:"d/m/Y H:i" }}</td>
+          <td>{{ r.nha_cung_cap.ten_nha_cung_cap }}</td>
+          <td>{{ r.co_so_nhan.ma_co_so }} — {{ r.co_so_nhan.ten_co_so }}</td>
+          <td>{{ r.nguoi_tao.display_name }}</td>
+          <td class="text-end fw-bold">{{ r.tong_tien|intcomma }} đ</td>
+          <td class="text-center">
+            {% if r.trang_thai == 'APPROVED' %}
+              <span class="badge-os badge-status-approved">Đã duyệt</span>
+            {% elif r.trang_thai == 'PENDING_APPROVAL' %}
+              <span class="badge-os badge-status-pending">Chờ duyệt</span>
+            {% elif r.trang_thai == 'RETURNED' %}
+              <span class="badge-os badge-status-returned">Trả lại chỉnh sửa</span>
+            {% else %}
+              <span class="badge bg-secondary">Bản nháp</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="{% url 'purchasing:import_detail' r.id %}" class="btn btn-outline-dark" title="Xem chi tiết"><i class="bi bi-eye"></i></a>
+              <a href="{% url 'purchasing:import_export_excel' r.id %}" class="btn btn-outline-success" title="Xuất Excel (UC-4.10)"><i class="bi bi-file-earmark-excel"></i></a>
+              {% if r.is_editable %}
+              <a href="{% url 'purchasing:import_update' r.id %}" class="btn btn-outline-primary" title="Chỉnh sửa"><i class="bi bi-pencil"></i></a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">Chưa có phiếu nhập kho nào phù hợp điều kiện lọc.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

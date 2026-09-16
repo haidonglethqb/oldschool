@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Phiếu nhập kho {{ receipt.ma_phieu_nhap_kho }} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1 small">
+        <li class="breadcrumb-item"><a href="{% url 'purchasing:import_list' %}">Phiếu nhập kho</a></li>
+        <li class="breadcrumb-item active">{{ receipt.ma_phieu_nhap_kho }}</li>
+      </ol>
+    </nav>
+    <h4 class="fw-bold mb-0">
+      Phiếu nhập kho: {{ receipt.ma_phieu_nhap_kho }}
+      {% if receipt.trang_thai == 'APPROVED' %}
+        <span class="badge-os badge-status-approved ms-2">Đã duyệt (Đã cộng tồn kho)</span>
+      {% elif receipt.trang_thai == 'PENDING_APPROVAL' %}
+        <span class="badge-os badge-status-pending ms-2">Chờ Chủ cửa hàng phê duyệt</span>
+      {% elif receipt.trang_thai == 'RETURNED' %}
+        <span class="badge-os badge-status-returned ms-2">Trả lại chỉnh sửa</span>
+      {% else %}
+        <span class="badge bg-secondary ms-2">Bản nháp</span>
+      {% endif %}
+    </h4>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'purchasing:import_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Danh sách</a>
+    <a href="{% url 'purchasing:import_export_excel' receipt.id %}" class="btn btn-sm btn-success">
+      <i class="bi bi-file-earmark-excel me-1"></i>Xuất file Excel (UC-4.10)
+    </a>
+    {% if receipt.is_editable %}
+    <a href="{% url 'purchasing:import_update' receipt.id %}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-pencil-square me-1"></i>Chỉnh sửa (UC-4.7)
+    </a>
+    {% endif %}
+    {% if receipt.is_deletable %}
+    <form method="post" action="{% url 'purchasing:import_delete' receipt.id %}" class="d-inline" onsubmit="return confirm('Xác nhận xóa phiếu nhập kho {{ receipt.ma_phieu_nhap_kho }}?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Xóa phiếu (UC-4.8)</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if receipt.ly_do_tra_lai %}
+<div class="alert alert-warning">
+  <strong><i class="bi bi-exclamation-triangle-fill me-1"></i>Lý do trả lại chỉnh sửa:</strong> {{ receipt.ly_do_tra_lai }}
+</div>
+{% endif %}
+
+<!-- Admin Approval Bar (UC-4.9) -->
+{% if request.user.role == 'ADMIN' and receipt.trang_thai != 'APPROVED' %}
+<div class="os-card p-3 mb-4 border-warning bg-warning-subtle">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h6 class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Phê duyệt phiếu nhập kho (Chủ cửa hàng — UC-4.9)</h6>
+      <p class="small mb-0 text-muted">Khi bấm <strong>Duyệt phiếu nhập</strong>, hệ thống sẽ tự động cộng số lượng vào tồn kho của <strong>{{ receipt.co_so_nhan.ten_co_so }}</strong>.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <form method="post" action="{% url 'purchasing:import_approve' receipt.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success fw-semibold">
+          <i class="bi bi-check-circle-fill me-1"></i>Duyệt phiếu nhập & Cộng tồn kho
+        </button>
+      </form>
+      {% if receipt.trang_thai != 'RETURNED' %}
+      <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#returnReasonBox">
+        <i class="bi bi-arrow-return-left me-1"></i>Yêu cầu chỉnh sửa lại
+      </button>
+      {% endif %}
+    </div>
+  </div>
+  <div class="collapse mt-3" id="returnReasonBox">
+    <form method="post" action="{% url 'purchasing:import_return' receipt.id %}" class="d-flex gap-2">
+      {% csrf_token %}
+      <input type="text" name="ly_do_tra_lai" class="form-control form-control-sm" placeholder="Nhập lý do yêu cầu chỉnh sửa..." required>
+      <button type="submit" class="btn btn-sm btn-danger text-nowrap">Xác nhận trả lại</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-12">
+    <div class="os-card p-3">
+      <div class="row small g-2">
+        <div class="col-md-3"><strong>Nhà cung cấp:</strong> {{ receipt.nha_cung_cap.ma_nha_cung_cap }} — {{ receipt.nha_cung_cap.ten_nha_cung_cap }}</div>
+        <div class="col-md-3"><strong>SĐT / Địa chỉ NCC:</strong> {{ receipt.sdt }} | {{ receipt.dia_chi }}</div>
+        <div class="col-md-3"><strong>Cơ sở nhận:</strong> {{ receipt.co_so_nhan.ma_co_so }} — {{ receipt.co_so_nhan.ten_co_so }}</div>
+        <div class="col-md-3"><strong>Ngày lập:</strong> {{ receipt.ngay_nhap|date:"d/m/Y H:i" }}</div>
+        <div class="col-md-3"><strong>Người lập phiếu:</strong> {{ receipt.nguoi_tao.display_name }}</div>
+        <div class="col-md-3"><strong>Người duyệt:</strong> {{ receipt.nguoi_duyet.display_name|default:"Chưa duyệt" }}</div>
+        <div class="col-md-3"><strong>Lý do nhập:</strong> {{ receipt.ly_do_nhap }}</div>
+        <div class="col-md-3"><strong>Ghi chú:</strong> {{ receipt.ghi_chu|default:"—" }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="os-card">
+  <div class="os-card-header d-flex justify-content-between align-items-center">
+    <span>Chi tiết mặt hàng nhập kho</span>
+    <span class="fw-bold text-danger fs-6">Tổng thanh toán: {{ receipt.tong_tien|intcomma }} VNĐ</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Mã SKU</th>
+          <th>Tên hàng hóa</th>
+          <th>Màu / Size</th>
+          <th>ĐVT</th>
+          <th class="text-center">Số lượng nhập</th>
+          <th class="text-end">Đơn giá nhập</th>
+          <th class="text-end">Chiết khấu (VNĐ)</th>
+          <th class="text-end">Thành tiền</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in lines %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><code>{{ line.bien_the.ma_sku }}</code></td>
+          <td class="fw-semibold">{{ line.bien_the.san_pham.ten_hang_hoa }}</td>
+          <td>{{ line.bien_the.mau_sac }} / {{ line.bien_the.kich_co }}</td>
+          <td>{{ line.bien_the.san_pham.don_vi_tinh }}</td>
+          <td class="text-center fw-bold">{{ line.so_luong }}</td>
+          <td class="text-end">{{ line.don_gia|intcomma }} đ</td>
+          <td class="text-end">{{ line.chiet_khau|intcomma }} đ</td>
+          <td class="text-end fw-bold">{{ line.thanh_tien|intcomma }} đ</td>
+          <td class="small text-muted">{{ line.ghi_chu }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

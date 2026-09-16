@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Danh mục Hàng hóa & Tồn kho | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-box-seam-fill me-2"></i>Danh mục Hàng hóa & Tra cứu Tồn kho</h4>
+    <p class="text-muted small mb-0">
+      Tra cứu thông tin sản phẩm, biến thể (Màu / Size) và lượng tồn kho thực tế theo cơ sở (UC-3, UC-3.1, UC-3.6, UC-3.7, UC-5.1)
+    </p>
+  </div>
+  {% if can_edit %}
+  <a href="{% url 'catalog:product_create' %}" class="btn btn-os-primary">
+    <i class="bi bi-plus-lg me-1"></i>Thêm mặt hàng mới
+  </a>
+  {% endif %}
+</div>
+
+<!-- Search & Filter Bar (Figma C.I Layout) -->
+<div class="os-card p-3 mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold mb-1">Tìm nhanh (Mã SP / SKU / Tên)</label>
+      <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="Nhập mã SP, mã SKU hoặc tên...">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Nhóm hàng</label>
+      <select name="nhom_hang" class="form-select form-select-sm">
+        <option value="">-- Tất cả nhóm --</option>
+        {% for c in categories %}
+        <option value="{{ c }}" {% if filters.nhom_hang == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Màu sắc</label>
+      <select name="mau_sac" class="form-select form-select-sm">
+        <option value="">-- Tất cả màu --</option>
+        {% for color in colors %}
+        <option value="{{ color }}" {% if filters.mau_sac == color %}selected{% endif %}>{{ color }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1">
+      <label class="form-label small fw-semibold mb-1">Size</label>
+      <select name="kich_co" class="form-select form-select-sm">
+        <option value="">Tất cả</option>
+        {% for sz in sizes %}
+        <option value="{{ sz }}" {% if filters.kich_co == sz %}selected{% endif %}>{{ sz }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Tình trạng tồn kho</label>
+      <select name="tinh_trang" class="form-select form-select-sm">
+        <option value="">-- Tất cả trạng thái --</option>
+        {% for st_code, st_label in stock_statuses %}
+        <option value="{{ st_code }}" {% if filters.tinh_trang == st_code %}selected{% endif %}>{{ st_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+      <button type="submit" class="btn btn-sm btn-os-primary flex-grow-1">
+        <i class="bi bi-search me-1"></i>Lọc / Tìm
+      </button>
+      <a href="{% url 'catalog:product_list' %}" class="btn btn-sm btn-outline-secondary" title="Xóa bộ lọc">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- Product & Variant Table -->
+<div class="os-card">
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Mã SP</th>
+          <th>Tên hàng hóa</th>
+          <th>Nhóm hàng</th>
+          <th>ĐVT</th>
+          <th class="text-end">Đơn giá niêm yết</th>
+          <th>Chi tiết Biến thể (SKU — Màu / Size : Tồn)</th>
+          <th class="text-center">Tổng tồn phạm vi</th>
+          <th class="text-center">Tình trạng tồn</th>
+          <th class="text-end">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td class="fw-bold">
+            <a href="{% url 'catalog:product_detail' p.id %}" class="text-decoration-none text-dark">{{ p.ma_san_pham }}</a>
+            {% if p.trang_thai == 'DISCONTINUED' %}
+              <div><span class="badge bg-secondary" style="font-size: 0.7rem;">Ngừng KD</span></div>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'catalog:product_detail' p.id %}" class="fw-semibold text-decoration-none text-dark">{{ p.ten_hang_hoa }}</a>
+          </td>
+          <td><span class="badge bg-light text-dark border">{{ p.nhom_hang }}</span></td>
+          <td>{{ p.don_vi_tinh }}</td>
+          <td class="text-end fw-semibold">{{ p.don_gia_niem_yet|intcomma }} đ</td>
+          <td>
+            <div class="d-flex flex-wrap gap-1">
+              {% for vr in p.computed_variants %}
+              <span class="badge bg-light text-dark border">
+                <code>{{ vr.variant.ma_sku }}</code> ({{ vr.variant.mau_sac }}/{{ vr.variant.kich_co }}):
+                <strong class="{% if vr.so_luong == 0 %}text-danger{% elif vr.so_luong <= vr.muc_ton_toi_thieu %}text-warning-emphasis{% else %}text-success{% endif %}">{{ vr.so_luong }}</strong>
+              </span>
+              {% endfor %}
+            </div>
+          </td>
+          <td class="text-center fw-bold fs-6">{{ p.computed_total_stock }}</td>
+          <td class="text-center">
+            <span class="{{ p.computed_stock_badge }}">{{ p.computed_stock_label }}</span>
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="{% url 'catalog:product_detail' p.id %}" class="btn btn-outline-dark" title="Xem chi tiết">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% if can_edit %}
+              <a href="{% url 'catalog:product_edit' p.id %}" class="btn btn-outline-primary" title="Chỉnh sửa">
+                <i class="bi bi-pencil"></i>
+              </a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+            Không tìm thấy sản phẩm phù hợp với từ khóa hoặc điều kiện lọc.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

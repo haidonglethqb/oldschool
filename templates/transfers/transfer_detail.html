@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Phiếu điều chuyển {{ transfer.ma_phieu_dieu_chuyen }} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1 small">
+        <li class="breadcrumb-item"><a href="{% url 'transfers:transfer_list' %}">Điều chuyển nội bộ</a></li>
+        <li class="breadcrumb-item active">{{ transfer.ma_phieu_dieu_chuyen }}</li>
+      </ol>
+    </nav>
+    <h4 class="fw-bold mb-0">
+      Phiếu điều chuyển: {{ transfer.ma_phieu_dieu_chuyen }}
+      <span class="badge bg-dark ms-2">{{ transfer.get_trang_thai_display }}</span>
+    </h4>
+  </div>
+  <a href="{% url 'transfers:transfer_list' %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Danh sách điều chuyển
+  </a>
+</div>
+
+<div class="os-card p-3 mb-4">
+  <div class="row small g-2">
+    <div class="col-md-4"><strong>Cơ sở xuất (Nguồn):</strong> {{ transfer.co_so_xuat.ma_co_so }} — {{ transfer.co_so_xuat.ten_co_so }}</div>
+    <div class="col-md-4"><strong>Cơ sở nhận (Đích):</strong> {{ transfer.co_so_nhan.ma_co_so }} — {{ transfer.co_so_nhan.ten_co_so }}</div>
+    <div class="col-md-4"><strong>Ngày yêu cầu:</strong> {{ transfer.ngay_dieu_chuyen|date:"d/m/Y" }}</div>
+    <div class="col-md-4"><strong>Người tạo yêu cầu:</strong> {{ transfer.nguoi_tao.display_name }}</div>
+    <div class="col-md-4"><strong>Người xuất hàng:</strong> {{ transfer.nguoi_xuat.display_name|default:"Chưa xuất" }} {% if transfer.thoi_gian_xuat %}({{ transfer.thoi_gian_xuat|date:"d/m/Y H:i" }}){% endif %}</div>
+    <div class="col-md-4"><strong>Người xác nhận nhận:</strong> {{ transfer.nguoi_nhan.display_name|default:"Chưa nhận" }} {% if transfer.thoi_gian_nhan %}({{ transfer.thoi_gian_nhan|date:"d/m/Y H:i" }}){% endif %}</div>
+    <div class="col-md-6"><strong>Lý do điều chuyển:</strong> {{ transfer.ly_do }}</div>
+    <div class="col-md-6"><strong>Ghi chú chênh lệch:</strong> {{ transfer.ghi_chu_chenh_lech|default:"Không có" }}</div>
+  </div>
+</div>
+
+<!-- Source Branch Action Panel: Accept / Reject / Dispatch (Step 1) -->
+{% if can_manage_source and transfer.trang_thai in 'REQUESTED,ACCEPTED' %}
+<div class="os-card p-3 mb-4 border-primary">
+  <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <div>
+      <h6 class="fw-bold mb-1"><i class="bi bi-truck me-2 text-primary"></i>Bước 1: Xử lý tại Cơ sở xuất ({{ transfer.co_so_xuat.ten_co_so }})</h6>
+      <p class="small text-muted mb-0">Khi bấm <strong>Xác nhận Xuất điều chuyển</strong>, hệ thống sẽ trừ tồn kho tại <strong>{{ transfer.co_so_xuat.ten_co_so }}</strong> và chuyển trạng thái sang <em>Đang vận chuyển</em>.</p>
+    </div>
+    <div class="d-flex gap-2">
+      {% if transfer.trang_thai == 'REQUESTED' %}
+      <form method="post" action="{% url 'transfers:transfer_accept' transfer.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-primary">Chấp nhận yêu cầu</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{% url 'transfers:transfer_reject' transfer.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="reason" value="Cơ sở xuất không đủ tồn kho khả dụng.">
+        <button type="submit" class="btn btn-sm btn-outline-danger">Từ chối điều chuyển</button>
+      </form>
+    </div>
+  </div>
+
+  <form method="post" action="{% url 'transfers:transfer_dispatch' transfer.id %}">
+    {% csrf_token %}
+    <div class="table-responsive mb-3">
+      <table class="table table-sm os-table">
+        <thead>
+          <tr>
+            <th>Mã SKU</th>
+            <th>Tên hàng hóa</th>
+            <th class="text-center">Tồn hiện tại ở {{ transfer.co_so_xuat.ma_co_so }}</th>
+            <th class="text-center">SL Yêu cầu</th>
+            <th class="text-center" style="width: 160px;">SL Thực xuất *</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for line in lines %}
+          <tr>
+            <td><code>{{ line.bien_the.ma_sku }}</code></td>
+            <td>{{ line.bien_the.full_display_name }}</td>
+            <td class="text-center fw-bold">{{ line.source_available_stock }}</td>
+            <td class="text-center">{{ line.so_luong_yeu_cau }}</td>
+            <td>
+              <input type="number" name="dispatch_qty_{{ line.id }}" value="{{ line.so_luong_yeu_cau }}" min="1" max="{{ line.so_luong_yeu_cau }}" class="form-control form-control-sm text-center" required>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-end">
+      <button type="submit" class="btn btn-os-primary">
+        <i class="bi bi-box-arrow-right me-1"></i>Xác nhận Xuất điều chuyển (Trừ kho {{ transfer.co_so_xuat.ma_co_so }})
+      </button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<!-- Destination Branch Action Panel: Confirm Receipt (Step 2) -->
+{% if can_manage_dest and transfer.trang_thai == 'DISPATCHED' %}
+<div class="os-card p-3 mb-4 border-success">
+  <h6 class="fw-bold mb-1"><i class="bi bi-box-arrow-in-down-left me-2 text-success"></i>Bước 2: Xác nhận nhận hàng tại Cơ sở đích ({{ transfer.co_so_nhan.ten_co_so }})</h6>
+  <p class="small text-muted mb-3">Kiểm đếm số lượng thực nhận. Hệ thống sẽ cộng số lượng thực nhận vào tồn kho của <strong>{{ transfer.co_so_nhan.ten_co_so }}</strong>.</p>
+
+  <form method="post" action="{% url 'transfers:transfer_receive' transfer.id %}">
+    {% csrf_token %}
+    <div class="table-responsive mb-3">
+      <table class="table table-sm os-table">
+        <thead>
+          <tr>
+            <th>Mã SKU</th>
+            <th>Tên hàng hóa</th>
+            <th class="text-center">SL Yêu cầu</th>
+            <th class="text-center">SL Đã xuất từ {{ transfer.co_so_xuat.ma_co_so }}</th>
+            <th class="text-center" style="width: 160px;">SL Thực nhận *</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for line in lines %}
+          <tr>
+            <td><code>{{ line.bien_the.ma_sku }}</code></td>
+            <td>{{ line.bien_the.full_display_name }}</td>
+            <td class="text-center">{{ line.so_luong_yeu_cau }}</td>
+            <td class="text-center fw-bold">{{ line.so_luong_xuat }}</td>
+            <td>
+              <input type="number" name="receive_qty_{{ line.id }}" value="{{ line.so_luong_xuat }}" min="0" max="{{ line.so_luong_xuat }}" class="form-control form-control-sm text-center" required>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="row g-2 align-items-center">
+      <div class="col-md-8">
+        <input type="text" name="ghi_chu_chenh_lech" class="form-control form-control-sm" placeholder="Ghi chú nhận hàng / lý do thiếu hụt (bắt buộc nếu thực nhận < thực xuất)">
+      </div>
+      <div class="col-md-4 text-end">
+        <button type="submit" class="btn btn-success fw-semibold">
+          <i class="bi bi-check2-circle me-1"></i>Xác nhận Đã nhận hàng (Cộng kho {{ transfer.co_so_nhan.ma_co_so }})
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<!-- Standard Line Items Summary Table -->
+<div class="os-card">
+  <div class="os-card-header">Chi tiết mặt hàng điều chuyển</div>
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Mã SKU</th>
+          <th>Tên hàng hóa</th>
+          <th>Màu / Size</th>
+          <th>ĐVT</th>
+          <th class="text-center">SL Yêu cầu</th>
+          <th class="text-center">SL Thực xuất</th>
+          <th class="text-center">SL Thực nhận</th>
+          <th class="text-center">Thiếu hụt</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in lines %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><code>{{ line.bien_the.ma_sku }}</code></td>
+          <td class="fw-semibold">{{ line.bien_the.san_pham.ten_hang_hoa }}</td>
+          <td>{{ line.bien_the.mau_sac }} / {{ line.bien_the.kich_co }}</td>
+          <td>{{ line.bien_the.san_pham.don_vi_tinh }}</td>
+          <td class="text-center">{{ line.so_luong_yeu_cau }}</td>
+          <td class="text-center fw-bold">{{ line.so_luong_xuat }}</td>
+          <td class="text-center fw-bold text-success">{{ line.so_luong_nhan }}</td>
+          <td class="text-center {% if line.shortage_quantity > 0 %}text-danger fw-bold{% endif %}">{{ line.shortage_quantity }}</td>
+          <td class="small text-muted">{{ line.ghi_chu }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

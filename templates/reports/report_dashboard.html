@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Báo cáo Xuất - Nhập - Tồn kho | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>Báo cáo Xuất — Nhập — Tồn Kho & Chuỗi Cung Ứng (UC-7.1 đến UC-7.5)</h4>
+    <p class="text-muted small mb-0">
+      Phân tách minh bạch <strong>Xuất bán hàng</strong> và <strong>Xuất điều chuyển nội bộ</strong>, theo dõi hàng đang vận chuyển và cảnh báo tồn kho
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="?date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&tab={{ filters.tab }}&export=excel" class="btn btn-sm btn-success">
+      <i class="bi bi-file-earmark-excel-fill me-1"></i>Xuất file Excel (UC-7.3)
+    </a>
+    <form method="post" action="{% url 'reports:report_save_snapshot' %}" class="d-inline">
+      {% csrf_token %}
+      <input type="hidden" name="date_from" value="{{ filters.date_from }}">
+      <input type="hidden" name="date_to" value="{{ filters.date_to }}">
+      <button type="submit" class="btn btn-sm btn-os-tan">
+        <i class="bi bi-camera me-1"></i>Lưu bản chụp báo cáo
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- KPI Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Tổng giá trị tồn kho cuối kỳ</div>
+      <div class="os-kpi-value">{{ report.totals.inventory_value|intcomma }} đ</div>
+      <div class="small text-muted">Tồn cuối kỳ: <strong>{{ report.totals.closing_qty }}</strong> SP</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Tổng nhập trong kỳ</div>
+      <div class="os-kpi-value text-success">+{{ report.totals.total_in_qty }}</div>
+      <div class="small text-muted">Nhập NCC: {{ report.totals.import_in_qty }} | Nhập ĐC: {{ report.totals.transfer_in_qty }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Tổng xuất trong kỳ</div>
+      <div class="os-kpi-value text-primary">-{{ report.totals.total_out_qty }}</div>
+      <div class="small text-muted">Xuất bán: <strong>{{ report.totals.sale_out_qty }}</strong> | Xuất ĐC: <strong>{{ report.totals.transfer_out_qty }}</strong></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="os-kpi-card">
+      <div class="os-kpi-title">Cảnh báo tồn & Đang vận chuyển</div>
+      <div class="os-kpi-value text-danger">{{ report.totals.low_stock_count|add:report.totals.out_of_stock_count }} SKU</div>
+      <div class="small text-muted">Đang điều chuyển trên đường: <strong>{{ report.totals.in_transit_qty }}</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter & Category Tabs (UC-7.4, UC-7.5) -->
+<div class="os-card p-3 mb-4">
+  <form method="get" class="row g-2 align-items-end mb-3">
+    <input type="hidden" name="tab" value="{{ filters.tab }}">
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Tìm kiếm (SP / SKU)</label>
+      <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="Mã hoặc tên...">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Nhóm hàng</label>
+      <select name="category" class="form-select form-select-sm">
+        <option value="">-- Tất cả --</option>
+        {% for c in categories %}
+        <option value="{{ c }}" {% if filters.category == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1">
+      <label class="form-label small fw-semibold mb-1">Màu sắc</label>
+      <select name="color" class="form-select form-select-sm">
+        <option value="">Tất cả</option>
+        {% for col in colors %}
+        <option value="{{ col }}" {% if filters.color == col %}selected{% endif %}>{{ col }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1">
+      <label class="form-label small fw-semibold mb-1">Kích cỡ</label>
+      <select name="size" class="form-select form-select-sm">
+        <option value="">Tất cả</option>
+        {% for sz in sizes %}
+        <option value="{{ sz }}" {% if filters.size == sz %}selected{% endif %}>{{ sz }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Trạng thái tồn</label>
+      <select name="stock_status" class="form-select form-select-sm">
+        <option value="">-- Tất cả --</option>
+        <option value="IN_STOCK" {% if filters.stock_status == 'IN_STOCK' %}selected{% endif %}>Còn hàng</option>
+        <option value="LOW_STOCK" {% if filters.stock_status == 'LOW_STOCK' %}selected{% endif %}>Sắp hết hàng</option>
+        <option value="OUT_OF_STOCK" {% if filters.stock_status == 'OUT_OF_STOCK' %}selected{% endif %}>Hết hàng</option>
+      </select>
+    </div>
+    <div class="col-md-1">
+      <label class="form-label small fw-semibold mb-1">Từ ngày</label>
+      <input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-1">
+      <label class="form-label small fw-semibold mb-1">Đến ngày</label>
+      <input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+      <button type="submit" class="btn btn-sm btn-os-primary flex-grow-1"><i class="bi bi-funnel me-1"></i>Lọc</button>
+      <a href="{% url 'reports:report_dashboard' %}" class="btn btn-sm btn-outline-secondary" title="Đặt lại"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+
+  <ul class="nav nav-pills gap-1 small">
+    <li class="nav-item">
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'all' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=all&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Tất cả mặt hàng</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'best_selling' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=best_selling&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Hàng bán chạy</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'slow_moving' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=slow_moving&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Hàng bán chậm / Tồn cao</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'low_stock' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=low_stock&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Sắp hết / Hết hàng</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'in_transit' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=in_transit&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Đang điều chuyển</a>
+    </li>
+  </ul>
+</div>
+
+<!-- Chart Section -->
+<div class="os-card p-3 mb-4">
+  <h6 class="fw-bold mb-2"><i class="bi bi-graph-up me-2"></i>Biểu đồ Top SKU Xuất bán & Tồn cuối kỳ</h6>
+  <div style="height: 220px;">
+    <canvas id="reportChart"></canvas>
+  </div>
+</div>
+
+<!-- Detailed Report Table -->
+<div class="os-card">
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Mã SKU</th>
+          <th>Tên hàng hóa (Màu / Size)</th>
+          <th class="text-center">Tồn đầu kỳ</th>
+          <th class="text-center">Nhập NCC</th>
+          <th class="text-center">Nhập ĐC</th>
+          <th class="text-center">Xuất bán</th>
+          <th class="text-center">Xuất ĐC</th>
+          <th class="text-center">Tồn cuối kỳ</th>
+          <th class="text-center">Đang VC</th>
+          <th class="text-end">Giá trị tồn (VNĐ)</th>
+          <th class="text-center">Trạng thái</th>
+          <th class="text-end">Sổ cái</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in report.rows %}
+        <tr>
+          <td><code>{{ r.ma_sku }}</code></td>
+          <td>
+            <div class="fw-semibold">{{ r.ten_hang_hoa }}</div>
+            <small class="text-muted">{{ r.mau_sac }} / Size {{ r.kich_co }} ({{ r.danh_muc }})</small>
+          </td>
+          <td class="text-center">{{ r.opening_qty }}</td>
+          <td class="text-center text-success">+{{ r.import_in_qty }}</td>
+          <td class="text-center text-success">+{{ r.transfer_in_qty }}</td>
+          <td class="text-center fw-bold text-primary">{{ r.sale_out_qty }}</td>
+          <td class="text-center text-secondary">{{ r.transfer_out_qty }}</td>
+          <td class="text-center fw-bold fs-6">{{ r.closing_qty }}</td>
+          <td class="text-center {% if r.in_transit_qty > 0 %}fw-bold text-info{% endif %}">{{ r.in_transit_qty }}</td>
+          <td class="text-end fw-semibold">{{ r.inventory_value|intcomma }} đ</td>
+          <td class="text-center"><span class="badge-os {{ r.badge_class }}">{{ r.status_label }}</span></td>
+          <td class="text-end">
+            <a href="{% url 'reports:report_variant_detail' r.variant.id %}" class="btn btn-sm btn-outline-dark" title="Xem lịch sử biến động (UC-7.2)">
+              <i class="bi bi-clock-history"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="12" class="text-center py-4 text-muted">Không có dữ liệu báo cáo phù hợp với điều kiện lọc.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const ctx = document.getElementById("reportChart");
+  if (!ctx) return;
+  const labels = {{ chart_labels_json|safe }};
+  const salesData = {{ chart_sales_json|safe }};
+  const closingData = {{ chart_closing_json|safe }};
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Số lượng xuất bán trong kỳ",
+          data: salesData,
+          backgroundColor: "#4A2511",
+        },
+        {
+          label: "Tồn kho cuối kỳ",
+          data: closingData,
+          backgroundColor: "#DEC2A8",
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+    }
+  });
+});
+</script>
+{% endblock %}

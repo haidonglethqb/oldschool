@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Yêu cầu xuất hàng bán từ quầy | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-cart-check me-2"></i>Yêu cầu Xuất Hàng Bán từ Quầy (Hình 5 — Quy trình Xuất bán)</h4>
+    <p class="text-muted small mb-0">
+      Nhân viên bán hàng gửi yêu cầu xuất kho khi có đơn hàng; Quản lý cơ sở kiểm tra và lập Phiếu xuất hàng bán
+    </p>
+  </div>
+  <a href="{% url 'sales_outbound:outbound_list' %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Danh sách Phiếu xuất
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="os-card p-3">
+      <h6 class="fw-bold border-bottom pb-2 mb-3">Tạo Yêu cầu Xuất Hàng Bán ({{ target_branch.ten_co_so }})</h6>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-2">
+          <label class="form-label small fw-semibold">Tên khách hàng / Mã đơn *</label>
+          {{ form.ten_khach_hang }}
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Số điện thoại</label>
+            {{ form.sdt_khach_hang }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Phương thức *</label>
+            {{ form.phuong_thuc_giao }}
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-semibold">Địa chỉ nhận hàng</label>
+          {{ form.dia_chi_giao }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Ghi chú</label>
+          {{ form.ghi_chu }}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="form-label small fw-bold mb-0">Sản phẩm yêu cầu xuất *</label>
+          <button type="button" class="btn btn-sm btn-os-tan py-0 px-2" onclick="addReqLine()">
+            <i class="bi bi-plus-circle me-1"></i>Thêm dòng
+          </button>
+        </div>
+        <div id="reqLinesContainer" class="mb-3">
+          <div class="d-flex gap-2 mb-2 req-line-row">
+            <select name="line_variant_id" class="form-select form-select-sm" required>
+              <option value="">-- Chọn SKU (Tồn tại {{ target_branch.ma_co_so }}) --</option>
+              {% for v in variants %}
+              <option value="{{ v.id }}">{{ v.ma_sku }} — {{ v.full_display_name }} (Tồn: {{ v.branch_stock_qty }})</option>
+              {% endfor %}
+            </select>
+            <input type="number" name="line_so_luong" value="1" min="1" class="form-control form-control-sm" style="width: 90px;" required>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="if(document.querySelectorAll('.req-line-row').length > 1) this.closest('.req-line-row').remove()"><i class="bi bi-x"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-os-primary w-100">
+          <i class="bi bi-send-check me-1"></i>Gửi yêu cầu xuất tới Quản lý cơ sở
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="os-card">
+      <div class="os-card-header">Danh sách Yêu cầu Xuất Hàng Bán</div>
+      <div class="table-responsive">
+        <table class="table os-table">
+          <thead>
+            <tr>
+              <th>Mã yêu cầu</th>
+              <th>Cơ sở</th>
+              <th>Khách hàng</th>
+              <th>Mặt hàng yêu cầu</th>
+              <th>Người tạo</th>
+              <th class="text-center">Trạng thái</th>
+              <th class="text-end">Xử lý</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in requests %}
+            <tr>
+              <td class="fw-bold">{{ req.ma_yeu_cau }}</td>
+              <td>{{ req.co_so.ma_co_so }}</td>
+              <td>{{ req.ten_khach_hang }}</td>
+              <td class="small">
+                {% for l in req.lines.all %}
+                  <div><code>{{ l.bien_the.ma_sku }}</code> x <strong>{{ l.so_luong }}</strong></div>
+                {% endfor %}
+              </td>
+              <td>{{ req.nguoi_yeu_cau.display_name }}</td>
+              <td class="text-center">
+                {% if req.trang_thai == 'PROCESSED' %}
+                  <span class="badge-os badge-status-completed">Đã lập phiếu xuất</span>
+                {% elif req.trang_thai == 'PENDING' %}
+                  <span class="badge-os badge-status-pending">Chờ xử lý</span>
+                {% else %}
+                  <span class="badge-os badge-status-rejected">Từ chối</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                {% if req.trang_thai == 'PENDING' and request.user.role != 'STAFF' %}
+                <div class="d-flex justify-content-end gap-1">
+                  <a href="{% url 'sales_outbound:outbound_create' %}?from_request={{ req.id }}" class="btn btn-sm btn-os-primary">Lập phiếu</a>
+                  <form method="post" action="{% url 'sales_outbound:request_reject' req.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Từ chối / Thiếu hàng"><i class="bi bi-x-lg"></i></button>
+                  </form>
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">Chưa có yêu cầu xuất hàng bán nào.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function addReqLine() {
+  const container = document.getElementById("reqLinesContainer");
+  const firstRow = container.querySelector(".req-line-row");
+  if (!firstRow) return;
+  const clone = firstRow.cloneNode(true);
+  clone.querySelector("select").value = "";
+  clone.querySelector("input[type='number']").value = "1";
+  container.appendChild(clone);
+}
+</script>
+{% endblock %}

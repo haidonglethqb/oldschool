@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Danh sách Nhà cung cấp | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-building me-2"></i>Quản lý Nhà Cung Cấp (UC-4.11)</h4>
+    <p class="text-muted small mb-0">Danh mục xưởng may, đối tác cung ứng nguồn hàng cho Kho tổng Old School</p>
+  </div>
+  <a href="{% url 'purchasing:import_list' %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Về danh sách Phiếu nhập
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="os-card p-3">
+      <h6 class="fw-bold border-bottom pb-2 mb-3">Thêm Nhà cung cấp mới</h6>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Mã nhà cung cấp *</label>
+          {{ form.ma_nha_cung_cap }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Tên nhà cung cấp *</label>
+          {{ form.ten_nha_cung_cap }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Số điện thoại *</label>
+          {{ form.sdt }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Địa chỉ *</label>
+          {{ form.dia_chi }}
+        </div>
+        <button type="submit" class="btn btn-os-primary w-100">
+          <i class="bi bi-plus-circle me-1"></i>Lưu Nhà cung cấp
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="os-card">
+      <div class="os-card-header d-flex justify-content-between align-items-center">
+        <span>Danh sách Nhà cung cấp hiện có</span>
+        <form method="get" class="d-flex gap-1 m-0">
+          <input type="text" name="q" value="{{ search_query }}" class="form-control form-control-sm" placeholder="Tìm mã, tên, SĐT...">
+          <button type="submit" class="btn btn-sm btn-os-primary">Tìm</button>
+        </form>
+      </div>
+      <div class="table-responsive">
+        <table class="table os-table">
+          <thead>
+            <tr>
+              <th>Mã NCC</th>
+              <th>Tên nhà cung cấp</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in suppliers %}
+            <tr>
+              <td class="fw-bold"><code>{{ s.ma_nha_cung_cap }}</code></td>
+              <td class="fw-semibold">{{ s.ten_nha_cung_cap }}</td>
+              <td>{{ s.sdt }}</td>
+              <td>{{ s.dia_chi }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center py-4 text-muted">Chưa có nhà cung cấp nào.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

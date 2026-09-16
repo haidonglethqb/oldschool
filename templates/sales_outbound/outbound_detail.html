@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Phiếu xuất {{ receipt.ma_phieu_xuat_hang_ban }} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1 small">
+        <li class="breadcrumb-item"><a href="{% url 'sales_outbound:outbound_list' %}">Phiếu xuất hàng bán</a></li>
+        <li class="breadcrumb-item active">{{ receipt.ma_phieu_xuat_hang_ban }}</li>
+      </ol>
+    </nav>
+    <h4 class="fw-bold mb-0">
+      Phiếu xuất hàng bán: {{ receipt.ma_phieu_xuat_hang_ban }}
+      {% if receipt.trang_thai == 'COMPLETED' %}
+        <span class="badge-os badge-status-completed ms-2">Đã ghi nhận xuất kho</span>
+      {% else %}
+        <span class="badge-os badge-status-pending ms-2">Chờ ghi nhận xuất kho</span>
+      {% endif %}
+    </h4>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'sales_outbound:outbound_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Danh sách</a>
+    {% if receipt.is_printable %}
+    <a href="{% url 'sales_outbound:outbound_print' receipt.id %}" target="_blank" class="btn btn-sm btn-success">
+      <i class="bi bi-printer-fill me-1"></i>In phiếu xuất (UC-5.12)
+    </a>
+    {% endif %}
+    {% if receipt.is_editable and request.user.role != 'STAFF' %}
+    <a href="{% url 'sales_outbound:outbound_update' receipt.id %}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-pencil-square me-1"></i>Chỉnh sửa (UC-5.9)
+    </a>
+    <form method="post" action="{% url 'sales_outbound:outbound_finalize' receipt.id %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-os-primary">
+        <i class="bi bi-check2-circle me-1"></i>Ghi nhận xuất kho & Trừ tồn (UC-5.11)
+      </button>
+    </form>
+    {% endif %}
+    {% if receipt.is_deletable and request.user.role != 'STAFF' %}
+    <form method="post" action="{% url 'sales_outbound:outbound_delete' receipt.id %}" class="d-inline" onsubmit="return confirm('Xác nhận xóa phiếu xuất {{ receipt.ma_phieu_xuat_hang_ban }}?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Xóa phiếu (UC-5.10)</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="os-card p-3 mb-4">
+  <div class="row small g-2">
+    <div class="col-md-3"><strong>Cơ sở xuất:</strong> {{ receipt.co_so.ma_co_so }} — {{ receipt.co_so.ten_co_so }}</div>
+    <div class="col-md-3"><strong>Khách hàng:</strong> {{ receipt.ten_khach_hang }}</div>
+    <div class="col-md-3"><strong>Số điện thoại:</strong> {{ receipt.sdt }}</div>
+    <div class="col-md-3"><strong>Phương thức:</strong> {{ receipt.get_phuong_thuc_giao_display }}</div>
+    <div class="col-md-3"><strong>Địa chỉ giao/nhận:</strong> {{ receipt.dia_chi }}</div>
+    <div class="col-md-3"><strong>Người lập phiếu:</strong> {{ receipt.nguoi_tao.display_name }}</div>
+    <div class="col-md-3"><strong>Người ghi nhận:</strong> {{ receipt.nguoi_ghi_nhan.display_name|default:"Chưa ghi nhận" }}</div>
+    <div class="col-md-3"><strong>Thời điểm ghi nhận:</strong> {{ receipt.thoi_gian_ghi_nhan|date:"d/m/Y H:i"|default:"—" }}</div>
+  </div>
+</div>
+
+<div class="os-card">
+  <div class="os-card-header d-flex justify-content-between align-items-center">
+    <span>Chi tiết mặt hàng xuất bán</span>
+    <span class="fw-bold text-danger fs-6">Tổng tiền: {{ receipt.tong_tien|intcomma }} VNĐ</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Mã SKU</th>
+          <th>Tên hàng hóa</th>
+          <th>Màu / Size</th>
+          <th>ĐVT</th>
+          <th class="text-center">Số lượng xuất</th>
+          <th class="text-end">Đơn giá bán</th>
+          <th class="text-end">Thành tiền</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in lines %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><code>{{ line.bien_the.ma_sku }}</code></td>
+          <td class="fw-semibold">{{ line.bien_the.san_pham.ten_hang_hoa }}</td>
+          <td>{{ line.bien_the.mau_sac }} / {{ line.bien_the.kich_co }}</td>
+          <td>{{ line.bien_the.san_pham.don_vi_tinh }}</td>
+          <td class="text-center fw-bold">{{ line.so_luong }}</td>
+          <td class="text-end">{{ line.don_gia|intcomma }} đ</td>
+          <td class="text-end fw-bold">{{ line.thanh_tien|intcomma }} đ</td>
+          <td class="small text-muted">{{ line.ghi_chu }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

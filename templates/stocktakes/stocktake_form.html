@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Chỉnh sửa {{ stocktake.ma_kiem_ke }}{% else %}Tạo Biên bản Kiểm kê{% endif %} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0">
+      <i class="bi bi-clipboard2-plus me-2"></i>
+      {% if is_edit %}Chỉnh sửa Biên bản Kiểm kê: {{ stocktake.ma_kiem_ke }}{% else %}Lập Biên bản Kiểm kê Kho ({{ target_branch.ma_co_so }} — {{ target_branch.ten_co_so }}){% endif %}
+    </h4>
+    <p class="text-muted small mb-0">Hỗ trợ nhập kết quả kiểm đếm thủ công (UC-6.2) hoặc tải lên từ file Excel .xlsx (UC-6.3)</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'inventory:download_template' 'stocktake' %}" class="btn btn-sm btn-outline-success">
+      <i class="bi bi-download me-1"></i>Tải file Excel mẫu (.xlsx)
+    </a>
+    <a href="{% url 'stocktakes:stocktake_list' %}" class="btn btn-sm btn-outline-secondary">Quay lại</a>
+  </div>
+</div>
+
+{% if not is_edit %}
+<!-- Excel Upload (UC-6.3) -->
+<div class="os-card p-3 mb-4">
+  <form method="post" enctype="multipart/form-data" class="row g-2 align-items-center">
+    {% csrf_token %}
+    <input type="hidden" name="form_action" value="upload_excel">
+    <div class="col-md-5">
+      <label class="form-label small fw-bold mb-1"><i class="bi bi-file-earmark-spreadsheet text-success me-1"></i>Tải dữ liệu kiểm đếm từ file Excel (.xlsx — UC-6.3)</label>
+      <input type="file" name="excel_file" accept=".xlsx" class="form-control form-control-sm" required>
+    </div>
+    <div class="col-md-3 mt-4">
+      <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-upload me-1"></i>Đọc & Đối chiếu tự động</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <div class="os-card p-3 mb-4">
+    <h6 class="fw-bold border-bottom pb-2 mb-3">1. Thông tin chung Biên bản Kiểm kê ({{ target_branch.ten_co_so }})</h6>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Mã biên bản kiểm kê</label>
+        {{ header_form.ma_kiem_ke }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold">Nhân sự kiểm đếm thực tế *</label>
+        {{ header_form.nguoi_kiem_ke }}
+      </div>
+      <div class="col-md-5">
+        <label class="form-label small fw-semibold">Mục đích kiểm kê *</label>
+        {{ header_form.muc_dich }}
+      </div>
+      <div class="col-md-12">
+        <label class="form-label small fw-semibold">Ghi chú biên bản</label>
+        {{ header_form.ghi_chu }}
+      </div>
+    </div>
+  </div>
+
+  <div class="os-card p-3">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+      <h6 class="fw-bold mb-0">2. Chi tiết số lượng kiểm đếm thực tế tại {{ target_branch.ma_co_so }}</h6>
+      <button type="button" class="btn btn-sm btn-os-tan" onclick="addStocktakeLine()">
+        <i class="bi bi-plus-circle me-1"></i>Thêm dòng kiểm kê
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm align-middle" id="stocktakeLinesTable">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 38%;">Sản phẩm / SKU (Tồn hệ thống tại {{ target_branch.ma_co_so }}) *</th>
+            <th style="width: 16%;">Số lượng thực tế *</th>
+            <th style="width: 22%;">Hướng xử lý chênh lệch</th>
+            <th style="width: 18%;">Ghi chú</th>
+            <th style="width: 6%;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in initial_lines %}
+          <tr>
+            <td>
+              <select name="line_variant_id" class="form-select form-select-sm" required>
+                <option value="">-- Chọn SKU --</option>
+                {% for v in variants %}
+                <option value="{{ v.id }}" {% if row.variant_id == v.id %}selected{% endif %}>
+                  {{ v.ma_sku }} — {{ v.full_display_name }} [Hệ thống: {{ v.system_qty }}]
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="number" name="line_so_luong_thuc_te" value="{{ row.so_luong_thuc_te }}" min="0" class="form-control form-control-sm" required></td>
+            <td><input type="text" name="line_xu_ly" value="{{ row.xu_ly }}" class="form-control form-control-sm"></td>
+            <td><input type="text" name="line_ghi_chu" value="{{ row.ghi_chu }}" class="form-control form-control-sm"></td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+          </tr>
+          {% empty %}
+          {% for v in variants|slice:":4" %}
+          <tr>
+            <td>
+              <select name="line_variant_id" class="form-select form-select-sm" required>
+                {% for opt in variants %}
+                <option value="{{ opt.id }}" {% if opt.id == v.id %}selected{% endif %}>
+                  {{ opt.ma_sku }} — {{ opt.full_display_name }} [Hệ thống: {{ opt.system_qty }}]
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="number" name="line_so_luong_thuc_te" value="{{ v.system_qty }}" min="0" class="form-control form-control-sm" required></td>
+            <td><input type="text" name="line_xu_ly" class="form-control form-control-sm" placeholder="VD: Khớp / Kiểm tra lại"></td>
+            <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm"></td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+          </tr>
+          {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+      <a href="{% url 'stocktakes:stocktake_list' %}" class="btn btn-outline-secondary">Hủy</a>
+      <button type="submit" name="form_action" value="submit" class="btn btn-os-primary px-4">
+        <i class="bi bi-send-check me-1"></i>Lưu & Gửi chờ phê duyệt (UC-6.2)
+      </button>
+    </div>
+  </div>
+</form>
+
+<template id="stocktakeLineTemplate">
+  <tr>
+    <td>
+      <select name="line_variant_id" class="form-select form-select-sm" required>
+        <option value="">-- Chọn SKU sản phẩm --</option>
+        {% for v in variants %}
+        <option value="{{ v.id }}">{{ v.ma_sku }} — {{ v.full_display_name }} [Hệ thống: {{ v.system_qty }}]</option>
+        {% endfor %}
+      </select>
+    </td>
+    <td><input type="number" name="line_so_luong_thuc_te" value="0" min="0" class="form-control form-control-sm" required></td>
+    <td><input type="text" name="line_xu_ly" class="form-control form-control-sm"></td>
+    <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm"></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+  </tr>
+</template>
+
+<script>
+function addStocktakeLine() {
+  const tpl = document.getElementById("stocktakeLineTemplate");
+  document.querySelector("#stocktakeLinesTable tbody").appendChild(tpl.content.cloneNode(true));
+}
+</script>
+{% endblock %}
