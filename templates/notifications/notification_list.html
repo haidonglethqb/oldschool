@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Thông báo & Cảnh báo Tồn kho | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-bell-fill me-2"></i>Trung tâm Thông báo & Cảnh báo Tồn kho</h4>
+    <p class="text-muted small mb-0">Theo dõi cảnh báo hàng sắp hết / hết hàng (UC-5.13) và các sự kiện phê duyệt chứng từ</p>
+  </div>
+  <form method="post" action="{% url 'notifications:mark_all_read' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sm btn-os-tan">
+      <i class="bi bi-check2-all me-1"></i>Đánh dấu tất cả đã đọc
+    </button>
+  </form>
+</div>
+
+<!-- Low Stock Alert Table (UC-5.13) -->
+<div class="os-card mb-4">
+  <div class="os-card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Danh sách mặt hàng Sắp hết hàng / Hết hàng cần xử lý ngay</span>
+    <span class="badge bg-danger">{{ low_stock_items|length }} SKU cần bổ sung</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Cơ sở</th>
+          <th>Mã SP / Mã SKU</th>
+          <th>Tên hàng hóa</th>
+          <th>Màu / Size</th>
+          <th class="text-center">Tồn hiện tại</th>
+          <th class="text-center">Định mức tối thiểu</th>
+          <th class="text-center">Trạng thái</th>
+          <th class="text-end">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in low_stock_items %}
+        <tr>
+          <td class="fw-semibold">{{ item.co_so.ma_co_so }} — {{ item.co_so.ten_co_so }}</td>
+          <td><code>{{ item.bien_the.ma_sku }}</code></td>
+          <td class="fw-semibold">{{ item.bien_the.san_pham.ten_hang_hoa }}</td>
+          <td>{{ item.bien_the.mau_sac }} / {{ item.bien_the.kich_co }}</td>
+          <td class="text-center fw-bold text-danger">{{ item.so_luong }}</td>
+          <td class="text-center">{{ item.muc_ton_toi_thieu }}</td>
+          <td class="text-center">
+            {% if item.so_luong == 0 %}
+              <span class="badge-os badge-out-of-stock">Hết hàng</span>
+            {% else %}
+              <span class="badge-os badge-low-stock">Sắp hết hàng</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            {% if request.user.role != 'STAFF' %}
+              {% if item.co_so.is_central_warehouse %}
+                <a href="{% url 'purchasing:import_create' %}" class="btn btn-sm btn-os-primary">Lập phiếu nhập</a>
+              {% else %}
+                <a href="{% url 'transfers:transfer_create' %}" class="btn btn-sm btn-os-tan">Yêu cầu điều chuyển</a>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">
+            <i class="bi bi-check-circle-fill text-success me-1"></i>Tất cả mặt hàng trong phạm vi đang có tồn kho an toàn (trên định mức tối thiểu).
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- System Notifications Feed -->
+<div class="os-card">
+  <div class="os-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span><i class="bi bi-inbox-fill me-2"></i>Nhật ký Thông báo Hệ thống</span>
+    <form method="get" class="d-flex gap-2 align-items-center m-0">
+      <select name="loai" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">-- Tất cả loại thông báo --</option>
+        {% for val, label in notif_types %}
+        <option value="{{ val }}" {% if selected_type == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <div class="form-check form-switch mb-0 ms-2">
+        <input class="form-check-input" type="checkbox" name="chua_doc" value="1" id="unreadSwitch" {% if unread_only == '1' %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label small" for="unreadSwitch">Chỉ chưa đọc</label>
+      </div>
+    </form>
+  </div>
+  <div class="list-group list-group-flush">
+    {% for notif in notifications %}
+    <div class="list-group-item d-flex justify-content-between align-items-start py-3 {% if not notif.da_doc %}bg-warning-subtle{% endif %}">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-secondary">{{ notif.get_loai_thong_bao_display }}</span>
+          {% if notif.co_so %}<span class="badge bg-dark">{{ notif.co_so.ma_co_so }}</span>{% endif %}
+          <strong class="text-dark">{{ notif.tieu_de }}</strong>
+          {% if not notif.da_doc %}<span class="badge bg-danger">Chưa đọc</span>{% endif %}
+        </div>
+        <p class="mb-1 small text-secondary">{{ notif.noi_dung }}</p>
+        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ notif.created_at|date:"d/m/Y H:i" }}</small>
+      </div>
+      <div>
+        <a href="{% url 'notifications:mark_read' notif.id %}" class="btn btn-sm btn-outline-dark">
+          Xem chi tiết <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="p-4 text-center text-muted">Không có thông báo nào phù hợp bộ lọc.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

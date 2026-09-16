@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Tạo Phiếu Điều Chuyển Nội Bộ | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2"></i>Tạo Phiếu Yêu Cầu Điều Chuyển Nội Bộ (UC-5.3)</h4>
+    <p class="text-muted small mb-0">Yêu cầu luân chuyển hàng hóa từ Kho tổng hoặc cơ sở còn tồn sang cơ sở đang thiếu hàng</p>
+  </div>
+  <a href="{% url 'transfers:transfer_list' %}" class="btn btn-sm btn-outline-secondary">Quay lại</a>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="os-card p-3 mb-4">
+    <h6 class="fw-bold border-bottom pb-2 mb-3">1. Thông tin cơ sở xuất & cơ sở nhận</h6>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Mã phiếu điều chuyển</label>
+        {{ form.ma_phieu_dieu_chuyen }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Cơ sở xuất hàng (Nguồn) *</label>
+        {{ form.co_so_xuat }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Cơ sở nhận hàng (Đích) *</label>
+        {{ form.co_so_nhan }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Lý do điều chuyển *</label>
+        {{ form.ly_do }}
+      </div>
+      <div class="col-md-12">
+        <label class="form-label small fw-semibold">Ghi chú</label>
+        {{ form.ghi_chu }}
+      </div>
+    </div>
+  </div>
+
+  <div class="os-card p-3">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+      <h6 class="fw-bold mb-0">2. Danh sách mặt hàng cần điều chuyển</h6>
+      <button type="button" class="btn btn-sm btn-os-tan" onclick="addTransferLine()">
+        <i class="bi bi-plus-circle me-1"></i>Thêm dòng hàng
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm align-middle" id="transferLinesTable">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 52%;">Sản phẩm / SKU (Tồn hiện tại ở các cơ sở) *</th>
+            <th style="width: 18%;">Số lượng yêu cầu *</th>
+            <th style="width: 24%;">Ghi chú dòng</th>
+            <th style="width: 6%;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <select name="line_variant_id" class="form-select form-select-sm" required>
+                <option value="">-- Chọn SKU sản phẩm --</option>
+                {% for v in variants %}
+                <option value="{{ v.id }}">
+                  {{ v.ma_sku }} — {{ v.full_display_name }}
+                  ({% for bcode, bqty in v.stock_by_branch.items %}{{ bcode }}: {{ bqty }} {% endfor %})
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="number" name="line_so_luong" value="5" min="1" class="form-control form-control-sm" required></td>
+            <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm" placeholder="Ghi chú"></td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+      <a href="{% url 'transfers:transfer_list' %}" class="btn btn-outline-secondary">Hủy</a>
+      <button type="submit" class="btn btn-os-primary px-4">
+        <i class="bi bi-send-check me-1"></i>Gửi yêu cầu điều chuyển
+      </button>
+    </div>
+  </div>
+</form>
+
+<template id="transferLineTemplate">
+  <tr>
+    <td>
+      <select name="line_variant_id" class="form-select form-select-sm" required>
+        <option value="">-- Chọn SKU sản phẩm --</option>
+        {% for v in variants %}
+        <option value="{{ v.id }}">
+          {{ v.ma_sku }} — {{ v.full_display_name }}
+          ({% for bcode, bqty in v.stock_by_branch.items %}{{ bcode }}: {{ bqty }} {% endfor %})
+        </option>
+        {% endfor %}
+      </select>
+    </td>
+    <td><input type="number" name="line_so_luong" value="5" min="1" class="form-control form-control-sm" required></td>
+    <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm"></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+  </tr>
+</template>
+
+<script>
+function addTransferLine() {
+  const tpl = document.getElementById("transferLineTemplate");
+  document.querySelector("#transferLinesTable tbody").appendChild(tpl.content.cloneNode(true));
+}
+</script>
+{% endblock %}

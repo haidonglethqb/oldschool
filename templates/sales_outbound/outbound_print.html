@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}In Phiếu Xuất Kho {{ receipt.ma_phieu_xuat_hang_ban }} | Old School{% endblock %}
+{% block content %}
+<div class="no-print d-flex justify-content-between align-items-center mb-3">
+  <a href="{% url 'sales_outbound:outbound_detail' receipt.id %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Quay lại chi tiết phiếu
+  </a>
+  <button type="button" onclick="window.print()" class="btn btn-os-primary">
+    <i class="bi bi-printer-fill me-1"></i>In phiếu xuất kho (UC-5.12)
+  </button>
+</div>
+
+<div class="os-card p-4 bg-white mx-auto" style="max-width: 840px;">
+  <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
+    <div>
+      <h5 class="fw-bold mb-1">CỬA HÀNG THỜI TRANG OLD SCHOOL</h5>
+      <div class="small">{{ receipt.co_so.ten_co_so }} — {{ receipt.co_so.dia_chi }}</div>
+      <div class="small">SĐT: {{ receipt.co_so.sdt }}</div>
+    </div>
+    <div class="text-end">
+      <h4 class="fw-bold mb-1">PHIẾU XUẤT KHO BÁN HÀNG</h4>
+      <div class="fw-bold text-danger">Số: {{ receipt.ma_phieu_xuat_hang_ban }}</div>
+      <div class="small text-muted">Ngày xuất: {{ receipt.ngay_xuat|date:"d/m/Y H:i" }}</div>
+    </div>
+  </div>
+
+  <div class="row small mb-3 g-2">
+    <div class="col-6"><strong>Khách hàng / Người nhận:</strong> {{ receipt.ten_khach_hang }}</div>
+    <div class="col-6"><strong>Số điện thoại:</strong> {{ receipt.sdt }}</div>
+    <div class="col-6"><strong>Địa chỉ nhận:</strong> {{ receipt.dia_chi }}</div>
+    <div class="col-6"><strong>Hình thức giao:</strong> {{ receipt.get_phuong_thuc_giao_display }}</div>
+  </div>
+
+  <table class="table table-bordered align-middle small mb-4">
+    <thead class="table-light">
+      <tr>
+        <th>STT</th>
+        <th>Mã SKU</th>
+        <th>Tên hàng hóa (Màu / Size)</th>
+        <th>ĐVT</th>
+        <th class="text-center">Số lượng</th>
+        <th class="text-end">Đơn giá (VNĐ)</th>
+        <th class="text-end">Thành tiền (VNĐ)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line in lines %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td><code>{{ line.bien_the.ma_sku }}</code></td>
+        <td>{{ line.bien_the.full_display_name }}</td>
+        <td>{{ line.bien_the.san_pham.don_vi_tinh }}</td>
+        <td class="text-center fw-bold">{{ line.so_luong }}</td>
+        <td class="text-end">{{ line.don_gia|intcomma }}</td>
+        <td class="text-end fw-bold">{{ line.thanh_tien|intcomma }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="4" class="text-end">TỔNG CỘNG:</th>
+        <th class="text-center">{{ receipt.total_quantity }}</th>
+        <th></th>
+        <th class="text-end text-danger fs-6">{{ receipt.tong_tien|intcomma }} VNĐ</th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="row text-center small mt-5 pt-2">
+    <div class="col-4">
+      <strong>Người lập phiếu</strong>
+      <div class="text-muted mb-5">(Ký, ghi rõ họ tên)</div>
+      <div class="fw-semibold">{{ receipt.nguoi_tao.display_name }}</div>
+    </div>
+    <div class="col-4">
+      <strong>Quản lý kho ghi nhận</strong>
+      <div class="text-muted mb-5">(Ký, ghi rõ họ tên)</div>
+      <div class="fw-semibold">{{ receipt.nguoi_ghi_nhan.display_name|default:"" }}</div>
+    </div>
+    <div class="col-4">
+      <strong>Người nhận hàng</strong>
+      <div class="text-muted mb-5">(Ký, ghi rõ họ tên)</div>
+      <div class="fw-semibold">{{ receipt.ten_khach_hang }}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

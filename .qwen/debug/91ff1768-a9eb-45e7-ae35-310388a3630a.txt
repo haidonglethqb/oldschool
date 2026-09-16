@@ -1,0 +1,144 @@
+2026-04-11T20:41:07.188Z [INFO] Config initialization started
+2026-04-11T20:41:07.189Z [DEBUG] Extension manager initialized
+2026-04-11T20:41:07.189Z [DEBUG] [TRUSTED_HOOKS] Hook system initialized successfully
+2026-04-11T20:41:07.189Z [DEBUG] [HOOK_REGISTRY] Hook registry initialized with 0 hook entries
+2026-04-11T20:41:07.189Z [DEBUG] Hook system initialized
+2026-04-11T20:41:07.189Z [DEBUG] MessageBus initialized with hook subscription
+2026-04-11T20:41:07.189Z [INFO] [SKILL_MANAGER] Starting skill directory watchers...
+2026-04-11T20:41:07.190Z [INFO] [SKILL_MANAGER] Refreshing skills cache...
+2026-04-11T20:41:07.190Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: c:\Users\ChuHai\Documents\nt208\.qwen\skills
+2026-04-11T20:41:07.190Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: c:\Users\ChuHai\Documents\nt208\.qwen\skills
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory c:\Users\ChuHai\Documents\nt208\.qwen\skills: ENOENT: no such file or directory, scandir 'c:\Users\ChuHai\Documents\nt208\.qwen\skills'
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: c:\Users\ChuHai\Documents\nt208\.agents\skills
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: c:\Users\ChuHai\Documents\nt208\.agents\skills
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Loaded 0 project level skills
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory c:\Users\ChuHai\Documents\nt208\.agents\skills: ENOENT: no such file or directory, scandir 'c:\Users\ChuHai\Documents\nt208\.agents\skills'
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.qwen\skills
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Loaded 0 project level skills
+2026-04-11T20:41:07.191Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.qwen\skills
+2026-04-11T20:41:07.192Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .env.example
+2026-04-11T20:41:07.192Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .gitignore
+2026-04-11T20:41:07.192Z [DEBUG] [SKILL_MANAGER] Found 79 entries in C:\Users\ChuHai\.qwen\skills
+2026-04-11T20:41:07.193Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:agent-browser (user) from C:\Users\ChuHai\.qwen\skills\agent-browser\SKILL.md
+2026-04-11T20:41:07.193Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: agent_skills_spec.md
+2026-04-11T20:41:07.193Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-artist (user) from C:\Users\ChuHai\.qwen\skills\ai-artist\SKILL.md
+2026-04-11T20:41:07.194Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-multimodal (user) from C:\Users\ChuHai\.qwen\skills\ai-multimodal\SKILL.md
+2026-04-11T20:41:07.194Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ask (user) from C:\Users\ChuHai\.qwen\skills\ask\SKILL.md
+2026-04-11T20:41:07.195Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: automationtest (user) from C:\Users\ChuHai\.qwen\skills\automationtest\SKILL.md
+2026-04-11T20:41:07.195Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: auto-playwright (user) from C:\Users\ChuHai\.qwen\skills\auto_playwright\SKILL.md
+2026-04-11T20:41:07.196Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:backend-development (user) from C:\Users\ChuHai\.qwen\skills\backend-development\SKILL.md
+2026-04-11T20:41:07.196Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:better-auth (user) from C:\Users\ChuHai\.qwen\skills\better-auth\SKILL.md
+2026-04-11T20:41:07.196Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:bootstrap (user) from C:\Users\ChuHai\.qwen\skills\bootstrap\SKILL.md
+2026-04-11T20:41:07.197Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:brainstorm (user) from C:\Users\ChuHai\.qwen\skills\brainstorm\SKILL.md
+2026-04-11T20:41:07.197Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\ChuHai\.qwen\skills\bugreport: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-11T20:41:07.198Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:chrome-devtools (user) from C:\Users\ChuHai\.qwen\skills\chrome-devtools\SKILL.md
+2026-04-11T20:41:07.198Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ck-help (user) from C:\Users\ChuHai\.qwen\skills\ck-help\SKILL.md
+2026-04-11T20:41:07.198Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:code-review (user) from C:\Users\ChuHai\.qwen\skills\code-review\SKILL.md
+2026-04-11T20:41:07.199Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:coding-level (user) from C:\Users\ChuHai\.qwen\skills\coding-level\SKILL.md
+2026-04-11T20:41:07.199Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\ChuHai\.qwen\skills\common, skipping
+2026-04-11T20:41:07.199Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:context-engineering (user) from C:\Users\ChuHai\.qwen\skills\context-engineering\SKILL.md
+2026-04-11T20:41:07.200Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:cook (user) from C:\Users\ChuHai\.qwen\skills\cook\SKILL.md
+2026-04-11T20:41:07.200Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:copywriting (user) from C:\Users\ChuHai\.qwen\skills\copywriting\SKILL.md
+2026-04-11T20:41:07.200Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:databases (user) from C:\Users\ChuHai\.qwen\skills\databases\SKILL.md
+2026-04-11T20:41:07.201Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:debug (user) from C:\Users\ChuHai\.qwen\skills\debug\SKILL.md
+2026-04-11T20:41:07.201Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:devops (user) from C:\Users\ChuHai\.qwen\skills\devops\SKILL.md
+2026-04-11T20:41:07.202Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs (user) from C:\Users\ChuHai\.qwen\skills\docs\SKILL.md
+2026-04-11T20:41:07.202Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs-seeker (user) from C:\Users\ChuHai\.qwen\skills\docs-seeker\SKILL.md
+2026-04-11T20:41:07.202Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\ChuHai\.qwen\skills\document-skills, skipping
+2026-04-11T20:41:07.207Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:find-skills (user) from C:\Users\ChuHai\.qwen\skills\find-skills\SKILL.md
+2026-04-11T20:41:07.208Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:fix (user) from C:\Users\ChuHai\.qwen\skills\fix\SKILL.md
+2026-04-11T20:41:07.209Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-design (user) from C:\Users\ChuHai\.qwen\skills\frontend-design\SKILL.md
+2026-04-11T20:41:07.209Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-development (user) from C:\Users\ChuHai\.qwen\skills\frontend-development\SKILL.md
+2026-04-11T20:41:07.210Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:git (user) from C:\Users\ChuHai\.qwen\skills\git\SKILL.md
+2026-04-11T20:41:07.211Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:gkg (user) from C:\Users\ChuHai\.qwen\skills\gkg\SKILL.md
+2026-04-11T20:41:07.212Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:google-adk-python (user) from C:\Users\ChuHai\.qwen\skills\google-adk-python\SKILL.md
+2026-04-11T20:41:07.212Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.ps1
+2026-04-11T20:41:07.212Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.sh
+2026-04-11T20:41:07.212Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: INSTALLATION.md
+2026-04-11T20:41:07.213Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:journal (user) from C:\Users\ChuHai\.qwen\skills\journal\SKILL.md
+2026-04-11T20:41:07.214Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:kanban (user) from C:\Users\ChuHai\.qwen\skills\kanban\SKILL.md
+2026-04-11T20:41:07.214Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:markdown-novel-viewer (user) from C:\Users\ChuHai\.qwen\skills\markdown-novel-viewer\SKILL.md
+2026-04-11T20:41:07.215Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-builder (user) from C:\Users\ChuHai\.qwen\skills\mcp-builder\SKILL.md
+2026-04-11T20:41:07.216Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-management (user) from C:\Users\ChuHai\.qwen\skills\mcp-management\SKILL.md
+2026-04-11T20:41:07.217Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:media-processing (user) from C:\Users\ChuHai\.qwen\skills\media-processing\SKILL.md
+2026-04-11T20:41:07.217Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mermaidjs-v11 (user) from C:\Users\ChuHai\.qwen\skills\mermaidjs-v11\SKILL.md
+2026-04-11T20:41:07.218Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mintlify (user) from C:\Users\ChuHai\.qwen\skills\mintlify\SKILL.md
+2026-04-11T20:41:07.219Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mobile-development (user) from C:\Users\ChuHai\.qwen\skills\mobile-development\SKILL.md
+2026-04-11T20:41:07.220Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:payment-integration (user) from C:\Users\ChuHai\.qwen\skills\payment-integration\SKILL.md
+2026-04-11T20:41:07.221Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plan (user) from C:\Users\ChuHai\.qwen\skills\plan\SKILL.md
+2026-04-11T20:41:07.221Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plans-kanban (user) from C:\Users\ChuHai\.qwen\skills\plans-kanban\SKILL.md
+2026-04-11T20:41:07.226Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:preview (user) from C:\Users\ChuHai\.qwen\skills\preview\SKILL.md
+2026-04-11T20:41:07.226Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:problem-solving (user) from C:\Users\ChuHai\.qwen\skills\problem-solving\SKILL.md
+2026-04-11T20:41:07.226Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:project-management (user) from C:\Users\ChuHai\.qwen\skills\project-management\SKILL.md
+2026-04-11T20:41:07.227Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:react-best-practices (user) from C:\Users\ChuHai\.qwen\skills\react-best-practices\SKILL.md
+2026-04-11T20:41:07.227Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: README.md
+2026-04-11T20:41:07.227Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:remotion (user) from C:\Users\ChuHai\.qwen\skills\remotion\SKILL.md
+2026-04-11T20:41:07.227Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:repomix (user) from C:\Users\ChuHai\.qwen\skills\repomix\SKILL.md
+2026-04-11T20:41:07.228Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\ChuHai\.qwen\skills\requirement_analyze: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-11T20:41:07.228Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:research (user) from C:\Users\ChuHai\.qwen\skills\research\SKILL.md
+2026-04-11T20:41:07.229Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:scout (user) from C:\Users\ChuHai\.qwen\skills\scout\SKILL.md
+2026-04-11T20:41:07.229Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:sequential-thinking (user) from C:\Users\ChuHai\.qwen\skills\sequential-thinking\SKILL.md
+2026-04-11T20:41:07.229Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shader (user) from C:\Users\ChuHai\.qwen\skills\shader\SKILL.md
+2026-04-11T20:41:07.230Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shopify (user) from C:\Users\ChuHai\.qwen\skills\shopify\SKILL.md
+2026-04-11T20:41:07.230Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:skill-creator (user) from C:\Users\ChuHai\.qwen\skills\skill-creator\SKILL.md
+2026-04-11T20:41:07.230Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:tanstack (user) from C:\Users\ChuHai\.qwen\skills\tanstack\SKILL.md
+2026-04-11T20:41:07.231Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:team (user) from C:\Users\ChuHai\.qwen\skills\team\SKILL.md
+2026-04-11T20:41:07.231Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:template-skill (user) from C:\Users\ChuHai\.qwen\skills\template-skill\SKILL.md
+2026-04-11T20:41:07.231Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:test (user) from C:\Users\ChuHai\.qwen\skills\test\SKILL.md
+2026-04-11T20:41:07.232Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: testcasewriting (user) from C:\Users\ChuHai\.qwen\skills\testcasewriting\SKILL.md
+2026-04-11T20:41:07.232Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: THIRD_PARTY_NOTICES.md
+2026-04-11T20:41:07.232Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:threejs (user) from C:\Users\ChuHai\.qwen\skills\threejs\SKILL.md
+2026-04-11T20:41:07.232Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-styling (user) from C:\Users\ChuHai\.qwen\skills\ui-styling\SKILL.md
+2026-04-11T20:41:07.232Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-ux-pro-max (user) from C:\Users\ChuHai\.qwen\skills\ui-ux-pro-max\SKILL.md
+2026-04-11T20:41:07.233Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:use-mcp (user) from C:\Users\ChuHai\.qwen\skills\use-mcp\SKILL.md
+2026-04-11T20:41:07.233Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:watzup (user) from C:\Users\ChuHai\.qwen\skills\watzup\SKILL.md
+2026-04-11T20:41:07.233Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-design-guidelines (user) from C:\Users\ChuHai\.qwen\skills\web-design-guidelines\SKILL.md
+2026-04-11T20:41:07.234Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-frameworks (user) from C:\Users\ChuHai\.qwen\skills\web-frameworks\SKILL.md
+2026-04-11T20:41:07.234Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-testing (user) from C:\Users\ChuHai\.qwen\skills\web-testing\SKILL.md
+2026-04-11T20:41:07.234Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:worktree (user) from C:\Users\ChuHai\.qwen\skills\worktree\SKILL.md
+2026-04-11T20:41:07.234Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.agents\skills
+2026-04-11T20:41:07.234Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.agents\skills
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory C:\Users\ChuHai\.agents\skills: ENOENT: no such file or directory, scandir 'C:\Users\ChuHai\.agents\skills'
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension-level skills from 0 extensions
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension level skills
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Loading bundled skills from: c:\Users\ChuHai\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.3-win32-x64\dist\qwen-cli\bundled
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: c:\Users\ChuHai\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.3-win32-x64\dist\qwen-cli\bundled
+2026-04-11T20:41:07.235Z [DEBUG] [SKILL_MANAGER] Found 3 entries in c:\Users\ChuHai\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.3-win32-x64\dist\qwen-cli\bundled
+2026-04-11T20:41:07.236Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: loop (bundled) from c:\Users\ChuHai\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.3-win32-x64\dist\qwen-cli\bundled\loop\SKILL.md
+2026-04-11T20:41:07.236Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: qc-helper (bundled) from c:\Users\ChuHai\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.3-win32-x64\dist\qwen-cli\bundled\qc-helper\SKILL.md
+2026-04-11T20:41:07.237Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: review (bundled) from c:\Users\ChuHai\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.3-win32-x64\dist\qwen-cli\bundled\review\SKILL.md
+2026-04-11T20:41:07.237Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled level skills
+2026-04-11T20:41:07.237Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled skills
+2026-04-11T20:41:07.237Z [INFO] [SKILL_MANAGER] Skills cache refreshed: 70 total skills loaded
+2026-04-11T20:41:07.238Z [INFO] [SKILL_MANAGER] Skill directory watchers started
+2026-04-11T20:41:07.238Z [DEBUG] Skill manager initialized
+2026-04-11T20:41:07.238Z [DEBUG] Permission manager initialized
+2026-04-11T20:41:07.239Z [DEBUG] [MEMORY_DISCOVERY] Loading server hierarchical memory for CWD: c:\Users\ChuHai\Documents\nt208 (importFormat: tree)
+2026-04-11T20:41:07.239Z [DEBUG] [MEMORY_DISCOVERY] Found readable global QWEN.md: C:\Users\ChuHai\.qwen\QWEN.md
+2026-04-11T20:41:07.239Z [DEBUG] [MEMORY_DISCOVERY] Searching for QWEN.md starting from CWD: c:\Users\ChuHai\Documents\nt208
+2026-04-11T20:41:07.240Z [DEBUG] [MEMORY_DISCOVERY] Determined project root: c:\Users\ChuHai\Documents\nt208
+2026-04-11T20:41:07.245Z [DEBUG] [MEMORY_DISCOVERY] Searching for AGENTS.md starting from CWD: c:\Users\ChuHai\Documents\nt208
+2026-04-11T20:41:07.247Z [DEBUG] [MEMORY_DISCOVERY] Determined project root: c:\Users\ChuHai\Documents\nt208
+2026-04-11T20:41:07.259Z [DEBUG] [MEMORY_DISCOVERY] Final ordered QWEN.md,AGENTS.md paths to read: ["C:\\Users\\ChuHai\\.qwen\\QWEN.md","C:\\Users\\ChuHai\\.qwen\\output-language.md"]
+2026-04-11T20:41:07.544Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\ChuHai\.qwen\QWEN.md (Length: 3918)
+2026-04-11T20:41:07.545Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\ChuHai\.qwen\output-language.md (Length: 812)
+2026-04-11T20:41:07.545Z [DEBUG] Hierarchical memory loaded
+2026-04-11T20:41:07.546Z [DEBUG] [SKILL_MANAGER] Listing skills
+2026-04-11T20:41:07.546Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-11T20:41:07.546Z [DEBUG] [SKILL_MANAGER] Processing 0 project level skills
+2026-04-11T20:41:07.546Z [DEBUG] [SKILL_MANAGER] Processing 0 extension level skills
+2026-04-11T20:41:07.546Z [DEBUG] [SKILL_MANAGER] Processing 67 user level skills
+2026-04-11T20:41:07.546Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-11T20:41:07.546Z [INFO] [SKILL_MANAGER] Listed 70 unique skills
+2026-04-11T20:41:10.572Z [DEBUG] ToolRegistry created: ["agent","skill","list_directory","read_file","grep_search","glob","edit","write_file","run_shell_command","save_memory","todo_write","ask_user_question","exit_plan_mode","web_fetch","web_search","mcp__atlassian-mcp-server__atlassianUserInfo","mcp__atlassian-mcp-server__getAccessibleAtlassianResources","mcp__atlassian-mcp-server__getConfluencePage","mcp__atlassian-mcp-server__searchConfluenceUsingCql","mcp__atlassian-mcp-server__getConfluenceSpaces","mcp__atlassian-mcp-server__getPagesInConfluenceSpace","mcp__atlassian-mcp-server__getConfluencePageFooterComments","mcp__atlassian-mcp-server__getConfluencePageInlineComments","mcp__atlassian-mcp-server__getConfluenceCommentChildren","mcp__atlassian-mcp-server__getConfluencePageDescendants","mcp__atlassian-mcp-server__createConfluencePage","mcp__atlassian-mcp-server__updateConfluencePage","mcp__atlassian-mcp-server__createConfluenceFooterComment","mcp__atlassian-mcp-server__createConfluenceInlineComment","mcp__atlassian-mcp-server__getJiraIssue","mcp__atlassian-mcp-server__editJiraIssue","mcp__atlassian-mcp-server__createJiraIssue","mcp__atlassian-mcp-server__getTransitionsForJiraIssue","mcp__atlassian-mcp-server__getJiraIssueRemoteIssueLinks","mcp__atlassian-mcp-server__getVisibleJiraProjects","mcp__atlassian-mcp-server__getJiraProjectIssueTypesMetadata","mcp__atlassian-mcp-server__getJiraIssueTypeMetaWithFields","mcp__atlassian-mcp-server__addCommentToJiraIssue","mcp__atlassian-mcp-server__transitionJiraIssue","mcp__atlassian-mcp-server__searchJiraIssuesUsingJql","mcp__atlassian-mcp-server__lookupJiraAccountId","mcp__atlassian-mcp-server__addWorklogToJiraIssue","mcp__atlassian-mcp-server__getIssueLinkTypes","mcp__atlassian-mcp-server__createIssueLink","mcp__atlassian-mcp-server__searchAtlassian","mcp__atlassian-mcp-server__fetchAtlassian"] (46 tools)
+2026-04-11T20:41:10.572Z [INFO] Tool registry initialized with 46 tools
+2026-04-11T20:41:10.576Z [INFO] Gemini client initialized
+2026-04-11T20:41:10.577Z [INFO] Config initialization completed
+2026-04-11T20:41:10.589Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-11T20:41:10.589Z [DEBUG] [SKILL_MANAGER] Listing skills at level: bundled
+2026-04-11T20:41:10.589Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-11T20:41:10.592Z [DEBUG] [BUNDLED_SKILL_LOADER] Hiding skill "loop" because cron is not enabled
+2026-04-11T20:41:10.589Z [INFO] [SKILL_MANAGER] Listed 3 unique skills
+2026-04-11T20:41:10.592Z [DEBUG] [BUNDLED_SKILL_LOADER] Loaded 2 bundled skill(s) as slash commands

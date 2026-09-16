@@ -1,0 +1,60 @@
+{
+  "security": {
+    "auth": {
+      "selectedType": "qwen-oauth"
+    }
+  },
+  "model": {
+    "name": "coder-model"
+  },
+  "$version": 3,
+  "ide": {
+    "hasSeenNudge": true,
+    "enabled": true
+  },
+  "permissions": {
+    "allow": [
+      "Read(C:\\Users\\linhl\\.qwen/**)",
+      "Read(C:\\Users\\linhl\\.qwen\\agents/**)",
+      "Read(C:\\Users\\linhl\\.qwen\\agents\\skills/**)",
+      "Read(C:\\Users\\linhl\\.qwen\\agents\\skills\\find-skills/**)",
+      "Read(C:\\Users\\linhl\\.qwen\\hooks/**)",
+      "Read(C:\\Users\\linhl\\AppData\\Roaming\\npm\\node_modules\\@qwen-code\\qwen-code\\bundled\\qc-helper\\docs/features/**)",
+      "Bash(rd *)",
+      "Bash(node *)",
+      "Bash(npx *)",
+      "Bash(sed *)",
+      "Bash(mkdir *)",
+      "Bash(dir *)",
+      "Bash(type *)",
+      "Bash(npm run *)",
+      "Bash(findstr *)",
+      "Bash(echo.)",
+      "Bash(npm ls *)",
+      "Bash(python *)",
+      "Bash(del *)",
+      "Bash(npm install)",
+      "Bash(curl *)",
+      "Bash(taskkill *)"
+    ]
+  },
+  "tools": {
+    "approvalMode": "auto-edit"
+  },
+  "ui": {
+    "theme": "GitHub",
+    "feedbackLastShownTimestamp": 1775690179277
+  },
+  "mcpServers": {
+    "atlassian-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.atlassian.com/v1/sse"
+      ],
+      "env": {}
+    }
+  },
+  "fastModel": "coder-model"
+}

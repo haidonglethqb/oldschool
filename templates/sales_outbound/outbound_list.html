@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Quản lý Phiếu Xuất Hàng Bán | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-receipt me-2"></i>Quản lý Phiếu Xuất Hàng Bán</h4>
+    <p class="text-muted small mb-0">
+      Lập phiếu xuất bán cho khách hàng, kiểm tra tồn kho thực tế và ghi nhận trừ kho nguyên tử (UC-5.2, UC-5.4 đến UC-5.12)
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'sales_outbound:request_list' %}" class="btn btn-sm btn-os-tan">
+      <i class="bi bi-cart-check me-1"></i>Yêu cầu xuất từ quầy ({{ pending_requests|length }} chờ)
+    </a>
+    {% if request.user.role != 'STAFF' %}
+    <a href="{% url 'sales_outbound:outbound_create' %}" class="btn btn-sm btn-os-primary">
+      <i class="bi bi-plus-lg me-1"></i>Tạo phiếu xuất hàng bán
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+{% if pending_requests and request.user.role != 'STAFF' %}
+<div class="os-card p-3 mb-4 border-warning bg-warning-subtle">
+  <h6 class="fw-bold mb-2"><i class="bi bi-bell-fill text-warning-emphasis me-1"></i>Yêu cầu xuất hàng bán đang chờ Quản lý xử lý (Hình 5)</h6>
+  <div class="d-flex flex-wrap gap-2">
+    {% for req in pending_requests %}
+    <div class="bg-white border rounded p-2 d-flex align-items-center gap-3 small shadow-sm">
+      <div>
+        <strong>{{ req.ma_yeu_cau }}</strong> ({{ req.co_so.ma_co_so }}) — {{ req.ten_khach_hang }}
+        <span class="text-muted">bởi {{ req.nguoi_yeu_cau.display_name }}</span>
+      </div>
+      <a href="{% url 'sales_outbound:outbound_create' %}?from_request={{ req.id }}" class="btn btn-sm btn-os-primary py-0 px-2">
+        Lập phiếu xuất
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Filter Bar -->
+<div class="os-card p-3 mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold mb-1">Tìm kiếm (Mã phiếu / Khách hàng / SĐT)</label>
+      <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="VD: PXB-...">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Trạng thái</label>
+      <select name="status" class="form-select form-select-sm">
+        <option value="">-- Tất cả --</option>
+        {% for st_code, st_label in status_choices %}
+        <option value="{{ st_code }}" {% if filters.status == st_code %}selected{% endif %}>{{ st_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Từ ngày</label>
+      <input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold mb-1">Đến ngày</label>
+      <input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+      <button type="submit" class="btn btn-sm btn-os-primary flex-grow-1"><i class="bi bi-funnel me-1"></i>Lọc</button>
+      <a href="{% url 'sales_outbound:outbound_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+</div>
+
+<div class="os-card">
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Mã phiếu xuất</th>
+          <th>Cơ sở</th>
+          <th>Ngày xuất</th>
+          <th>Khách hàng / SĐT</th>
+          <th>Phương thức</th>
+          <th class="text-end">Tổng tiền (VNĐ)</th>
+          <th class="text-center">Trạng thái</th>
+          <th class="text-end">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in receipts %}
+        <tr>
+          <td class="fw-bold">
+            <a href="{% url 'sales_outbound:outbound_detail' r.id %}" class="text-decoration-none text-dark">{{ r.ma_phieu_xuat_hang_ban }}</a>
+          </td>
+          <td><span class="badge bg-dark">{{ r.co_so.ma_co_so }}</span> {{ r.co_so.ten_co_so }}</td>
+          <td>{{ r.ngay_xuat|date:"d/m/Y H:i" }}</td>
+          <td>{{ r.ten_khach_hang }} <small class="text-muted">({{ r.sdt }})</small></td>
+          <td>{{ r.get_phuong_thuc_giao_display }}</td>
+          <td class="text-end fw-bold">{{ r.tong_tien|intcomma }} đ</td>
+          <td class="text-center">
+            {% if r.trang_thai == 'COMPLETED' %}
+              <span class="badge-os badge-status-completed">Đã ghi nhận xuất kho</span>
+            {% elif r.trang_thai == 'PENDING' %}
+              <span class="badge-os badge-status-pending">Chờ ghi nhận</span>
+            {% else %}
+              <span class="badge bg-secondary">Đã hủy</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="{% url 'sales_outbound:outbound_detail' r.id %}" class="btn btn-outline-dark" title="Xem chi tiết"><i class="bi bi-eye"></i></a>
+              {% if r.is_printable %}
+              <a href="{% url 'sales_outbound:outbound_print' r.id %}" target="_blank" class="btn btn-outline-success" title="In phiếu xuất (UC-5.12)"><i class="bi bi-printer"></i></a>
+              {% endif %}
+              {% if r.is_editable and request.user.role != 'STAFF' %}
+              <a href="{% url 'sales_outbound:outbound_update' r.id %}" class="btn btn-outline-primary" title="Chỉnh sửa"><i class="bi bi-pencil"></i></a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">Chưa có phiếu xuất hàng bán nào trong phạm vi.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

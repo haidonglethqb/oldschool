@@ -1,0 +1,297 @@
+/* ==========================================================================
+   Old School Inventory & Supply Chain Design System
+   Inspired by Old School Figma UI (Hình 7 - Hình 39 in Specification)
+   Palette:
+   - Header / Primary Brand: #4A2511 (Warm Espresso Brown)
+   - Page Canvas: #F3E9DC (Warm Vintage Cream)
+   - Secondary Surface / Active Tab / Filter Pill: #DEC2A8 (Soft Tan)
+   - Card Surface: #FFFDF9 (Crisp Warm Ivory)
+   - Border: #D8C3B0
+   - Status Badges:
+     * Còn hàng (In Stock): #1E7E48 / #E6F6EC
+     * Sắp hết hàng (Low Stock): #B45309 / #FEF3C7
+     * Hết hàng (Out of Stock): #B91C1C / #FEE2E2
+   ========================================================================== */
+
+:root {
+  --os-brown-900: #361909;
+  --os-brown-800: #4A2511;
+  --os-brown-700: #63351B;
+  --os-brown-600: #7C4728;
+  --os-tan-400: #C8A27E;
+  --os-tan-300: #DEC2A8;
+  --os-tan-200: #EAD7C5;
+  --os-cream-100: #F3E9DC;
+  --os-ivory-50: #FFFDF9;
+  --os-border: #D9C4B1;
+  --os-text-main: #2A180D;
+  --os-text-muted: #6E5646;
+}
+
+body {
+  background-color: var(--os-cream-100);
+  color: var(--os-text-main);
+  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top Brand Header & Navigation (Figma Style) */
+.os-navbar {
+  background: linear-gradient(90deg, var(--os-brown-900) 0%, var(--os-brown-800) 60%, var(--os-brown-700) 100%);
+  box-shadow: 0 3px 12px rgba(54, 25, 9, 0.22);
+  padding: 0.55rem 1.25rem;
+}
+
+.os-brand {
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #FFFDF9 !important;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
+.os-brand-badge {
+  background-color: var(--os-tan-300);
+  color: var(--os-brown-900);
+  font-weight: 900;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.os-nav-link {
+  color: rgba(255, 253, 249, 0.88) !important;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.45rem 0.9rem !important;
+  border-radius: 8px;
+  transition: all 0.16s ease;
+}
+
+.os-nav-link:hover,
+.os-nav-link.active {
+  background-color: var(--os-tan-300);
+  color: var(--os-brown-900) !important;
+}
+
+/* Subheader Context Bar */
+.os-context-bar {
+  background-color: var(--os-tan-200);
+  border-bottom: 1px solid var(--os-border);
+  padding: 0.55rem 1.25rem;
+  font-size: 0.88rem;
+}
+
+/* Cards & Panels */
+.os-card {
+  background-color: var(--os-ivory-50);
+  border: 1px solid var(--os-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(74, 37, 17, 0.05);
+}
+
+.os-card-header {
+  background-color: var(--os-tan-200);
+  border-bottom: 1px solid var(--os-border);
+  padding: 0.85rem 1.25rem;
+  border-top-left-radius: 11px;
+  border-top-right-radius: 11px;
+  font-weight: 700;
+  color: var(--os-brown-800);
+}
+
+/* Buttons */
+.btn-os-primary {
+  background-color: var(--os-brown-800);
+  border-color: var(--os-brown-800);
+  color: #FFFDF9;
+  font-weight: 600;
+}
+
+.btn-os-primary:hover,
+.btn-os-primary:focus {
+  background-color: var(--os-brown-900);
+  border-color: var(--os-brown-900);
+  color: #FFFFFF;
+}
+
+.btn-os-tan {
+  background-color: var(--os-tan-300);
+  border-color: var(--os-tan-400);
+  color: var(--os-brown-900);
+  font-weight: 600;
+}
+
+.btn-os-tan:hover {
+  background-color: var(--os-tan-400);
+  color: var(--os-brown-900);
+}
+
+/* Tables */
+.os-table {
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.os-table thead th {
+  background-color: var(--os-brown-800);
+  color: #FFFDF9;
+  font-weight: 600;
+  font-size: 0.84rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: none;
+  padding: 0.75rem 0.85rem;
+  white-space: nowrap;
+}
+
+.os-table tbody td {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid #EFE4D8;
+  font-size: 0.92rem;
+}
+
+.os-table tbody tr:hover {
+  background-color: rgba(222, 194, 168, 0.2);
+}
+
+/* Stock & Workflow Status Badges */
+.badge-os {
+  padding: 0.35em 0.7em;
+  font-weight: 600;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.badge-in-stock,
+.os-badge-in-stock {
+  background-color: #DCFCE7;
+  color: #166534;
+  border: 1px solid #86EFAC;
+  padding: 0.3em 0.65em;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.badge-low-stock,
+.os-badge-low-stock {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+  padding: 0.3em 0.65em;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.badge-out-of-stock,
+.os-badge-out-of-stock {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+  padding: 0.3em 0.65em;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.badge-status-pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.badge-status-approved,
+.badge-status-completed {
+  background-color: #DCFCE7;
+  color: #166534;
+  border: 1px solid #86EFAC;
+}
+
+.badge-status-rejected,
+.badge-status-returned {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
+.badge-status-dispatched {
+  background-color: #DBEAFE;
+  color: #1E40AF;
+  border: 1px solid #93C5FD;
+}
+
+/* KPI Metric Cards */
+.os-kpi-card {
+  background: var(--os-ivory-50);
+  border: 1px solid var(--os-border);
+  border-left: 5px solid var(--os-brown-800);
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+}
+
+.os-kpi-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--os-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.os-kpi-value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--os-brown-800);
+}
+
+/* Login Split Layout */
+.os-login-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--os-brown-900) 0%, var(--os-brown-800) 45%, var(--os-cream-100) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.os-login-card {
+  max-width: 920px;
+  width: 100%;
+  background: var(--os-ivory-50);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.os-login-banner {
+  background: linear-gradient(160deg, var(--os-brown-900) 0%, var(--os-brown-700) 100%);
+  color: #FFFDF9;
+  padding: 2.75rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Print Styles for Outbound Slip */
+@media print {
+  .no-print,
+  .os-navbar,
+  .os-context-bar,
+  footer {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+  }
+  .os-card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}

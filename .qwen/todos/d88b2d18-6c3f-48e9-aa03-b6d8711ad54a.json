@@ -1,0 +1,25 @@
+{
+  "todos": [
+    {
+      "id": "1",
+      "content": "Create task6/index.html = copy of task5 with Leaflet replaced by Mapbox GL JS through proxy",
+      "status": "completed"
+    },
+    {
+      "id": "2",
+      "content": "Fix proxy tile route in server.js",
+      "status": "completed"
+    },
+    {
+      "id": "3",
+      "content": "Test map renders correctly at http://localhost:3000",
+      "status": "in_progress"
+    },
+    {
+      "id": "4",
+      "content": "Clean up old task6 HTML files",
+      "status": "pending"
+    }
+  ],
+  "sessionId": "d88b2d18-6c3f-48e9-aa03-b6d8711ad54a"
+}

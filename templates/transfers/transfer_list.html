@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Điều chuyển Nội bộ giữa các Cơ sở | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-left-right me-2"></i>Quản lý Phiếu Điều Chuyển Nội Bộ (UC-5.3 — Hình 6)</h4>
+    <p class="text-muted small mb-0">
+      Hạch toán tồn kho 2 bước: Trừ kho tại Cơ sở xuất khi <strong>Xuất điều chuyển</strong> và Cộng kho tại Cơ sở nhận khi <strong>Xác nhận nhận hàng</strong>
+    </p>
+  </div>
+  <a href="{% url 'transfers:transfer_create' %}" class="btn btn-sm btn-os-primary">
+    <i class="bi bi-plus-lg me-1"></i>Tạo phiếu yêu cầu điều chuyển
+  </a>
+</div>
+
+<!-- Filter Bar -->
+<div class="os-card p-3 mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold mb-1">Tìm kiếm (Mã phiếu / Cơ sở / Lý do)</label>
+      <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="VD: PDC-...">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold mb-1">Chiều điều chuyển</label>
+      <select name="direction" class="form-select form-select-sm">
+        <option value="">-- Tất cả chiều đi & đến --</option>
+        <option value="outgoing" {% if filters.direction == 'outgoing' %}selected{% endif %}>Phiếu xuất đi từ cơ sở</option>
+        <option value="incoming" {% if filters.direction == 'incoming' %}selected{% endif %}>Phiếu nhận về cơ sở</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold mb-1">Trạng thái</label>
+      <select name="status" class="form-select form-select-sm">
+        <option value="">-- Tất cả trạng thái --</option>
+        {% for st_code, st_label in status_choices %}
+        <option value="{{ st_code }}" {% if filters.status == st_code %}selected{% endif %}>{{ st_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+      <button type="submit" class="btn btn-sm btn-os-primary flex-grow-1"><i class="bi bi-funnel me-1"></i>Lọc</button>
+      <a href="{% url 'transfers:transfer_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+</div>
+
+<div class="os-card">
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Mã phiếu ĐC</th>
+          <th>Cơ sở xuất (Nguồn)</th>
+          <th>Cơ sở nhận (Đích)</th>
+          <th>Ngày yêu cầu</th>
+          <th>Lý do điều chuyển</th>
+          <th>Người tạo</th>
+          <th class="text-center">Trạng thái</th>
+          <th class="text-end">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in transfers %}
+        <tr>
+          <td class="fw-bold">
+            <a href="{% url 'transfers:transfer_detail' t.id %}" class="text-decoration-none text-dark">{{ t.ma_phieu_dieu_chuyen }}</a>
+          </td>
+          <td><span class="badge bg-dark">{{ t.co_so_xuat.ma_co_so }}</span> {{ t.co_so_xuat.ten_co_so }}</td>
+          <td><span class="badge bg-warning text-dark">{{ t.co_so_nhan.ma_co_so }}</span> {{ t.co_so_nhan.ten_co_so }}</td>
+          <td>{{ t.ngay_dieu_chuyen|date:"d/m/Y" }}</td>
+          <td>{{ t.ly_do }}</td>
+          <td>{{ t.nguoi_tao.display_name }}</td>
+          <td class="text-center">
+            {% if t.trang_thai == 'RECEIVED' %}
+              <span class="badge-os badge-status-completed">Đã nhận đủ hàng</span>
+            {% elif t.trang_thai == 'RECEIVED_WITH_SHORTAGE' %}
+              <span class="badge-os badge-low-stock">Đã nhận (Có thiếu hụt)</span>
+            {% elif t.trang_thai == 'DISPATCHED' %}
+              <span class="badge-os badge-status-dispatched">Đang vận chuyển (Đã xuất)</span>
+            {% elif t.trang_thai == 'REJECTED' %}
+              <span class="badge-os badge-status-rejected">Từ chối</span>
+            {% else %}
+              <span class="badge-os badge-status-pending">{{ t.get_trang_thai_display }}</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <a href="{% url 'transfers:transfer_detail' t.id %}" class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-eye me-1"></i>Chi tiết & Xử lý
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">Chưa có phiếu điều chuyển nội bộ nào.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

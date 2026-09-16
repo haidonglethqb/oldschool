@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Sổ cái biến động {{ variant.ma_sku }} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Chi tiết Sổ cái Biến động Tồn kho (UC-7.2): <code>{{ variant.ma_sku }}</code></h4>
+    <p class="text-muted small mb-0">{{ variant.full_display_name }} — Đơn giá: {{ variant.don_gia|intcomma }} VNĐ</p>
+  </div>
+  <a href="{% url 'reports:report_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Quay lại Báo cáo tổng hợp
+  </a>
+</div>
+
+<div class="os-card">
+  <div class="os-card-header">Lịch sử giao dịch tồn kho bất biến (StockMovement Ledger)</div>
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Thời điểm</th>
+          <th>Cơ sở</th>
+          <th>Loại giao dịch</th>
+          <th>Mã chứng từ gốc</th>
+          <th class="text-center">Biến động (+/-)</th>
+          <th class="text-center">Tồn sau GD</th>
+          <th>Người thực hiện</th>
+          <th>Diễn giải</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in movements %}
+        <tr>
+          <td>{{ m.effective_at|date:"d/m/Y H:i:s" }}</td>
+          <td class="fw-semibold">{{ m.co_so.ma_co_so }} — {{ m.co_so.ten_co_so }}</td>
+          <td><span class="badge bg-light text-dark border">{{ m.get_movement_type_display }}</span></td>
+          <td><code>{{ m.source_doc_code }}</code></td>
+          <td class="text-center fw-bold {% if m.quantity_delta > 0 %}text-success{% else %}text-danger{% endif %}">
+            {% if m.quantity_delta > 0 %}+{% endif %}{{ m.quantity_delta }}
+          </td>
+          <td class="text-center fw-bold">{{ m.balance_after }}</td>
+          <td>{{ m.actor.display_name|default:"Hệ thống" }}</td>
+          <td class="small text-muted">{{ m.notes }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">Chưa có lịch sử giao dịch nào cho biến thể này.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

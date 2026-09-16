@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ product.ma_san_pham }} — {{ product.ten_hang_hoa }} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1 small">
+        <li class="breadcrumb-item"><a href="{% url 'catalog:product_list' %}">Danh mục hàng hóa</a></li>
+        <li class="breadcrumb-item active">{{ product.ma_san_pham }}</li>
+      </ol>
+    </nav>
+    <h4 class="fw-bold mb-0">{{ product.ma_san_pham }} — {{ product.ten_hang_hoa }}</h4>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'catalog:product_list' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Quay lại
+    </a>
+    {% if can_edit %}
+    <a href="{% url 'catalog:product_edit' product.id %}" class="btn btn-sm btn-os-primary">
+      <i class="bi bi-pencil-square me-1"></i>Chỉnh sửa mặt hàng
+    </a>
+    <form method="post" action="{% url 'catalog:product_toggle_status' product.id %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-os-tan">
+        <i class="bi bi-arrow-repeat me-1"></i>
+        {% if product.trang_thai == 'ACTIVE' %}Ngừng kinh doanh{% else %}Mở bán lại{% endif %}
+      </button>
+    </form>
+    {% if not has_transactions %}
+    <form method="post" action="{% url 'catalog:product_delete' product.id %}" class="d-inline" onsubmit="return confirm('Xác nhận xóa mặt hàng {{ product.ma_san_pham }}?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-outline-danger">
+        <i class="bi bi-trash me-1"></i>Xóa mặt hàng
+      </button>
+    </form>
+    {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-5">
+    <div class="os-card p-3 h-100">
+      <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-info-circle me-2"></i>Thông tin chung</h6>
+      <dl class="row mb-0 small">
+        <dt class="col-sm-5 text-muted">Mã hàng hóa:</dt>
+        <dd class="col-sm-7 fw-bold">{{ product.ma_san_pham }}</dd>
+
+        <dt class="col-sm-5 text-muted">Tên hàng hóa:</dt>
+        <dd class="col-sm-7 fw-semibold">{{ product.ten_hang_hoa }}</dd>
+
+        <dt class="col-sm-5 text-muted">Nhóm hàng:</dt>
+        <dd class="col-sm-7">{{ product.nhom_hang }}</dd>
+
+        <dt class="col-sm-5 text-muted">Đơn vị tính:</dt>
+        <dd class="col-sm-7">{{ product.don_vi_tinh }}</dd>
+
+        <dt class="col-sm-5 text-muted">Đơn giá niêm yết:</dt>
+        <dd class="col-sm-7 fw-bold text-danger">{{ product.don_gia_niem_yet|intcomma }} VNĐ</dd>
+
+        <dt class="col-sm-5 text-muted">Trạng thái KD:</dt>
+        <dd class="col-sm-7">
+          {% if product.trang_thai == 'ACTIVE' %}
+            <span class="badge bg-success">Đang kinh doanh</span>
+          {% else %}
+            <span class="badge bg-secondary">Ngừng kinh doanh</span>
+          {% endif %}
+        </dd>
+
+        <dt class="col-sm-5 text-muted">Ghi chú / Mô tả:</dt>
+        <dd class="col-sm-7">{{ product.ghi_chu|default:"Không có ghi chú" }}</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="os-card h-100">
+      <div class="os-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-diagram-3-fill me-2"></i>Danh sách Biến thể (SKU) theo phạm vi đang xem</span>
+        <span class="{{ product.computed_stock_badge }}">Tổng tồn: {{ product.computed_total_stock }} ({{ product.computed_stock_label }})</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table os-table">
+          <thead>
+            <tr>
+              <th>Mã SKU</th>
+              <th>Màu sắc</th>
+              <th>Kích cỡ</th>
+              <th class="text-end">Đơn giá</th>
+              <th class="text-center">Số lượng tồn</th>
+              <th class="text-center">Định mức tối thiểu</th>
+              <th class="text-center">Tình trạng</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vr in product.computed_variants %}
+            <tr>
+              <td><code>{{ vr.variant.ma_sku }}</code></td>
+              <td>{{ vr.variant.mau_sac }}</td>
+              <td><span class="badge bg-secondary">{{ vr.variant.kich_co }}</span></td>
+              <td class="text-end">{{ vr.variant.don_gia|intcomma }} đ</td>
+              <td class="text-center fw-bold">{{ vr.so_luong }}</td>
+              <td class="text-center">{{ vr.muc_ton_toi_thieu }}</td>
+              <td class="text-center"><span class="{{ vr.stock_status_badge_class }}">{{ vr.stock_status_label }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Branch x Variant Stock Breakdown -->
+<div class="os-card">
+  <div class="os-card-header">
+    <i class="bi bi-buildings-fill me-2"></i>Phân bổ tồn kho chi tiết tại các cơ sở trong phạm vi quyền hạn
+  </div>
+  <div class="table-responsive">
+    <table class="table os-table">
+      <thead>
+        <tr>
+          <th>Cơ sở</th>
+          <th>Mã SKU</th>
+          <th>Màu / Size</th>
+          <th class="text-center">Số lượng tồn hiện tại</th>
+          <th class="text-center">Định mức tối thiểu</th>
+          <th class="text-center">Trạng thái tồn tại cơ sở</th>
+          <th class="text-end">Cập nhật lần cuối</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bal in branch_balances %}
+        <tr>
+          <td class="fw-semibold">{{ bal.co_so.ma_co_so }} — {{ bal.co_so.ten_co_so }}</td>
+          <td><code>{{ bal.bien_the.ma_sku }}</code></td>
+          <td>{{ bal.bien_the.mau_sac }} / {{ bal.bien_the.kich_co }}</td>
+          <td class="text-center fw-bold">{{ bal.so_luong }}</td>
+          <td class="text-center">{{ bal.muc_ton_toi_thieu }}</td>
+          <td class="text-center"><span class="badge-os {{ bal.stock_status_badge_class }}">{{ bal.stock_status_label }}</span></td>
+          <td class="text-end small text-muted">{{ bal.updated_at|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center py-3 text-muted">Chưa có dữ liệu tồn kho theo cơ sở.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

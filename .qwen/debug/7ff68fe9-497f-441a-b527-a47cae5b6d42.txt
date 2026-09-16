@@ -1,0 +1,75 @@
+2026-04-05T15:13:02.664Z [DEBUG] [BUNDLED_SKILL_LOADER] SkillManager not available, skipping bundled skills
+2026-04-05T15:13:02.703Z [DEBUG] [HOOK_REGISTRY] Hook registry initialized with 0 hook entries
+2026-04-05T15:13:02.703Z [DEBUG] Extension manager initialized
+2026-04-05T15:13:02.705Z [DEBUG] [TRUSTED_HOOKS] Hook system initialized successfully
+2026-04-05T15:13:02.652Z [INFO] Config initialization started
+2026-04-05T15:13:02.705Z [DEBUG] Hook system initialized
+2026-04-05T15:13:02.705Z [DEBUG] MessageBus initialized with hook subscription
+2026-04-05T15:13:02.705Z [INFO] [SKILL_MANAGER] Starting skill directory watchers...
+2026-04-05T15:13:02.727Z [INFO] [SKILL_MANAGER] Refreshing skills cache...
+2026-04-05T15:13:02.727Z [DEBUG] [SKILL_MANAGER] Skipping project-level skills: project root is home directory
+2026-04-05T15:13:02.727Z [DEBUG] [SKILL_MANAGER] Loaded 0 project level skills
+2026-04-05T15:13:02.727Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.qwen\skills
+2026-04-05T15:13:02.728Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.qwen\skills
+2026-04-05T15:13:02.733Z [DEBUG] [SKILL_MANAGER] Found 0 entries in C:\Users\ChuHai\.qwen\skills
+2026-04-05T15:13:02.733Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.agents\skills
+2026-04-05T15:13:02.733Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.agents\skills
+2026-04-05T15:13:02.733Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory C:\Users\ChuHai\.agents\skills: ENOENT: no such file or directory, scandir 'C:\Users\ChuHai\.agents\skills'
+2026-04-05T15:13:02.733Z [DEBUG] [SKILL_MANAGER] Loaded 0 user level skills
+2026-04-05T15:13:02.734Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension-level skills from 0 extensions
+2026-04-05T15:13:02.733Z [DEBUG] [SKILL_MANAGER] Loaded 0 user level skills
+2026-04-05T15:13:02.734Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension level skills
+2026-04-05T15:13:02.734Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-05T15:13:02.734Z [DEBUG] [SKILL_MANAGER] Loading bundled skills from: C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-05T15:13:02.734Z [DEBUG] [SKILL_MANAGER] Found 3 entries in C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-05T15:13:02.753Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: loop (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\loop\SKILL.md
+2026-04-05T15:13:02.756Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: qc-helper (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\qc-helper\SKILL.md
+2026-04-05T15:13:02.757Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: review (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\review\SKILL.md
+2026-04-05T15:13:02.757Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled skills
+2026-04-05T15:13:02.757Z [INFO] [SKILL_MANAGER] Skills cache refreshed: 3 total skills loaded
+2026-04-05T15:13:02.757Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled level skills
+2026-04-05T15:13:02.758Z [INFO] [SKILL_MANAGER] Skill directory watchers started
+2026-04-05T15:13:02.758Z [DEBUG] Skill manager initialized
+2026-04-05T15:13:02.758Z [DEBUG] Permission manager initialized
+2026-04-05T15:13:02.759Z [DEBUG] [MEMORY_DISCOVERY] Loading server hierarchical memory for CWD: C:\Users\ChuHai (importFormat: tree)
+2026-04-05T15:13:02.762Z [DEBUG] [MEMORY_DISCOVERY] Final ordered QWEN.md,AGENTS.md paths to read: ["C:\\Users\\ChuHai\\.qwen\\output-language.md"]
+2026-04-05T15:13:02.779Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\ChuHai\.qwen\output-language.md (Length: 812)
+2026-04-05T15:13:02.779Z [DEBUG] Hierarchical memory loaded
+2026-04-05T15:13:02.781Z [DEBUG] [SKILL_MANAGER] Listing skills
+2026-04-05T15:13:02.781Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-05T15:13:02.781Z [DEBUG] [SKILL_MANAGER] Processing 0 project level skills
+2026-04-05T15:13:02.781Z [DEBUG] [SKILL_MANAGER] Processing 0 extension level skills
+2026-04-05T15:13:02.781Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-05T15:13:02.781Z [INFO] [SKILL_MANAGER] Listed 3 unique skills
+2026-04-05T15:13:02.781Z [DEBUG] [SKILL_MANAGER] Processing 0 user level skills
+2026-04-05T15:13:02.783Z [DEBUG] ToolRegistry created: ["agent","skill","list_directory","read_file","grep_search","glob","edit","write_file","run_shell_command","save_memory","todo_write","ask_user_question","exit_plan_mode","web_fetch","web_search"] (15 tools)
+2026-04-05T15:13:02.783Z [INFO] Tool registry initialized with 15 tools
+2026-04-05T15:13:02.787Z [INFO] Gemini client initialized
+2026-04-05T15:13:02.792Z [DEBUG] [APP_CONTAINER] SessionStart event completed successfully
+2026-04-05T15:13:02.787Z [INFO] Config initialization completed
+2026-04-05T15:13:02.804Z [DEBUG] [SKILL_MANAGER] Listing skills at level: bundled
+2026-04-05T15:13:02.804Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-05T15:13:02.804Z [INFO] [SKILL_MANAGER] Listed 3 unique skills
+2026-04-05T15:13:02.804Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-05T15:13:02.807Z [DEBUG] [BUNDLED_SKILL_LOADER] Hiding skill "loop" because cron is not enabled
+2026-04-05T15:13:02.807Z [DEBUG] [BUNDLED_SKILL_LOADER] Loaded 2 bundled skill(s) as slash commands
+2026-04-05T15:13:03.597Z [DEBUG] [IDE] Failed to read IDE connection directory: Error: ENOENT: no such file or directory, scandir 'C:\Users\ChuHai\.qwen\ide'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async _IdeClient.getAllConnectionConfigs (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:228976:24)
+    at async _IdeClient.getConnectionConfigFromFile (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:228948:25)
+    at async file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:228606:39
+2026-04-05T15:13:11.555Z [DEBUG] Received user query (6 chars)
+2026-04-05T15:13:42.919Z [DEBUG] Received user query (75 chars)
+2026-04-05T15:13:54.216Z [DEBUG] [WEB_FETCH] [WebFetchTool] Fetching content from: http://haichu.io.vn
+2026-04-05T15:13:54.216Z [DEBUG] [WEB_FETCH] [WebFetchTool] Public URL detected for http://haichu.io.vn, using direct fetch
+2026-04-05T15:13:54.599Z [DEBUG] [WEB_FETCH] [WebFetchTool] Successfully fetched content from http://haichu.io.vn
+2026-04-05T15:13:54.610Z [DEBUG] [WEB_FETCH] [WebFetchTool] Converted HTML to text (0 characters)
+2026-04-05T15:13:54.610Z [DEBUG] [WEB_FETCH] [WebFetchTool] Processing content with prompt: "Read the content of this website and summarize what it is about"
+2026-04-05T15:14:16.976Z [DEBUG] [WEB_FETCH] [WebFetchTool] Successfully processed content from http://haichu.io.vn
+2026-04-05T15:14:17.018Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.
+2026-04-05T15:14:19.892Z [DEBUG] [WEB_FETCH] [WebFetchTool] Public URL detected for https://haichu.io.vn, using direct fetch
+2026-04-05T15:14:19.892Z [DEBUG] [WEB_FETCH] [WebFetchTool] Fetching content from: https://haichu.io.vn
+2026-04-05T15:14:20.103Z [DEBUG] [WEB_FETCH] [WebFetchTool] Successfully fetched content from https://haichu.io.vn
+2026-04-05T15:14:20.109Z [DEBUG] [WEB_FETCH] [WebFetchTool] Converted HTML to text (0 characters)
+2026-04-05T15:14:20.109Z [DEBUG] [WEB_FETCH] [WebFetchTool] Processing content with prompt: "Read the content of this website and summarize what it is about"
+2026-04-05T15:14:48.991Z [DEBUG] [WEB_FETCH] [WebFetchTool] Successfully processed content from https://haichu.io.vn

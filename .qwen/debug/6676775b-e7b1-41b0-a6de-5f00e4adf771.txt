@@ -1,0 +1,343 @@
+2026-04-09T10:47:01.647Z [DEBUG] [IDE] Attempting to connect to IDE via HTTP at 127.0.0.1:49533
+2026-04-09T10:47:01.699Z [DEBUG] [IDE] Discovering tools from IDE...
+2026-04-09T10:47:01.710Z [DEBUG] [IDE] Discovered 2 tools from IDE: openDiff, closeDiff
+2026-04-09T10:47:02.100Z [INFO] Config initialization started
+2026-04-09T10:47:02.104Z [DEBUG] [BUNDLED_SKILL_LOADER] SkillManager not available, skipping bundled skills
+2026-04-09T10:47:02.140Z [DEBUG] [HOOK_REGISTRY] Hook registry initialized with 0 hook entries
+2026-04-09T10:47:02.140Z [DEBUG] Extension manager initialized
+2026-04-09T10:47:02.176Z [DEBUG] Hook system initialized
+2026-04-09T10:47:02.176Z [INFO] [SKILL_MANAGER] Starting skill directory watchers...
+2026-04-09T10:47:02.176Z [DEBUG] MessageBus initialized with hook subscription
+2026-04-09T10:47:02.176Z [DEBUG] [TRUSTED_HOOKS] Hook system initialized successfully
+2026-04-09T10:47:02.200Z [INFO] [SKILL_MANAGER] Refreshing skills cache...
+2026-04-09T10:47:02.200Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills
+2026-04-09T10:47:02.200Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills
+2026-04-09T10:47:02.206Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills: ENOENT: no such file or directory, scandir 'C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills'
+2026-04-09T10:47:02.206Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills
+2026-04-09T10:47:02.206Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills
+2026-04-09T10:47:02.208Z [DEBUG] [SKILL_MANAGER] Found 1 entries in C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills
+2026-04-09T10:47:02.226Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: find-skills (project) from C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills\find-skills\SKILL.md
+2026-04-09T10:47:02.226Z [DEBUG] [SKILL_MANAGER] Loaded 1 project level skills
+2026-04-09T10:47:02.226Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.qwen\skills
+2026-04-09T10:47:02.226Z [DEBUG] [SKILL_MANAGER] Loaded 1 project level skills
+2026-04-09T10:47:02.226Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.qwen\skills
+2026-04-09T10:47:02.232Z [DEBUG] [SKILL_MANAGER] Found 79 entries in C:\Users\ChuHai\.qwen\skills
+2026-04-09T10:47:02.232Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .gitignore
+2026-04-09T10:47:02.232Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .env.example
+2026-04-09T10:47:02.235Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:agent-browser (user) from C:\Users\ChuHai\.qwen\skills\agent-browser\SKILL.md
+2026-04-09T10:47:02.235Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: agent_skills_spec.md
+2026-04-09T10:47:02.236Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-artist (user) from C:\Users\ChuHai\.qwen\skills\ai-artist\SKILL.md
+2026-04-09T10:47:02.237Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-multimodal (user) from C:\Users\ChuHai\.qwen\skills\ai-multimodal\SKILL.md
+2026-04-09T10:47:02.238Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ask (user) from C:\Users\ChuHai\.qwen\skills\ask\SKILL.md
+2026-04-09T10:47:02.239Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: automationtest (user) from C:\Users\ChuHai\.qwen\skills\automationtest\SKILL.md
+2026-04-09T10:47:02.239Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: auto-playwright (user) from C:\Users\ChuHai\.qwen\skills\auto_playwright\SKILL.md
+2026-04-09T10:47:02.244Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:backend-development (user) from C:\Users\ChuHai\.qwen\skills\backend-development\SKILL.md
+2026-04-09T10:47:02.245Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:better-auth (user) from C:\Users\ChuHai\.qwen\skills\better-auth\SKILL.md
+2026-04-09T10:47:02.246Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:bootstrap (user) from C:\Users\ChuHai\.qwen\skills\bootstrap\SKILL.md
+2026-04-09T10:47:02.247Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:brainstorm (user) from C:\Users\ChuHai\.qwen\skills\brainstorm\SKILL.md
+2026-04-09T10:47:02.248Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\ChuHai\.qwen\skills\bugreport: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-09T10:47:02.249Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:chrome-devtools (user) from C:\Users\ChuHai\.qwen\skills\chrome-devtools\SKILL.md
+2026-04-09T10:47:02.250Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ck-help (user) from C:\Users\ChuHai\.qwen\skills\ck-help\SKILL.md
+2026-04-09T10:47:02.251Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:code-review (user) from C:\Users\ChuHai\.qwen\skills\code-review\SKILL.md
+2026-04-09T10:47:02.252Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:coding-level (user) from C:\Users\ChuHai\.qwen\skills\coding-level\SKILL.md
+2026-04-09T10:47:02.252Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\ChuHai\.qwen\skills\common, skipping
+2026-04-09T10:47:02.253Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:context-engineering (user) from C:\Users\ChuHai\.qwen\skills\context-engineering\SKILL.md
+2026-04-09T10:47:02.254Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:cook (user) from C:\Users\ChuHai\.qwen\skills\cook\SKILL.md
+2026-04-09T10:47:02.255Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:copywriting (user) from C:\Users\ChuHai\.qwen\skills\copywriting\SKILL.md
+2026-04-09T10:47:02.255Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:databases (user) from C:\Users\ChuHai\.qwen\skills\databases\SKILL.md
+2026-04-09T10:47:02.256Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:debug (user) from C:\Users\ChuHai\.qwen\skills\debug\SKILL.md
+2026-04-09T10:47:02.257Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:devops (user) from C:\Users\ChuHai\.qwen\skills\devops\SKILL.md
+2026-04-09T10:47:02.259Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs (user) from C:\Users\ChuHai\.qwen\skills\docs\SKILL.md
+2026-04-09T10:47:02.259Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs-seeker (user) from C:\Users\ChuHai\.qwen\skills\docs-seeker\SKILL.md
+2026-04-09T10:47:02.260Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\ChuHai\.qwen\skills\document-skills, skipping
+2026-04-09T10:47:02.260Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:find-skills (user) from C:\Users\ChuHai\.qwen\skills\find-skills\SKILL.md
+2026-04-09T10:47:02.261Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:fix (user) from C:\Users\ChuHai\.qwen\skills\fix\SKILL.md
+2026-04-09T10:47:02.262Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-design (user) from C:\Users\ChuHai\.qwen\skills\frontend-design\SKILL.md
+2026-04-09T10:47:02.263Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-development (user) from C:\Users\ChuHai\.qwen\skills\frontend-development\SKILL.md
+2026-04-09T10:47:02.264Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:git (user) from C:\Users\ChuHai\.qwen\skills\git\SKILL.md
+2026-04-09T10:47:02.265Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:gkg (user) from C:\Users\ChuHai\.qwen\skills\gkg\SKILL.md
+2026-04-09T10:47:02.268Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:google-adk-python (user) from C:\Users\ChuHai\.qwen\skills\google-adk-python\SKILL.md
+2026-04-09T10:47:02.268Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.ps1
+2026-04-09T10:47:02.268Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.sh
+2026-04-09T10:47:02.268Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: INSTALLATION.md
+2026-04-09T10:47:02.280Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:journal (user) from C:\Users\ChuHai\.qwen\skills\journal\SKILL.md
+2026-04-09T10:47:02.281Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:kanban (user) from C:\Users\ChuHai\.qwen\skills\kanban\SKILL.md
+2026-04-09T10:47:02.282Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:markdown-novel-viewer (user) from C:\Users\ChuHai\.qwen\skills\markdown-novel-viewer\SKILL.md
+2026-04-09T10:47:02.283Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-builder (user) from C:\Users\ChuHai\.qwen\skills\mcp-builder\SKILL.md
+2026-04-09T10:47:02.284Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-management (user) from C:\Users\ChuHai\.qwen\skills\mcp-management\SKILL.md
+2026-04-09T10:47:02.285Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:media-processing (user) from C:\Users\ChuHai\.qwen\skills\media-processing\SKILL.md
+2026-04-09T10:47:02.285Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mermaidjs-v11 (user) from C:\Users\ChuHai\.qwen\skills\mermaidjs-v11\SKILL.md
+2026-04-09T10:47:02.286Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mintlify (user) from C:\Users\ChuHai\.qwen\skills\mintlify\SKILL.md
+2026-04-09T10:47:02.287Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mobile-development (user) from C:\Users\ChuHai\.qwen\skills\mobile-development\SKILL.md
+2026-04-09T10:47:02.288Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:payment-integration (user) from C:\Users\ChuHai\.qwen\skills\payment-integration\SKILL.md
+2026-04-09T10:47:02.289Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plan (user) from C:\Users\ChuHai\.qwen\skills\plan\SKILL.md
+2026-04-09T10:47:02.290Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plans-kanban (user) from C:\Users\ChuHai\.qwen\skills\plans-kanban\SKILL.md
+2026-04-09T10:47:02.290Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:preview (user) from C:\Users\ChuHai\.qwen\skills\preview\SKILL.md
+2026-04-09T10:47:02.291Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:problem-solving (user) from C:\Users\ChuHai\.qwen\skills\problem-solving\SKILL.md
+2026-04-09T10:47:02.292Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:project-management (user) from C:\Users\ChuHai\.qwen\skills\project-management\SKILL.md
+2026-04-09T10:47:02.302Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:react-best-practices (user) from C:\Users\ChuHai\.qwen\skills\react-best-practices\SKILL.md
+2026-04-09T10:47:02.302Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: README.md
+2026-04-09T10:47:02.303Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:remotion (user) from C:\Users\ChuHai\.qwen\skills\remotion\SKILL.md
+2026-04-09T10:47:02.304Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:repomix (user) from C:\Users\ChuHai\.qwen\skills\repomix\SKILL.md
+2026-04-09T10:47:02.305Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\ChuHai\.qwen\skills\requirement_analyze: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-09T10:47:02.305Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:research (user) from C:\Users\ChuHai\.qwen\skills\research\SKILL.md
+2026-04-09T10:47:02.306Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:scout (user) from C:\Users\ChuHai\.qwen\skills\scout\SKILL.md
+2026-04-09T10:47:02.307Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:sequential-thinking (user) from C:\Users\ChuHai\.qwen\skills\sequential-thinking\SKILL.md
+2026-04-09T10:47:02.308Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shader (user) from C:\Users\ChuHai\.qwen\skills\shader\SKILL.md
+2026-04-09T10:47:02.309Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shopify (user) from C:\Users\ChuHai\.qwen\skills\shopify\SKILL.md
+2026-04-09T10:47:02.310Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:skill-creator (user) from C:\Users\ChuHai\.qwen\skills\skill-creator\SKILL.md
+2026-04-09T10:47:02.311Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:tanstack (user) from C:\Users\ChuHai\.qwen\skills\tanstack\SKILL.md
+2026-04-09T10:47:02.312Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:team (user) from C:\Users\ChuHai\.qwen\skills\team\SKILL.md
+2026-04-09T10:47:02.313Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:template-skill (user) from C:\Users\ChuHai\.qwen\skills\template-skill\SKILL.md
+2026-04-09T10:47:02.314Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:test (user) from C:\Users\ChuHai\.qwen\skills\test\SKILL.md
+2026-04-09T10:47:02.315Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: testcasewriting (user) from C:\Users\ChuHai\.qwen\skills\testcasewriting\SKILL.md
+2026-04-09T10:47:02.315Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: THIRD_PARTY_NOTICES.md
+2026-04-09T10:47:02.315Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:threejs (user) from C:\Users\ChuHai\.qwen\skills\threejs\SKILL.md
+2026-04-09T10:47:02.316Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-styling (user) from C:\Users\ChuHai\.qwen\skills\ui-styling\SKILL.md
+2026-04-09T10:47:02.317Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-ux-pro-max (user) from C:\Users\ChuHai\.qwen\skills\ui-ux-pro-max\SKILL.md
+2026-04-09T10:47:02.318Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:use-mcp (user) from C:\Users\ChuHai\.qwen\skills\use-mcp\SKILL.md
+2026-04-09T10:47:02.319Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:watzup (user) from C:\Users\ChuHai\.qwen\skills\watzup\SKILL.md
+2026-04-09T10:47:02.319Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-design-guidelines (user) from C:\Users\ChuHai\.qwen\skills\web-design-guidelines\SKILL.md
+2026-04-09T10:47:02.320Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-frameworks (user) from C:\Users\ChuHai\.qwen\skills\web-frameworks\SKILL.md
+2026-04-09T10:47:02.321Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-testing (user) from C:\Users\ChuHai\.qwen\skills\web-testing\SKILL.md
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:worktree (user) from C:\Users\ChuHai\.qwen\skills\worktree\SKILL.md
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.agents\skills
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.agents\skills
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory C:\Users\ChuHai\.agents\skills: ENOENT: no such file or directory, scandir 'C:\Users\ChuHai\.agents\skills'
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension-level skills from 0 extensions
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension level skills
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loading bundled skills from: C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-09T10:47:02.322Z [DEBUG] [SKILL_MANAGER] Found 3 entries in C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-09T10:47:02.323Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: loop (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\loop\SKILL.md
+2026-04-09T10:47:02.324Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: qc-helper (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\qc-helper\SKILL.md
+2026-04-09T10:47:02.325Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: review (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\review\SKILL.md
+2026-04-09T10:47:02.325Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled skills
+2026-04-09T10:47:02.325Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled level skills
+2026-04-09T10:47:02.325Z [INFO] [SKILL_MANAGER] Skills cache refreshed: 71 total skills loaded
+2026-04-09T10:47:02.327Z [INFO] [SKILL_MANAGER] Skill directory watchers started
+2026-04-09T10:47:02.327Z [DEBUG] Skill manager initialized
+2026-04-09T10:47:02.327Z [DEBUG] Permission manager initialized
+2026-04-09T10:47:02.327Z [DEBUG] [MEMORY_DISCOVERY] Loading server hierarchical memory for CWD: C:\Users\ChuHai\Documents\VirtualGfriend (importFormat: tree)
+2026-04-09T10:47:02.329Z [DEBUG] [MEMORY_DISCOVERY] Found readable global QWEN.md: C:\Users\ChuHai\.qwen\QWEN.md
+2026-04-09T10:47:02.329Z [DEBUG] [MEMORY_DISCOVERY] Searching for QWEN.md starting from CWD: C:\Users\ChuHai\Documents\VirtualGfriend
+2026-04-09T10:47:02.329Z [DEBUG] [MEMORY_DISCOVERY] Determined project root: C:\Users\ChuHai\Documents\VirtualGfriend
+2026-04-09T10:47:02.334Z [DEBUG] [MEMORY_DISCOVERY] Searching for AGENTS.md starting from CWD: C:\Users\ChuHai\Documents\VirtualGfriend
+2026-04-09T10:47:02.337Z [DEBUG] [MEMORY_DISCOVERY] Determined project root: C:\Users\ChuHai\Documents\VirtualGfriend
+2026-04-09T10:47:02.350Z [DEBUG] [MEMORY_DISCOVERY] Final ordered QWEN.md,AGENTS.md paths to read: ["C:\\Users\\ChuHai\\.qwen\\QWEN.md","C:\\Users\\ChuHai\\Documents\\VirtualGfriend\\AGENTS.md","C:\\Users\\ChuHai\\.qwen\\output-language.md"]
+2026-04-09T10:47:02.522Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\ChuHai\Documents\VirtualGfriend\AGENTS.md (Length: 3419)
+2026-04-09T10:47:02.765Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\ChuHai\.qwen\output-language.md (Length: 812)
+2026-04-09T10:47:02.775Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\ChuHai\.qwen\QWEN.md (Length: 3918)
+2026-04-09T10:47:02.775Z [DEBUG] Hierarchical memory loaded
+2026-04-09T10:47:02.777Z [DEBUG] [SKILL_MANAGER] Listing skills
+2026-04-09T10:47:02.777Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-09T10:47:02.777Z [DEBUG] [SKILL_MANAGER] Processing 1 project level skills
+2026-04-09T10:47:02.777Z [DEBUG] [SKILL_MANAGER] Processing 67 user level skills
+2026-04-09T10:47:02.777Z [DEBUG] [SKILL_MANAGER] Processing 0 extension level skills
+2026-04-09T10:47:02.777Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-09T10:47:02.777Z [INFO] [SKILL_MANAGER] Listed 71 unique skills
+2026-04-09T10:47:06.971Z [DEBUG] ToolRegistry created: ["agent","skill","list_directory","read_file","grep_search","glob","edit","write_file","run_shell_command","save_memory","todo_write","ask_user_question","exit_plan_mode","web_fetch","web_search","mcp__atlassian-mcp-server__atlassianUserInfo","mcp__atlassian-mcp-server__getAccessibleAtlassianResources","mcp__atlassian-mcp-server__getConfluencePage","mcp__atlassian-mcp-server__searchConfluenceUsingCql","mcp__atlassian-mcp-server__getConfluenceSpaces","mcp__atlassian-mcp-server__getPagesInConfluenceSpace","mcp__atlassian-mcp-server__getConfluencePageFooterComments","mcp__atlassian-mcp-server__getConfluencePageInlineComments","mcp__atlassian-mcp-server__getConfluenceCommentChildren","mcp__atlassian-mcp-server__getConfluencePageDescendants","mcp__atlassian-mcp-server__createConfluencePage","mcp__atlassian-mcp-server__updateConfluencePage","mcp__atlassian-mcp-server__createConfluenceFooterComment","mcp__atlassian-mcp-server__createConfluenceInlineComment","mcp__atlassian-mcp-server__getJiraIssue","mcp__atlassian-mcp-server__editJiraIssue","mcp__atlassian-mcp-server__createJiraIssue","mcp__atlassian-mcp-server__getTransitionsForJiraIssue","mcp__atlassian-mcp-server__getJiraIssueRemoteIssueLinks","mcp__atlassian-mcp-server__getVisibleJiraProjects","mcp__atlassian-mcp-server__getJiraProjectIssueTypesMetadata","mcp__atlassian-mcp-server__getJiraIssueTypeMetaWithFields","mcp__atlassian-mcp-server__addCommentToJiraIssue","mcp__atlassian-mcp-server__transitionJiraIssue","mcp__atlassian-mcp-server__searchJiraIssuesUsingJql","mcp__atlassian-mcp-server__lookupJiraAccountId","mcp__atlassian-mcp-server__addWorklogToJiraIssue","mcp__atlassian-mcp-server__getIssueLinkTypes","mcp__atlassian-mcp-server__createIssueLink","mcp__atlassian-mcp-server__searchAtlassian","mcp__atlassian-mcp-server__fetchAtlassian"] (46 tools)
+2026-04-09T10:47:06.971Z [INFO] Tool registry initialized with 46 tools
+2026-04-09T10:47:07.050Z [INFO] Gemini client initialized
+2026-04-09T10:47:07.051Z [INFO] Config initialization completed
+2026-04-09T10:47:07.054Z [DEBUG] [APP_CONTAINER] SessionStart event completed successfully
+2026-04-09T10:47:07.059Z [DEBUG] [SKILL_MANAGER] Listing skills at level: bundled
+2026-04-09T10:47:07.059Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-09T10:47:07.059Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-09T10:47:07.061Z [DEBUG] [BUNDLED_SKILL_LOADER] Loaded 2 bundled skill(s) as slash commands
+2026-04-09T10:47:07.060Z [INFO] [SKILL_MANAGER] Listed 3 unique skills
+2026-04-09T10:47:07.061Z [DEBUG] [BUNDLED_SKILL_LOADER] Hiding skill "loop" because cron is not enabled
+2026-04-09T10:47:41.946Z [DEBUG] Received user query (126 chars)
+2026-04-09T10:48:11.281Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.
+2026-04-09T10:48:11.321Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.
+2026-04-09T10:48:20.208Z [ERROR] [OPENAI_ERROR] OpenAI API Streaming Error: 429 You exceeded your current quota, please check your plan and billing details. For details, see: https://help.aliyun.com/zh/model-studio/error-code#token-limit
+2026-04-09T10:48:20.247Z [WARN] [RETRY] Attempt 1 failed with status 429. Retrying with backoff... Error: 429 You exceeded your current quota, please check your plan and billing details. For details, see: https://help.aliyun.com/zh/model-studio/error-code#token-limit
+    at APIError.generate (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:148993:18)
+    at OpenAI.makeStatusError (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156009:25)
+    at OpenAI.makeRequest (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156144:29)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156960:27
+    at async ContentGenerationPipeline.executeWithErrorHandling (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:157136:26)
+    at async attemptOperation (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:159955:18)
+    at async QwenContentGenerator.executeWithCredentialManagement (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:159958:18)
+    at async LoggingContentGenerator.generateContentStream (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:147164:21)
+    at async retryWithBackoff (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:172070:22)
+2026-04-09T10:48:28.883Z [DEBUG] [SKILL_MANAGER] Loading skill: ck:ui-ux-pro-max
+2026-04-09T10:48:28.883Z [DEBUG] [SKILL_MANAGER] Loading skill for runtime: ck:ui-ux-pro-max
+2026-04-09T10:48:28.883Z [DEBUG] [SKILL_MANAGER] Found skill ck:ui-ux-pro-max at user level
+2026-04-09T10:48:28.883Z [INFO] [SKILL_MANAGER] Skill loaded for runtime: ck:ui-ux-pro-max from C:\Users\ChuHai\.qwen\skills\ui-ux-pro-max\SKILL.md
+2026-04-09T15:28:21.526Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills
+2026-04-09T15:28:21.526Z [INFO] [SKILL_MANAGER] Refreshing skills cache...
+2026-04-09T15:28:21.526Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills
+2026-04-09T15:28:21.527Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills: ENOENT: no such file or directory, scandir 'C:\Users\ChuHai\Documents\VirtualGfriend\.qwen\skills'
+2026-04-09T15:28:21.527Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills
+2026-04-09T15:28:21.527Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills
+2026-04-09T15:28:21.528Z [DEBUG] [SKILL_MANAGER] Found 1 entries in C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills
+2026-04-09T15:28:21.529Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: find-skills (project) from C:\Users\ChuHai\Documents\VirtualGfriend\.agents\skills\find-skills\SKILL.md
+2026-04-09T15:28:21.529Z [DEBUG] [SKILL_MANAGER] Loaded 1 project level skills
+2026-04-09T15:28:21.529Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.qwen\skills
+2026-04-09T15:28:21.529Z [DEBUG] [SKILL_MANAGER] Loaded 1 project level skills
+2026-04-09T15:28:21.529Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.qwen\skills
+2026-04-09T15:28:21.530Z [DEBUG] [SKILL_MANAGER] Found 79 entries in C:\Users\ChuHai\.qwen\skills
+2026-04-09T15:28:21.530Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .env.example
+2026-04-09T15:28:21.530Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .gitignore
+2026-04-09T15:28:21.531Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:agent-browser (user) from C:\Users\ChuHai\.qwen\skills\agent-browser\SKILL.md
+2026-04-09T15:28:21.531Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: agent_skills_spec.md
+2026-04-09T15:28:21.534Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-artist (user) from C:\Users\ChuHai\.qwen\skills\ai-artist\SKILL.md
+2026-04-09T15:28:21.538Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-multimodal (user) from C:\Users\ChuHai\.qwen\skills\ai-multimodal\SKILL.md
+2026-04-09T15:28:21.540Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ask (user) from C:\Users\ChuHai\.qwen\skills\ask\SKILL.md
+2026-04-09T15:28:21.544Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: automationtest (user) from C:\Users\ChuHai\.qwen\skills\automationtest\SKILL.md
+2026-04-09T15:28:21.547Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: auto-playwright (user) from C:\Users\ChuHai\.qwen\skills\auto_playwright\SKILL.md
+2026-04-09T15:28:21.549Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:backend-development (user) from C:\Users\ChuHai\.qwen\skills\backend-development\SKILL.md
+2026-04-09T15:28:21.553Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:better-auth (user) from C:\Users\ChuHai\.qwen\skills\better-auth\SKILL.md
+2026-04-09T15:28:21.555Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:bootstrap (user) from C:\Users\ChuHai\.qwen\skills\bootstrap\SKILL.md
+2026-04-09T15:28:21.558Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:brainstorm (user) from C:\Users\ChuHai\.qwen\skills\brainstorm\SKILL.md
+2026-04-09T15:28:21.562Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\ChuHai\.qwen\skills\bugreport: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-09T15:28:21.564Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:chrome-devtools (user) from C:\Users\ChuHai\.qwen\skills\chrome-devtools\SKILL.md
+2026-04-09T15:28:21.567Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ck-help (user) from C:\Users\ChuHai\.qwen\skills\ck-help\SKILL.md
+2026-04-09T15:28:21.570Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:code-review (user) from C:\Users\ChuHai\.qwen\skills\code-review\SKILL.md
+2026-04-09T15:28:21.573Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:coding-level (user) from C:\Users\ChuHai\.qwen\skills\coding-level\SKILL.md
+2026-04-09T15:28:21.574Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\ChuHai\.qwen\skills\common, skipping
+2026-04-09T15:28:21.577Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:context-engineering (user) from C:\Users\ChuHai\.qwen\skills\context-engineering\SKILL.md
+2026-04-09T15:28:21.580Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:cook (user) from C:\Users\ChuHai\.qwen\skills\cook\SKILL.md
+2026-04-09T15:28:21.583Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:copywriting (user) from C:\Users\ChuHai\.qwen\skills\copywriting\SKILL.md
+2026-04-09T15:28:21.586Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:databases (user) from C:\Users\ChuHai\.qwen\skills\databases\SKILL.md
+2026-04-09T15:28:21.589Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:debug (user) from C:\Users\ChuHai\.qwen\skills\debug\SKILL.md
+2026-04-09T15:28:21.617Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:devops (user) from C:\Users\ChuHai\.qwen\skills\devops\SKILL.md
+2026-04-09T15:28:21.630Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs (user) from C:\Users\ChuHai\.qwen\skills\docs\SKILL.md
+2026-04-09T15:28:21.634Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs-seeker (user) from C:\Users\ChuHai\.qwen\skills\docs-seeker\SKILL.md
+2026-04-09T15:28:21.636Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\ChuHai\.qwen\skills\document-skills, skipping
+2026-04-09T15:28:21.641Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:find-skills (user) from C:\Users\ChuHai\.qwen\skills\find-skills\SKILL.md
+2026-04-09T15:28:21.651Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:fix (user) from C:\Users\ChuHai\.qwen\skills\fix\SKILL.md
+2026-04-09T15:28:21.654Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-design (user) from C:\Users\ChuHai\.qwen\skills\frontend-design\SKILL.md
+2026-04-09T15:28:21.657Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-development (user) from C:\Users\ChuHai\.qwen\skills\frontend-development\SKILL.md
+2026-04-09T15:28:21.683Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:git (user) from C:\Users\ChuHai\.qwen\skills\git\SKILL.md
+2026-04-09T15:28:21.685Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:gkg (user) from C:\Users\ChuHai\.qwen\skills\gkg\SKILL.md
+2026-04-09T15:28:21.688Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:google-adk-python (user) from C:\Users\ChuHai\.qwen\skills\google-adk-python\SKILL.md
+2026-04-09T15:28:21.689Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.sh
+2026-04-09T15:28:21.689Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.ps1
+2026-04-09T15:28:21.689Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: INSTALLATION.md
+2026-04-09T15:28:21.691Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:journal (user) from C:\Users\ChuHai\.qwen\skills\journal\SKILL.md
+2026-04-09T15:28:21.693Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:kanban (user) from C:\Users\ChuHai\.qwen\skills\kanban\SKILL.md
+2026-04-09T15:28:21.696Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:markdown-novel-viewer (user) from C:\Users\ChuHai\.qwen\skills\markdown-novel-viewer\SKILL.md
+2026-04-09T15:28:21.714Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-builder (user) from C:\Users\ChuHai\.qwen\skills\mcp-builder\SKILL.md
+2026-04-09T15:28:21.735Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-management (user) from C:\Users\ChuHai\.qwen\skills\mcp-management\SKILL.md
+2026-04-09T15:28:21.738Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:media-processing (user) from C:\Users\ChuHai\.qwen\skills\media-processing\SKILL.md
+2026-04-09T15:28:21.741Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mermaidjs-v11 (user) from C:\Users\ChuHai\.qwen\skills\mermaidjs-v11\SKILL.md
+2026-04-09T15:28:21.743Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mintlify (user) from C:\Users\ChuHai\.qwen\skills\mintlify\SKILL.md
+2026-04-09T15:28:21.747Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mobile-development (user) from C:\Users\ChuHai\.qwen\skills\mobile-development\SKILL.md
+2026-04-09T15:28:21.749Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:payment-integration (user) from C:\Users\ChuHai\.qwen\skills\payment-integration\SKILL.md
+2026-04-09T15:28:21.752Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plan (user) from C:\Users\ChuHai\.qwen\skills\plan\SKILL.md
+2026-04-09T15:28:21.755Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plans-kanban (user) from C:\Users\ChuHai\.qwen\skills\plans-kanban\SKILL.md
+2026-04-09T15:28:21.757Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:preview (user) from C:\Users\ChuHai\.qwen\skills\preview\SKILL.md
+2026-04-09T15:28:21.770Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:problem-solving (user) from C:\Users\ChuHai\.qwen\skills\problem-solving\SKILL.md
+2026-04-09T15:28:21.773Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:project-management (user) from C:\Users\ChuHai\.qwen\skills\project-management\SKILL.md
+2026-04-09T15:28:21.775Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:react-best-practices (user) from C:\Users\ChuHai\.qwen\skills\react-best-practices\SKILL.md
+2026-04-09T15:28:21.776Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: README.md
+2026-04-09T15:28:21.778Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:remotion (user) from C:\Users\ChuHai\.qwen\skills\remotion\SKILL.md
+2026-04-09T15:28:21.781Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:repomix (user) from C:\Users\ChuHai\.qwen\skills\repomix\SKILL.md
+2026-04-09T15:28:21.784Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\ChuHai\.qwen\skills\requirement_analyze: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-09T15:28:21.787Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:research (user) from C:\Users\ChuHai\.qwen\skills\research\SKILL.md
+2026-04-09T15:28:21.789Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:scout (user) from C:\Users\ChuHai\.qwen\skills\scout\SKILL.md
+2026-04-09T15:28:21.792Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:sequential-thinking (user) from C:\Users\ChuHai\.qwen\skills\sequential-thinking\SKILL.md
+2026-04-09T15:28:21.795Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shader (user) from C:\Users\ChuHai\.qwen\skills\shader\SKILL.md
+2026-04-09T15:28:21.798Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shopify (user) from C:\Users\ChuHai\.qwen\skills\shopify\SKILL.md
+2026-04-09T15:28:21.800Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:skill-creator (user) from C:\Users\ChuHai\.qwen\skills\skill-creator\SKILL.md
+2026-04-09T15:28:21.803Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:tanstack (user) from C:\Users\ChuHai\.qwen\skills\tanstack\SKILL.md
+2026-04-09T15:28:21.805Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:team (user) from C:\Users\ChuHai\.qwen\skills\team\SKILL.md
+2026-04-09T15:28:21.808Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:template-skill (user) from C:\Users\ChuHai\.qwen\skills\template-skill\SKILL.md
+2026-04-09T15:28:21.810Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:test (user) from C:\Users\ChuHai\.qwen\skills\test\SKILL.md
+2026-04-09T15:28:21.813Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: testcasewriting (user) from C:\Users\ChuHai\.qwen\skills\testcasewriting\SKILL.md
+2026-04-09T15:28:21.813Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: THIRD_PARTY_NOTICES.md
+2026-04-09T15:28:21.816Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:threejs (user) from C:\Users\ChuHai\.qwen\skills\threejs\SKILL.md
+2026-04-09T15:28:21.818Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-styling (user) from C:\Users\ChuHai\.qwen\skills\ui-styling\SKILL.md
+2026-04-09T15:28:21.821Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-ux-pro-max (user) from C:\Users\ChuHai\.qwen\skills\ui-ux-pro-max\SKILL.md
+2026-04-09T15:28:21.823Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:use-mcp (user) from C:\Users\ChuHai\.qwen\skills\use-mcp\SKILL.md
+2026-04-09T15:28:21.825Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:watzup (user) from C:\Users\ChuHai\.qwen\skills\watzup\SKILL.md
+2026-04-09T15:28:21.828Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-design-guidelines (user) from C:\Users\ChuHai\.qwen\skills\web-design-guidelines\SKILL.md
+2026-04-09T15:28:21.830Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-frameworks (user) from C:\Users\ChuHai\.qwen\skills\web-frameworks\SKILL.md
+2026-04-09T15:28:21.832Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-testing (user) from C:\Users\ChuHai\.qwen\skills\web-testing\SKILL.md
+2026-04-09T15:28:21.834Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:worktree (user) from C:\Users\ChuHai\.qwen\skills\worktree\SKILL.md
+2026-04-09T15:28:21.835Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\.agents\skills
+2026-04-09T15:28:21.835Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\ChuHai\.agents\skills
+2026-04-09T15:28:21.836Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-09T15:28:21.836Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory C:\Users\ChuHai\.agents\skills: ENOENT: no such file or directory, scandir 'C:\Users\ChuHai\.agents\skills'
+2026-04-09T15:28:21.836Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-09T15:28:21.836Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension-level skills from 0 extensions
+2026-04-09T15:28:21.836Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension level skills
+2026-04-09T15:28:21.836Z [DEBUG] [SKILL_MANAGER] Loading bundled skills from: C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-09T15:28:21.836Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-09T15:28:21.837Z [DEBUG] [SKILL_MANAGER] Found 3 entries in C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled
+2026-04-09T15:28:21.847Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: loop (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\loop\SKILL.md
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: qc-helper (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\qc-helper\SKILL.md
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: review (bundled) from C:\Users\ChuHai\AppData\Roaming\npm\node_modules\@qwen-code\qwen-code\bundled\review\SKILL.md
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled skills
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled level skills
+2026-04-09T15:28:21.851Z [INFO] [SKILL_MANAGER] Skills cache refreshed: 71 total skills loaded
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Listing skills
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Processing 1 project level skills
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Processing 67 user level skills
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Processing 0 extension level skills
+2026-04-09T15:28:21.851Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-09T15:28:21.851Z [INFO] [SKILL_MANAGER] Listed 71 unique skills
+2026-04-09T15:29:22.719Z [ERROR] [OPENAI_ERROR] OpenAI API Streaming Error: 429 You exceeded your current quota, please check your plan and billing details. For details, see: https://help.aliyun.com/zh/model-studio/error-code#token-limit
+2026-04-09T15:29:22.776Z [WARN] [RETRY] Attempt 1 failed with status 429. Retrying with backoff... Error: 429 You exceeded your current quota, please check your plan and billing details. For details, see: https://help.aliyun.com/zh/model-studio/error-code#token-limit
+    at APIError.generate (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:148993:18)
+    at OpenAI.makeStatusError (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156009:25)
+    at OpenAI.makeRequest (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156144:29)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156960:27
+    at async ContentGenerationPipeline.executeWithErrorHandling (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:157136:26)
+    at async attemptOperation (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:159955:18)
+    at async QwenContentGenerator.executeWithCredentialManagement (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:159958:18)
+    at async LoggingContentGenerator.generateContentStream (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:147164:21)
+    at async retryWithBackoff (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:172070:22)
+2026-04-09T15:29:28.531Z [ERROR] [OPENAI_ERROR] OpenAI API Streaming Error: 429 You exceeded your current quota, please check your plan and billing details. For details, see: https://help.aliyun.com/zh/model-studio/error-code#token-limit
+2026-04-09T15:29:28.586Z [WARN] [RETRY] Attempt 2 failed with status 429. Retrying with backoff... Error: 429 You exceeded your current quota, please check your plan and billing details. For details, see: https://help.aliyun.com/zh/model-studio/error-code#token-limit
+    at APIError.generate (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:148993:18)
+    at OpenAI.makeStatusError (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156009:25)
+    at OpenAI.makeRequest (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156144:29)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156960:27
+    at async ContentGenerationPipeline.executeWithErrorHandling (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:157136:26)
+    at async attemptOperation (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:159955:18)
+    at async QwenContentGenerator.executeWithCredentialManagement (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:159958:18)
+    at async LoggingContentGenerator.generateContentStream (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:147164:21)
+    at async retryWithBackoff (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:172070:22)
+2026-04-09T15:32:17.919Z [ERROR] [JSON_PARSE] Failed to parse JSON even with jsonrepair: {
+  originalError: SyntaxError: Unterminated string in JSON at position 28904 (line 1 column 28905)
+      at JSON.parse (<anonymous>)
+      at safeJsonParse (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:145576:17)
+      at StreamingToolCallParser.getCompletedToolCalls (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:145776:27)
+      at OpenAIContentConverter.convertOpenAIChunkToGemini (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:146661:69)
+      at ContentGenerationPipeline.processStreamWithLogging (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156986:45)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async LoggingContentGenerator.loggingStreamWrapper (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:147177:28)
+      at async GeminiChat.processStreamResponse (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:173783:26)
+      at async file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:173525:34
+      at async AgentCore.runReasoningLoop (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:190213:28),
+  repairError: JSONRepairError: Unexpected character "{" at position 148
+      at throwUnexpectedCharacter (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:145509:11)
+      at jsonrepair (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:144989:3)
+      at safeJsonParse (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:145579:28)
+      at StreamingToolCallParser.getCompletedToolCalls (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:145776:27)
+      at OpenAIContentConverter.convertOpenAIChunkToGemini (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:146661:69)
+      at ContentGenerationPipeline.processStreamWithLogging (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:156986:45)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async LoggingContentGenerator.loggingStreamWrapper (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:147177:28)
+      at async GeminiChat.processStreamResponse (file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:173783:26)
+      at async file:///C:/Users/ChuHai/AppData/Roaming/npm/node_modules/@qwen-code/qwen-code/cli.js:173525:34 {
+    position: 148
+  },
+  jsonString: '{"file_path": "C:\\\\Users\\\\ChuHai\\\\Documents\\\\VirtualGfriend\\\\client\\\\src\\\\features\\\\landing\\\\landing-page.tsx", "content": "\'use client\';\\n\\nimport { useState, useEffect, useRef, useCallback } from \'react\';\\nimport { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from \'framer-motion\';\\nimport {\\n  Heart, Sparkles, MessageCircle, Gift, Star, ArrowRight, ArrowDown,\\n  Clock, User, Shield, Send, CheckCircle, Zap, Brain, Lock,\\n  ChevronRight, Menu, X, Globe, Palette, Trophy, MessageSquare,\\n  Play, Users, Quote,\\n} from \'lucide-react\';\\nimport Link from \'next/link\';\\n\\n/* ──────────────────── REDUCED MOTION HOOK ──────────────────── */\\nfunction useReducedMotionCheck() {\\n  const systemPrefersReduced = useReducedMotion();\\n  const [reduced, setReduced] = useState(systemPrefersReduced);\\n\\n  useEffect(() => {\\n    // Also check CSS media query for broader support\\n    const mq = window.matchMedia(\'(prefers-reduced-motion: reduce)\');\\n    setReduced(mq.matches);\\n    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);\\n    mq.addEventListener(\'change\', handler);\\n    return () => mq.removeEventListener(\'change\', handler);\\n  }, []);\\n\\n  return reduced || systemPrefersReduced;\\n}\\n\\n/* ──────────────────── FLOATING PARTICLE ──────────────────── */\\nfunction FloatingParticle({ delay, size, x, duration }: { delay: number; size: number; x: string; duration: number }) {\\n  const prefersReduced = useReducedMotionCheck();\\n  if (prefersReduced) return null;\\n\\n  return (\\n    <motion.div\\n      initial={{ opacity: 0, y: 20 }}\\n      animate={{ opacity: [0.1, 0.4, 0.1], y: [-20, -60, -20] }}\\n      transition={{ delay, duration, repeat: Infinity, ease: \'easeInOut\' }}\\n      className=\\"absolute rounded-full bg-love/30 pointer-events-none\\"\\n      style={{ left: x, top: `${Math.random() * 100}%`, width: size, height: size }}\\n    />\\n  );\\n}\\n\\n/* ──────────────────── STAGGER CONTAINER ──────────────────── */\\nfunction StaggerContainer({ children, className = \'\' }: { children: React.ReactNode; className?: string }) {\\n  const prefersReduced = useReducedMotionCheck();\\n\\n  return (\\n    <motion.div\\n      className={className}\\n      initial={prefersReduced ? {} : { opacity: 0 }}\\n      whileInView={prefersReduced ? {} : { opacity: 1 }}\\n      transition={prefersReduced ? {} : { duration: 0.3 }}\\n      viewport={{ once: true }}\\n    >\\n      {children}\\n    </motion.div>\\n  );\\n}\\n\\n/* ──────────────────── SECTION DIVIDER ──────────────────── */\\nfunction SectionDivider() {\\n  return (\\n    <div className=\\"relative h-px w-full overflow-hidden\\">\\n      <div className=\\"absolute inset-0 bg-gradient-to-r from-transparent via-love/20 to-transparent\\" />\\n      <div className=\\"absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent translate-y-px\\" />\\n    </div>\\n  );\\n}\\n\\n/* ──────────────────── 3D TILT CARD COMPONENT ──────────────────── */\\ninterface TiltCardProps {\\n  children: React.ReactNode;\\n  className?: string;\\n  glowColor?: string;\\n  intensity?: number;\\n}\\n\\nfunction TiltCard({ children, className = \'\', glowColor = \'#f4258c\', intensity = 15 }: TiltCardProps) {\\n  const cardRef = useRef<HTMLDivElement>(null);\\n  const [transform, setTransform] = useState(\'perspective(1000px) rotateX(0deg) rotateY(0deg)\');\\n  const [glowPosition, setGlowPosition] = useState({ x: 50, y: 50 });\\n  const [isHovering, setIsHovering] = useState(false);\\n\\n  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {\\n    if (!cardRef.current) return;\\n    const rect = cardRef.current.getBoundingClientRect();\\n    const x = e.clientX - rect.left;\\n    const y = e.clientY - rect.top;\\n    const centerX = rect.width / 2;\\n    const centerY = rect.height / 2;\\n    const rotateX = ((y - centerY) / centerY) * -intensity;\\n    const rotateY = ((x - centerX) / centerX) * intensity;\\n    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`);\\n    setGlowPosition({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });\\n  }, [intensity]);\\n\\n  const handleMouseEnter = useCallback(() => {\\n    setIsHovering(true);\\n  }, []);\\n\\n  const handleMouseLeave = useCallback(() => {\\n    setTransform(\'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)\');\\n    setGlowPosition({ x: 50, y: 50 });\\n    setIsHovering(false);\\n  }, []);\\n\\n  return (\\n    <div\\n      ref={cardRef}\\n      onMouseMove={handleMouseMove}\\n      onMouseEnter={handleMouseEnter}\\n      onMouseLeave={handleMouseLeave}\\n      className={`relative transition-transform duration-200 ease-out ${className}`}\\n      style={{ transform, transformStyle: \'preserve-3d\' }}\\n    >\\n      {/* Dynamic highlight - uses isHovering state instead of group-hover */}\\n      <div\\n        className={`absolute inset-0 rounded-[inherit] transition-opacity duration-300 pointer-events-none overflow-hidden ${isHovering ? \'opacity-100\' : \'opacity-0\'}`}\\n        style={{\\n          background: `radial-gradient(circle at ${glowPosition.x}% ${glowPosition.y}%, ${glowColor}25, transparent 50%)`,\\n        }}\\n      />\\n      {/* Shine effect */}\\n      <div\\n        className={`absolute inset-0 rounded-[inherit] transition-opacity duration-500 pointer-events-none overflow-hidden ${isHovering ? \'opacity-100\' : \'opacity-0\'}`}\\n        style={{\\n          background: `linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, transparent 100%)`,\\n        }}\\n      />\\n      {children}\\n    </div>\\n  );\\n}\\n\\n/* ──────────────────── ROOT ──────────────────── */\\nexport function LandingPage() {\\n  return (\\n    <div className=\\"min-h-screen bg-[#030014] text-white overflow-x-hidden selection:bg-love selection:text-white font-sans antialiased\\">\\n      <Header />\\n      <HeroSection />\\n      <TechBanner />\\n      <StatsSection />\\n      <SectionDivider />\\n      <FeaturesSection />\\n      <SectionDivider />\\n      <ChatDemoSection />\\n      <SectionDivider />\\n      <HowItWorksSection />\\n      <SectionDivider />\\n      <TestimonialsSection />\\n      <TrustBanner />\\n      <SectionDivider />\\n      <PricingSection />\\n      <SectionDivider />\\n      <CTASection />\\n      <Footer />\\n    </div>\\n  );\\n}\\n\\n/* ──────────────────── HEADER ──────────────────── */\\nfunction Header() {\\n  const [isScrolled, setIsScrolled] = useState(false);\\n  const [mobileOpen, setMobileOpen] = useState(false);\\n\\n  useEffect(() => {\\n    const handler = () => setIsScrolled(window.scrollY > 20);\\n    window.addEventListener(\'scroll\', handler, { passive: true });\\n    return () => window.removeEventListener(\'scroll\', handler);\\n  }, []);\\n\\n  const navLinks = [\\n    { label: \'Tính năng\', href: \'#features\' },\\n    { label: \'Trải nghiệm\', href: \'#demo\' },\\n    { label: \'Cách hoạt động\', href: \'#how\' },\\n    { label: \'Đánh giá\', href: \'#stories\' },\\n    { label: \'Bảng giá\', href: \'#pricing\' },\\n  ];\\n\\n  return (\\n    <>\\n      <header\\n        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${\\n          isScrolled\\n            ? \'bg-[#030014]/90 backdrop-blur-2xl border-b border-white/[0.05] shadow-2xl shadow-black/20\'\\n            : \'bg-transparent\'\\n        }`}\\n      >\\n        <div className=\\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\\">\\n          <div className=\\"flex h-16 lg:h-20 items-center justify-between\\">\\n            {/* Logo */}\\n            <Link href=\\"/\\" className=\\"flex items-center gap-3 group cursor-pointer\\">\\n              <div className=\\"relative flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-love via-purple-500 to-love text-white shadow-lg shadow-love/25 group-hover:shadow-love/40 transition-all duration-300 group-hover:scale-105\\">\\n                <Heart className=\\"w-5 h-5 fill-white\\" />\\n                <div className=\\"absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity\\" />\\n              </div>\\n              <span className=\\"text-xl font-bold tracking-tight\\">\\n                <span className=\\"text-white\\">Amou</span>\\n                <span className=\\"text-love\\">ra</span>\\n              </span>\\n            </Link>\\n\\n            {/* Desktop Nav */}\\n            <nav className=\\"hidden lg:flex items-center gap-1\\">\\n              {navLinks.map((link) => (\\n                <a\\n                  key={link.href}\\n                  href={link.href}\\n                  className=\\"relative px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg transition-all duration-300 group cursor-pointer\\"\\n                >\\n                  <span className=\\"relative z-10\\">{link.label}</span>\\n                  <div className=\\"absolute inset-0 rounded-lg bg-white/[0.03] scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300\\" />\\n                </a>\\n              ))}\\n            </nav>\\n\\n            {/* CTA */}\\n            <div className=\\"flex items-center gap-3\\">\\n              <Link href=\\"/auth/login\\" className=\\"hidden sm:block cursor-pointer\\">\\n                <button className=\\"h-10 px-5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white border border-transparent hover:border-white/10 hover:bg-white/[0.03] transition-all duration-300 cursor-pointer\\">\\n                  Đăng nhập\\n                </button>\\n              </Link>\\n              <Link href=\\"/auth/register\\" className=\\"cursor-pointer\\">\\n                <button className=\\"relative h-10 px-6 rounded-xl bg-gradient-to-r from-love to-purple-500 text-sm font-bold text-white overflow-hidden group cursor-pointer\\">\\n                  <span className=\\"relative z-10\\">Bắt đầu miễn phí</span>\\n                  <div className=\\"absolute inset-0 bg-gradient-to-r from-purple-500 to-love opacity-0 group-hover:opacity-100 transition-opacity duration-300\\" />\\n                  <div className=\\"absolute inset-0 opacity-0 group-hover'... 18904 more characters
+}
+2026-04-09T15:32:18.060Z [INFO] [QWEN_CODE_CHAT] Output truncated at capped default. Escalating to 64000 tokens.
+2026-04-09T15:39:13.986Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.
+2026-04-09T15:39:14.037Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.
+2026-04-09T15:39:14.088Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.
+2026-04-09T15:58:48.107Z [DEBUG] Received user query (70 chars)
+2026-04-09T16:01:13.327Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.
+2026-04-09T16:01:13.368Z [DEBUG] [QWEN_LOGGER] QwenLogger: Flush already in progress, marking pending flush.

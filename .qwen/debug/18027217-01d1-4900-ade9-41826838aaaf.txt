@@ -1,0 +1,144 @@
+2026-04-07T02:26:59.114Z [INFO] Config initialization started
+2026-04-07T02:26:59.115Z [DEBUG] Extension manager initialized
+2026-04-07T02:26:59.115Z [DEBUG] [HOOK_REGISTRY] Hook registry initialized with 0 hook entries
+2026-04-07T02:26:59.115Z [DEBUG] [TRUSTED_HOOKS] Hook system initialized successfully
+2026-04-07T02:26:59.115Z [DEBUG] Hook system initialized
+2026-04-07T02:26:59.116Z [DEBUG] MessageBus initialized with hook subscription
+2026-04-07T02:26:59.116Z [INFO] [SKILL_MANAGER] Starting skill directory watchers...
+2026-04-07T02:26:59.118Z [INFO] [SKILL_MANAGER] Refreshing skills cache...
+2026-04-07T02:26:59.118Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: c:\Users\linhl\Documents\master\.qwen\skills
+2026-04-07T02:26:59.119Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory c:\Users\linhl\Documents\master\.qwen\skills: ENOENT: no such file or directory, scandir 'c:\Users\linhl\Documents\master\.qwen\skills'
+2026-04-07T02:26:59.118Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: c:\Users\linhl\Documents\master\.qwen\skills
+2026-04-07T02:26:59.120Z [DEBUG] [SKILL_MANAGER] Loading project level skills from: c:\Users\linhl\Documents\master\.agents\skills
+2026-04-07T02:26:59.120Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: c:\Users\linhl\Documents\master\.agents\skills
+2026-04-07T02:26:59.120Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory c:\Users\linhl\Documents\master\.agents\skills: ENOENT: no such file or directory, scandir 'c:\Users\linhl\Documents\master\.agents\skills'
+2026-04-07T02:26:59.120Z [DEBUG] [SKILL_MANAGER] Loaded 0 project level skills
+2026-04-07T02:26:59.120Z [DEBUG] [SKILL_MANAGER] Loaded 0 project level skills
+2026-04-07T02:26:59.121Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\linhl\.qwen\skills
+2026-04-07T02:26:59.121Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\linhl\.qwen\skills
+2026-04-07T02:26:59.122Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .env.example
+2026-04-07T02:26:59.122Z [DEBUG] [SKILL_MANAGER] Found 79 entries in C:\Users\linhl\.qwen\skills
+2026-04-07T02:26:59.122Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: .gitignore
+2026-04-07T02:26:59.124Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:agent-browser (user) from C:\Users\linhl\.qwen\skills\agent-browser\SKILL.md
+2026-04-07T02:26:59.124Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: agent_skills_spec.md
+2026-04-07T02:26:59.125Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-artist (user) from C:\Users\linhl\.qwen\skills\ai-artist\SKILL.md
+2026-04-07T02:26:59.126Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ai-multimodal (user) from C:\Users\linhl\.qwen\skills\ai-multimodal\SKILL.md
+2026-04-07T02:26:59.127Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ask (user) from C:\Users\linhl\.qwen\skills\ask\SKILL.md
+2026-04-07T02:26:59.128Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: automationtest (user) from C:\Users\linhl\.qwen\skills\automationtest\SKILL.md
+2026-04-07T02:26:59.128Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: auto-playwright (user) from C:\Users\linhl\.qwen\skills\auto_playwright\SKILL.md
+2026-04-07T02:26:59.129Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:backend-development (user) from C:\Users\linhl\.qwen\skills\backend-development\SKILL.md
+2026-04-07T02:26:59.130Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:better-auth (user) from C:\Users\linhl\.qwen\skills\better-auth\SKILL.md
+2026-04-07T02:26:59.131Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:bootstrap (user) from C:\Users\linhl\.qwen\skills\bootstrap\SKILL.md
+2026-04-07T02:26:59.131Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:brainstorm (user) from C:\Users\linhl\.qwen\skills\brainstorm\SKILL.md
+2026-04-07T02:26:59.132Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\linhl\.qwen\skills\bugreport: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-07T02:26:59.133Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:chrome-devtools (user) from C:\Users\linhl\.qwen\skills\chrome-devtools\SKILL.md
+2026-04-07T02:26:59.134Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ck-help (user) from C:\Users\linhl\.qwen\skills\ck-help\SKILL.md
+2026-04-07T02:26:59.135Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:code-review (user) from C:\Users\linhl\.qwen\skills\code-review\SKILL.md
+2026-04-07T02:26:59.136Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:coding-level (user) from C:\Users\linhl\.qwen\skills\coding-level\SKILL.md
+2026-04-07T02:26:59.136Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\linhl\.qwen\skills\common, skipping
+2026-04-07T02:26:59.137Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:context-engineering (user) from C:\Users\linhl\.qwen\skills\context-engineering\SKILL.md
+2026-04-07T02:26:59.138Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:cook (user) from C:\Users\linhl\.qwen\skills\cook\SKILL.md
+2026-04-07T02:26:59.138Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:copywriting (user) from C:\Users\linhl\.qwen\skills\copywriting\SKILL.md
+2026-04-07T02:26:59.139Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:databases (user) from C:\Users\linhl\.qwen\skills\databases\SKILL.md
+2026-04-07T02:26:59.139Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:debug (user) from C:\Users\linhl\.qwen\skills\debug\SKILL.md
+2026-04-07T02:26:59.140Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:devops (user) from C:\Users\linhl\.qwen\skills\devops\SKILL.md
+2026-04-07T02:26:59.141Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs (user) from C:\Users\linhl\.qwen\skills\docs\SKILL.md
+2026-04-07T02:26:59.142Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:docs-seeker (user) from C:\Users\linhl\.qwen\skills\docs-seeker\SKILL.md
+2026-04-07T02:26:59.143Z [DEBUG] [SKILL_MANAGER] No valid SKILL.md found in C:\Users\linhl\.qwen\skills\document-skills, skipping
+2026-04-07T02:26:59.144Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:find-skills (user) from C:\Users\linhl\.qwen\skills\find-skills\SKILL.md
+2026-04-07T02:26:59.144Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:fix (user) from C:\Users\linhl\.qwen\skills\fix\SKILL.md
+2026-04-07T02:26:59.145Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-design (user) from C:\Users\linhl\.qwen\skills\frontend-design\SKILL.md
+2026-04-07T02:26:59.146Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:frontend-development (user) from C:\Users\linhl\.qwen\skills\frontend-development\SKILL.md
+2026-04-07T02:26:59.147Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:git (user) from C:\Users\linhl\.qwen\skills\git\SKILL.md
+2026-04-07T02:26:59.148Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:gkg (user) from C:\Users\linhl\.qwen\skills\gkg\SKILL.md
+2026-04-07T02:26:59.149Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:google-adk-python (user) from C:\Users\linhl\.qwen\skills\google-adk-python\SKILL.md
+2026-04-07T02:26:59.149Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.ps1
+2026-04-07T02:26:59.149Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: install.sh
+2026-04-07T02:26:59.149Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: INSTALLATION.md
+2026-04-07T02:26:59.150Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:journal (user) from C:\Users\linhl\.qwen\skills\journal\SKILL.md
+2026-04-07T02:26:59.151Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:kanban (user) from C:\Users\linhl\.qwen\skills\kanban\SKILL.md
+2026-04-07T02:26:59.151Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:markdown-novel-viewer (user) from C:\Users\linhl\.qwen\skills\markdown-novel-viewer\SKILL.md
+2026-04-07T02:26:59.152Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-builder (user) from C:\Users\linhl\.qwen\skills\mcp-builder\SKILL.md
+2026-04-07T02:26:59.153Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mcp-management (user) from C:\Users\linhl\.qwen\skills\mcp-management\SKILL.md
+2026-04-07T02:26:59.153Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:media-processing (user) from C:\Users\linhl\.qwen\skills\media-processing\SKILL.md
+2026-04-07T02:26:59.154Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mermaidjs-v11 (user) from C:\Users\linhl\.qwen\skills\mermaidjs-v11\SKILL.md
+2026-04-07T02:26:59.155Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mintlify (user) from C:\Users\linhl\.qwen\skills\mintlify\SKILL.md
+2026-04-07T02:26:59.155Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:mobile-development (user) from C:\Users\linhl\.qwen\skills\mobile-development\SKILL.md
+2026-04-07T02:26:59.157Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:payment-integration (user) from C:\Users\linhl\.qwen\skills\payment-integration\SKILL.md
+2026-04-07T02:26:59.168Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plan (user) from C:\Users\linhl\.qwen\skills\plan\SKILL.md
+2026-04-07T02:26:59.171Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:plans-kanban (user) from C:\Users\linhl\.qwen\skills\plans-kanban\SKILL.md
+2026-04-07T02:26:59.173Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:preview (user) from C:\Users\linhl\.qwen\skills\preview\SKILL.md
+2026-04-07T02:26:59.176Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:problem-solving (user) from C:\Users\linhl\.qwen\skills\problem-solving\SKILL.md
+2026-04-07T02:26:59.178Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:project-management (user) from C:\Users\linhl\.qwen\skills\project-management\SKILL.md
+2026-04-07T02:26:59.179Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:react-best-practices (user) from C:\Users\linhl\.qwen\skills\react-best-practices\SKILL.md
+2026-04-07T02:26:59.179Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: README.md
+2026-04-07T02:26:59.180Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:remotion (user) from C:\Users\linhl\.qwen\skills\remotion\SKILL.md
+2026-04-07T02:26:59.183Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:repomix (user) from C:\Users\linhl\.qwen\skills\repomix\SKILL.md
+2026-04-07T02:26:59.188Z [ERROR] [SKILL_MANAGER] Failed to parse skill at C:\Users\linhl\.qwen\skills\requirement_analyze: Failed to parse skill file: Invalid format: missing YAML frontmatter
+2026-04-07T02:26:59.190Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:research (user) from C:\Users\linhl\.qwen\skills\research\SKILL.md
+2026-04-07T02:26:59.192Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:scout (user) from C:\Users\linhl\.qwen\skills\scout\SKILL.md
+2026-04-07T02:26:59.194Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:sequential-thinking (user) from C:\Users\linhl\.qwen\skills\sequential-thinking\SKILL.md
+2026-04-07T02:26:59.197Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shader (user) from C:\Users\linhl\.qwen\skills\shader\SKILL.md
+2026-04-07T02:26:59.200Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:shopify (user) from C:\Users\linhl\.qwen\skills\shopify\SKILL.md
+2026-04-07T02:26:59.202Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:skill-creator (user) from C:\Users\linhl\.qwen\skills\skill-creator\SKILL.md
+2026-04-07T02:26:59.204Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:tanstack (user) from C:\Users\linhl\.qwen\skills\tanstack\SKILL.md
+2026-04-07T02:26:59.206Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:team (user) from C:\Users\linhl\.qwen\skills\team\SKILL.md
+2026-04-07T02:26:59.217Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:template-skill (user) from C:\Users\linhl\.qwen\skills\template-skill\SKILL.md
+2026-04-07T02:26:59.219Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:test (user) from C:\Users\linhl\.qwen\skills\test\SKILL.md
+2026-04-07T02:26:59.219Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: testcasewriting (user) from C:\Users\linhl\.qwen\skills\testcasewriting\SKILL.md
+2026-04-07T02:26:59.219Z [WARN] [SKILL_MANAGER] Skipping non-directory entry: THIRD_PARTY_NOTICES.md
+2026-04-07T02:26:59.220Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:threejs (user) from C:\Users\linhl\.qwen\skills\threejs\SKILL.md
+2026-04-07T02:26:59.220Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-styling (user) from C:\Users\linhl\.qwen\skills\ui-styling\SKILL.md
+2026-04-07T02:26:59.221Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:ui-ux-pro-max (user) from C:\Users\linhl\.qwen\skills\ui-ux-pro-max\SKILL.md
+2026-04-07T02:26:59.221Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:use-mcp (user) from C:\Users\linhl\.qwen\skills\use-mcp\SKILL.md
+2026-04-07T02:26:59.222Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:watzup (user) from C:\Users\linhl\.qwen\skills\watzup\SKILL.md
+2026-04-07T02:26:59.224Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-design-guidelines (user) from C:\Users\linhl\.qwen\skills\web-design-guidelines\SKILL.md
+2026-04-07T02:26:59.226Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-frameworks (user) from C:\Users\linhl\.qwen\skills\web-frameworks\SKILL.md
+2026-04-07T02:26:59.227Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:web-testing (user) from C:\Users\linhl\.qwen\skills\web-testing\SKILL.md
+2026-04-07T02:26:59.229Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: ck:worktree (user) from C:\Users\linhl\.qwen\skills\worktree\SKILL.md
+2026-04-07T02:26:59.229Z [DEBUG] [SKILL_MANAGER] Loading user level skills from: C:\Users\linhl\.agents\skills
+2026-04-07T02:26:59.229Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: C:\Users\linhl\.agents\skills
+2026-04-07T02:26:59.230Z [DEBUG] [SKILL_MANAGER] Cannot read skills directory C:\Users\linhl\.agents\skills: ENOENT: no such file or directory, scandir 'C:\Users\linhl\.agents\skills'
+2026-04-07T02:26:59.230Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-07T02:26:59.230Z [DEBUG] [SKILL_MANAGER] Loaded 67 user level skills
+2026-04-07T02:26:59.231Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension-level skills from 0 extensions
+2026-04-07T02:26:59.231Z [DEBUG] [SKILL_MANAGER] Loading bundled skills from: c:\Users\linhl\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.0-win32-x64\dist\qwen-cli\bundled
+2026-04-07T02:26:59.231Z [DEBUG] [SKILL_MANAGER] Loading skills from directory: c:\Users\linhl\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.0-win32-x64\dist\qwen-cli\bundled
+2026-04-07T02:26:59.231Z [DEBUG] [SKILL_MANAGER] Loaded 0 extension level skills
+2026-04-07T02:26:59.231Z [DEBUG] [SKILL_MANAGER] Found 3 entries in c:\Users\linhl\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.0-win32-x64\dist\qwen-cli\bundled
+2026-04-07T02:26:59.232Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: loop (bundled) from c:\Users\linhl\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.0-win32-x64\dist\qwen-cli\bundled\loop\SKILL.md
+2026-04-07T02:26:59.233Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: qc-helper (bundled) from c:\Users\linhl\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.0-win32-x64\dist\qwen-cli\bundled\qc-helper\SKILL.md
+2026-04-07T02:26:59.233Z [DEBUG] [SKILL_MANAGER] Successfully parsed skill: review (bundled) from c:\Users\linhl\.vscode\extensions\qwenlm.qwen-code-vscode-ide-companion-0.14.0-win32-x64\dist\qwen-cli\bundled\review\SKILL.md
+2026-04-07T02:26:59.233Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled skills
+2026-04-07T02:26:59.233Z [DEBUG] [SKILL_MANAGER] Loaded 3 bundled level skills
+2026-04-07T02:26:59.233Z [INFO] [SKILL_MANAGER] Skills cache refreshed: 70 total skills loaded
+2026-04-07T02:26:59.235Z [INFO] [SKILL_MANAGER] Skill directory watchers started
+2026-04-07T02:26:59.235Z [DEBUG] Skill manager initialized
+2026-04-07T02:26:59.237Z [DEBUG] Permission manager initialized
+2026-04-07T02:26:59.237Z [DEBUG] [MEMORY_DISCOVERY] Loading server hierarchical memory for CWD: c:\Users\linhl\Documents\master (importFormat: tree)
+2026-04-07T02:26:59.239Z [DEBUG] [MEMORY_DISCOVERY] Searching for QWEN.md starting from CWD: c:\Users\linhl\Documents\master
+2026-04-07T02:26:59.239Z [DEBUG] [MEMORY_DISCOVERY] Found readable global QWEN.md: C:\Users\linhl\.qwen\QWEN.md
+2026-04-07T02:26:59.241Z [DEBUG] [MEMORY_DISCOVERY] Determined project root: c:\Users\linhl\Documents\master
+2026-04-07T02:26:59.253Z [DEBUG] [MEMORY_DISCOVERY] Searching for AGENTS.md starting from CWD: c:\Users\linhl\Documents\master
+2026-04-07T02:26:59.257Z [DEBUG] [MEMORY_DISCOVERY] Determined project root: c:\Users\linhl\Documents\master
+2026-04-07T02:26:59.288Z [DEBUG] [MEMORY_DISCOVERY] Final ordered QWEN.md,AGENTS.md paths to read: ["C:\\Users\\linhl\\.qwen\\QWEN.md","C:\\Users\\linhl\\.qwen\\output-language.md"]
+2026-04-07T02:27:00.017Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\linhl\.qwen\QWEN.md (Length: 3918)
+2026-04-07T02:27:00.020Z [DEBUG] [MEMORY_DISCOVERY] Successfully read and processed imports: C:\Users\linhl\.qwen\output-language.md (Length: 812)
+2026-04-07T02:27:00.020Z [DEBUG] Hierarchical memory loaded
+2026-04-07T02:27:00.022Z [DEBUG] [SKILL_MANAGER] Listing skills
+2026-04-07T02:27:00.022Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-07T02:27:00.022Z [DEBUG] [SKILL_MANAGER] Processing 0 project level skills
+2026-04-07T02:27:00.022Z [DEBUG] [SKILL_MANAGER] Processing 67 user level skills
+2026-04-07T02:27:00.022Z [DEBUG] [SKILL_MANAGER] Processing 0 extension level skills
+2026-04-07T02:27:00.022Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-07T02:27:00.022Z [INFO] [SKILL_MANAGER] Listed 70 unique skills
+2026-04-07T02:27:00.385Z [DEBUG] ToolRegistry created: ["agent","skill","list_directory","read_file","grep_search","glob","edit","write_file","run_shell_command","save_memory","todo_write","ask_user_question","exit_plan_mode","web_fetch","web_search"] (15 tools)
+2026-04-07T02:27:00.385Z [INFO] Tool registry initialized with 15 tools
+2026-04-07T02:27:00.482Z [INFO] Gemini client initialized
+2026-04-07T02:27:00.484Z [INFO] Config initialization completed
+2026-04-07T02:27:00.570Z [DEBUG] [SKILL_MANAGER] Listing skills at level: bundled
+2026-04-07T02:27:00.571Z [DEBUG] [SKILL_MANAGER] Using cached skills
+2026-04-07T02:27:00.571Z [DEBUG] [SKILL_MANAGER] Processing 3 bundled level skills
+2026-04-07T02:27:00.571Z [INFO] [SKILL_MANAGER] Listed 3 unique skills
+2026-04-07T02:27:00.579Z [DEBUG] [BUNDLED_SKILL_LOADER] Hiding skill "loop" because cron is not enabled
+2026-04-07T02:27:00.579Z [DEBUG] [BUNDLED_SKILL_LOADER] Loaded 2 bundled skill(s) as slash commands

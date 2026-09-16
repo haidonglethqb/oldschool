@@ -1,0 +1,295 @@
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Job 1: Validate trước khi build image
+  # ─────────────────────────────────────────────
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      image_name_lower: ${{ steps.lowercase.outputs.image_name }}
+    steps:
+      - name: Lowercase image name
+        id: lowercase
+        run: echo "image_name=$(echo '${{ env.IMAGE_NAME }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+  # ─────────────────────────────────────────────
+  # Job 2a: Build và push Backend image (PARALLEL)
+  # ─────────────────────────────────────────────
+  build-backend:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ needs.validate.outputs.image_name_lower }}/backend
+          tags: |
+            type=raw,value=${{ github.sha }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────
+  # Job 2b: Build và push Frontend image (PARALLEL)
+  # ─────────────────────────────────────────────
+  build-frontend:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ needs.validate.outputs.image_name_lower }}/frontend
+          tags: |
+            type=raw,value=${{ github.sha }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+
+  # ─────────────────────────────────────────────
+  # Job 3: Deploy lên VPS (đợi cả 2 builds hoàn thành)
+  # ─────────────────────────────────────────────
+  deploy:
+    needs: [validate, build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create deploy directory on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: mkdir -p ${{ secrets.VPS_DEPLOY_PATH }}
+
+      - name: Copy docker-compose.yml to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "docker-compose.yml"
+          target: ${{ secrets.VPS_DEPLOY_PATH }}
+          strip_components: 0
+          overwrite: true
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          command_timeout: 45m
+          script: |
+            set -e
+            cd ${{ secrets.VPS_DEPLOY_PATH }}
+            export COMPOSE_HTTP_TIMEOUT=300
+            export COMPOSE_PROGRESS=plain
+
+            # ── Bước 1: Ghi .env ───────────────────────────────────
+            cat > .env << 'ENVEOF'
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_EXPIRES_IN=24h
+            CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            GITHUB_REPOSITORY=${{ needs.validate.outputs.image_name_lower }}
+            IMAGE_TAG=${{ github.sha }}
+            COOKIE_SECURE=true
+            TZ_OFFSET_HOURS=7
+            ENVEOF
+            sed -i 's/^[[:space:]]*//' .env
+
+            # ── Bước 2: Login GHCR ─────────────────────────────────
+            echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+            # ── Bước 3: Pull app images mới (không pull postgres) ─
+            echo "Pulling backend/frontend images..."
+            for i in $(seq 1 3); do
+              if docker compose pull backend 2>&1 && docker compose pull frontend 2>&1; then
+                echo "Pull images success."
+                break
+              fi
+              if [ "$i" -eq 3 ]; then
+                echo "ERROR: docker compose pull backend/frontend failed after 3 attempts."
+                exit 1
+              fi
+              echo "Pull failed (attempt $i/3), retrying in 10s..."
+              sleep 10
+            done
+
+            # ── Bước 4: Start database trước, chờ healthy ─────────
+            docker compose up -d postgres
+
+            echo "Waiting for PostgreSQL to be ready..."
+            for i in $(seq 1 30); do
+              if docker compose exec -T postgres pg_isready -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} > /dev/null 2>&1; then
+                echo "PostgreSQL is ready."
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                echo "ERROR: PostgreSQL did not become ready in time."
+                exit 1
+              fi
+              sleep 2
+            done
+
+            # ── Bước 5: Deploy database migrations ─────────────────
+            echo "Deploying database migrations..."
+            if docker compose run --rm --user root backend npx prisma migrate deploy; then
+              echo "Migrations applied successfully."
+            else
+              echo "migrate deploy failed, attempting legacy baseline flow..."
+              docker compose run --rm --user root backend sh -lc '
+                set -e
+                npx prisma db push
+                for migration in $(ls -1 prisma/migrations | grep -v "^migration_lock.toml$"); do
+                  npx prisma migrate resolve --applied "$migration" || true
+                done
+                npx prisma migrate deploy
+              '
+            fi
+
+            echo "Database migrations completed."
+
+            # ── Bước 5.5: Seed database (idempotent - safe to run multiple times)
+            echo "Seeding database..."
+            docker compose run --rm --user root backend npm run db:seed
+            echo "Seeding completed."
+
+            # ── Bước 6: Recreate app services (giữ postgres) ─────
+            docker compose up -d --no-deps --force-recreate backend frontend
+
+            # ── Bước 7: Verify backend healthy ─────────────────────
+            echo "Waiting for backend to be healthy..."
+            for i in $(seq 1 20); do
+              STATUS=$(docker inspect --format='{{.State.Health.Status}}' cloudschool-backend 2>/dev/null || echo "starting")
+              if [ "$STATUS" = "healthy" ]; then
+                echo "Backend is healthy!"
+                break
+              fi
+              if [ "$i" -eq 20 ]; then
+                echo "ERROR: Backend did not become healthy. Check logs:"
+                docker compose logs --tail=50 backend
+                exit 1
+              fi
+              echo "Backend status: $STATUS, retrying ($i/20)..."
+              sleep 5
+            done
+
+            # ── Bước 8: Cleanup để tránh tràn bộ nhớ ──────────────
+            echo "Starting cleanup..."
+
+            docker container prune -f
+            docker image prune -f
+
+            echo "Cleaning old backend images..."
+            docker images "ghcr.io/${{ needs.validate.outputs.image_name_lower }}/backend" --format "{{.ID}} {{.CreatedAt}}" | \
+              sort -k2 -r | tail -n +4 | awk '{print $1}' | xargs -r docker rmi -f 2>/dev/null || true
+
+            echo "Cleaning old frontend images..."
+            docker images "ghcr.io/${{ needs.validate.outputs.image_name_lower }}/frontend" --format "{{.ID}} {{.CreatedAt}}" | \
+              sort -k2 -r | tail -n +4 | awk '{print $1}' | xargs -r docker rmi -f 2>/dev/null || true
+
+            docker builder prune -f --keep-storage 500MB 2>/dev/null || true
+            docker network prune -f
+
+            echo "Disk usage after cleanup:"
+            df -h / | tail -1
+            echo "Docker disk usage:"
+            docker system df
+
+            # ⚠️  KHÔNG dùng 'docker volume prune' - sẽ xóa postgres_data!
+
+            echo "Deployment completed successfully!"
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment to ${{ github.event.inputs.environment }} was successful!"
+          else
+            echo "❌ Deployment to ${{ github.event.inputs.environment }} failed!"
+          fi

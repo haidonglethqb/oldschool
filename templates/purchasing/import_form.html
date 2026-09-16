@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{% if is_edit %}Chỉnh sửa {{ receipt.ma_phieu_nhap_kho }}{% else %}Tạo Phiếu Nhập Kho{% endif %} | Old School{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0">
+      <i class="bi bi-file-earmark-plus me-2"></i>
+      {% if is_edit %}Chỉnh sửa Phiếu Nhập Kho: {{ receipt.ma_phieu_nhap_kho }}{% else %}Tạo Phiếu Nhập Kho Mới (Kho tổng CS1){% endif %}
+    </h4>
+    <p class="text-muted small mb-0">Hỗ trợ nhập thủ công (UC-4.2) hoặc tải lên từ file Excel .xlsx (UC-4.1)</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'inventory:download_template' 'import' %}" class="btn btn-sm btn-outline-success">
+      <i class="bi bi-download me-1"></i>Tải file Excel mẫu (.xlsx)
+    </a>
+    <a href="{% url 'purchasing:supplier_list' %}" class="btn btn-sm btn-os-tan">
+      <i class="bi bi-plus-circle me-1"></i>Thêm Nhà cung cấp mới (UC-4.11)
+    </a>
+    <a href="{% url 'purchasing:import_list' %}" class="btn btn-sm btn-outline-secondary">Quay lại</a>
+  </div>
+</div>
+
+{% if not is_edit %}
+<!-- Excel Upload Card (UC-4.1) -->
+<div class="os-card p-3 mb-4">
+  <form method="post" enctype="multipart/form-data" class="row g-2 align-items-center">
+    {% csrf_token %}
+    <input type="hidden" name="form_action" value="upload_excel">
+    <div class="col-md-4">
+      <label class="form-label small fw-bold mb-1"><i class="bi bi-file-earmark-spreadsheet text-success me-1"></i>Tải dữ liệu dòng hàng từ file Excel (.xlsx — UC-4.1)</label>
+      <input type="file" name="excel_file" accept=".xlsx" class="form-control form-control-sm" required>
+    </div>
+    <div class="col-md-3 mt-4">
+      <button type="submit" class="btn btn-sm btn-success">
+        <i class="bi bi-upload me-1"></i>Đọc & Kiểm tra file Excel
+      </button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<form method="post" id="importReceiptForm">
+  {% csrf_token %}
+  <div class="os-card p-3 mb-4">
+    <h6 class="fw-bold border-bottom pb-2 mb-3">1. Thông tin chung Phiếu Nhập Kho</h6>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Mã phiếu nhập kho</label>
+        {{ header_form.ma_phieu_nhap_kho }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold">Nhà cung cấp *</label>
+        {{ header_form.nha_cung_cap }}
+      </div>
+      <div class="col-md-5">
+        <label class="form-label small fw-semibold">Lý do nhập kho</label>
+        {{ header_form.ly_do_nhap }}
+      </div>
+      <div class="col-md-12">
+        <label class="form-label small fw-semibold">Ghi chú chứng từ</label>
+        {{ header_form.ghi_chu }}
+      </div>
+    </div>
+  </div>
+
+  <div class="os-card p-3">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+      <h6 class="fw-bold mb-0">2. Chi tiết mặt hàng nhập kho</h6>
+      <button type="button" class="btn btn-sm btn-os-tan" onclick="addImportLine()">
+        <i class="bi bi-plus-circle me-1"></i>Thêm dòng hàng
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm align-middle" id="importLinesTable">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 34%;">Sản phẩm / Biến thể (SKU) *</th>
+            <th style="width: 12%;">Số lượng *</th>
+            <th style="width: 16%;">Đơn giá nhập (VNĐ) *</th>
+            <th style="width: 14%;">Chiết khấu (VNĐ)</th>
+            <th style="width: 18%;">Ghi chú dòng</th>
+            <th style="width: 6%;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in initial_lines %}
+          <tr class="line-item-row">
+            <td>
+              <select name="line_variant_id" class="form-select form-select-sm" required>
+                <option value="">-- Chọn SKU --</option>
+                {% for v in variants %}
+                <option value="{{ v.id }}" {% if row.variant_id == v.id %}selected{% endif %}>
+                  {{ v.ma_sku }} — {{ v.full_display_name }}
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="number" name="line_so_luong" value="{{ row.so_luong }}" class="form-control form-control-sm line-qty-input" min="1" required></td>
+            <td><input type="number" name="line_don_gia" value="{{ row.don_gia }}" class="form-control form-control-sm line-price-input" min="0" required></td>
+            <td><input type="number" name="line_chiet_khau" value="{{ row.chiet_khau|default:0 }}" class="form-control form-control-sm line-disc-input" min="0"></td>
+            <td><input type="text" name="line_ghi_chu" value="{{ row.ghi_chu }}" class="form-control form-control-sm"></td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+          </tr>
+          {% empty %}
+          <tr class="line-item-row">
+            <td>
+              <select name="line_variant_id" class="form-select form-select-sm" required>
+                <option value="">-- Chọn SKU sản phẩm --</option>
+                {% for v in variants %}
+                <option value="{{ v.id }}">{{ v.ma_sku }} — {{ v.full_display_name }} (Giá bán: {{ v.don_gia|intcomma }}đ)</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="number" name="line_so_luong" value="10" class="form-control form-control-sm line-qty-input" min="1" required></td>
+            <td><input type="number" name="line_don_gia" value="150000" class="form-control form-control-sm line-price-input" min="0" required></td>
+            <td><input type="number" name="line_chiet_khau" value="0" class="form-control form-control-sm line-disc-input" min="0"></td>
+            <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm" placeholder="Ghi chú"></td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+      <button type="submit" name="form_action" value="save_draft" class="btn btn-outline-secondary">
+        <i class="bi bi-save me-1"></i>Lưu bản nháp
+      </button>
+      <button type="submit" name="form_action" value="submit" class="btn btn-os-primary px-4">
+        <i class="bi bi-send-check me-1"></i>Lưu & Gửi chờ phê duyệt
+      </button>
+    </div>
+  </div>
+</form>
+
+<template id="importLineTemplate">
+  <tr class="line-item-row">
+    <td>
+      <select name="line_variant_id" class="form-select form-select-sm" required>
+        <option value="">-- Chọn SKU sản phẩm --</option>
+        {% for v in variants %}
+        <option value="{{ v.id }}">{{ v.ma_sku }} — {{ v.full_display_name }}</option>
+        {% endfor %}
+      </select>
+    </td>
+    <td><input type="number" name="line_so_luong" value="10" class="form-control form-control-sm line-qty-input" min="1" required></td>
+    <td><input type="number" name="line_don_gia" value="150000" class="form-control form-control-sm line-price-input" min="0" required></td>
+    <td><input type="number" name="line_chiet_khau" value="0" class="form-control form-control-sm line-disc-input" min="0"></td>
+    <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm"></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+  </tr>
+</template>
+
+<script>
+function addImportLine() {
+  const tpl = document.getElementById("importLineTemplate");
+  document.querySelector("#importLinesTable tbody").appendChild(tpl.content.cloneNode(true));
+}
+</script>
+{% endblock %}

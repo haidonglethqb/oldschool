@@ -1,0 +1,30 @@
+{
+  "todos": [
+    {
+      "content": "Create Prisma migration files for schema changes",
+      "id": "m1",
+      "status": "completed"
+    },
+    {
+      "content": "Replace db push with migrate deploy in deploy.yml",
+      "id": "m2",
+      "status": "completed"
+    },
+    {
+      "content": "Add migration step to Dockerfile",
+      "id": "m3",
+      "status": "completed"
+    },
+    {
+      "content": "Verify migration files are correct",
+      "id": "m4",
+      "status": "completed"
+    },
+    {
+      "content": "Final deploy-ready verification",
+      "id": "m5",
+      "status": "completed"
+    }
+  ],
+  "sessionId": "6a9a85b5-4940-4403-9f32-26ce3966423d"
+}

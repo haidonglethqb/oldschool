@@ -1,0 +1,220 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Old School — Hệ thống Quản lý Kho & Chuỗi Cung Ứng{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{% static 'css/oldschool.css' %}" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Top Brand Navigation (Figma Design) -->
+  <nav class="navbar navbar-expand-lg os-navbar sticky-top">
+    <div class="container-fluid">
+      <a class="os-brand me-4" href="{% url 'catalog:product_list' %}">
+        <span class="os-brand-badge">OLD SCHOOL</span>
+        <span class="d-none d-sm-inline">Quản lý Kho & Chuỗi Cung Ứng</span>
+      </a>
+      <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#osMainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="osMainNav">
+        {% if request.user.is_authenticated %}
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
+          <!-- Danh mục hàng hóa (UC-3) -->
+          <li class="nav-item">
+            <a class="nav-link os-nav-link {% if '/catalog/' in request.path or request.path == '/' %}active{% endif %}" href="{% url 'catalog:product_list' %}">
+              <i class="bi bi-box-seam me-1"></i>Danh mục hàng hóa
+            </a>
+          </li>
+
+          <!-- Nhập kho (UC-4 - Admin & CS1 Manager) -->
+          {% if request.user.role == 'ADMIN' or request.user.branch.is_central_warehouse or request.user.branch.ma_co_so == 'CS1' %}
+          {% if request.user.role != 'STAFF' %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle os-nav-link {% if '/purchasing/' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-box-arrow-in-down me-1"></i>Nhập kho
+            </a>
+            <ul class="dropdown-menu shadow-sm">
+              <li><a class="dropdown-item" href="{% url 'purchasing:import_list' %}"><i class="bi bi-file-earmark-arrow-down me-2"></i>Phiếu nhập kho</a></li>
+              <li><a class="dropdown-item" href="{% url 'purchasing:import_create' %}"><i class="bi bi-plus-circle me-2"></i>Tạo phiếu nhập mới</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'purchasing:supplier_list' %}"><i class="bi bi-building me-2"></i>Danh sách Nhà cung cấp</a></li>
+            </ul>
+          </li>
+          {% endif %}
+          {% endif %}
+
+          <!-- Xuất kho: Xuất bán & Điều chuyển (UC-5) -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle os-nav-link {% if '/outbound/' in request.path or '/transfers/' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Xuất kho & Điều chuyển
+            </a>
+            <ul class="dropdown-menu shadow-sm">
+              <li><h6 class="dropdown-header text-uppercase">Xuất bán hàng</h6></li>
+              <li><a class="dropdown-item" href="{% url 'sales_outbound:outbound_list' %}"><i class="bi bi-receipt me-2"></i>Phiếu xuất hàng bán</a></li>
+              {% if request.user.role != 'STAFF' %}
+              <li><a class="dropdown-item" href="{% url 'sales_outbound:outbound_create' %}"><i class="bi bi-plus-circle me-2"></i>Tạo phiếu xuất bán</a></li>
+              {% endif %}
+              <li><a class="dropdown-item" href="{% url 'sales_outbound:request_list' %}"><i class="bi bi-cart-check me-2"></i>Yêu cầu xuất từ quầy bán</a></li>
+              {% if request.user.role != 'STAFF' %}
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header text-uppercase">Điều chuyển nội bộ</h6></li>
+              <li><a class="dropdown-item" href="{% url 'transfers:transfer_list' %}"><i class="bi bi-arrow-left-right me-2"></i>Phiếu điều chuyển cơ sở</a></li>
+              <li><a class="dropdown-item" href="{% url 'transfers:transfer_create' %}"><i class="bi bi-truck me-2"></i>Tạo yêu cầu điều chuyển</a></li>
+              {% endif %}
+            </ul>
+          </li>
+
+          <!-- Kiểm kê kho (UC-6 - Admin & Manager) -->
+          {% if request.user.role != 'STAFF' %}
+          <li class="nav-item">
+            <a class="nav-link os-nav-link {% if '/stocktakes/' in request.path %}active{% endif %}" href="{% url 'stocktakes:stocktake_list' %}">
+              <i class="bi bi-clipboard2-check me-1"></i>Kiểm kê kho
+            </a>
+          </li>
+
+          <!-- Báo cáo (UC-7 - Admin & Manager) -->
+          <li class="nav-item">
+            <a class="nav-link os-nav-link {% if '/reports/' in request.path %}active{% endif %}" href="{% url 'reports:report_dashboard' %}">
+              <i class="bi bi-bar-chart-line me-1"></i>Báo cáo
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+
+        <!-- Right Controls: Branch Selector, Notifications, User Profile -->
+        <div class="d-flex align-items-center gap-3">
+          <!-- Branch Selector (Admin can switch; Manager/Staff locked) -->
+          {% if request.user.role == 'ADMIN' %}
+          <form method="post" action="{% url 'accounts:switch_branch' %}" class="d-flex align-items-center m-0">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-warning-subtle border-0 fw-bold text-dark">
+                <i class="bi bi-geo-alt-fill me-1"></i>Cơ sở:
+              </span>
+              <select name="branch_id" class="form-select form-select-sm fw-semibold" onchange="this.form.submit()">
+                <option value="ALL" {% if not global_active_branch %}selected{% endif %}>Tất cả cơ sở (Toàn chuỗi)</option>
+                {% for b in global_all_branches %}
+                <option value="{{ b.id }}" {% if global_active_branch and global_active_branch.id == b.id %}selected{% endif %}>
+                  {{ b.ma_co_so }} — {{ b.ten_co_so }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </form>
+          {% else %}
+          <span class="badge bg-light text-dark px-3 py-2 fw-semibold">
+            <i class="bi bi-shop me-1 text-warning-emphasis"></i>
+            {% if request.user.branch %}{{ request.user.branch.ma_co_so }} — {{ request.user.branch.ten_co_so }}{% else %}Chưa gán cơ sở{% endif %}
+          </span>
+          {% endif %}
+
+          <!-- Notification Bell & Dropdown (UC-5.13 & Section C.II) -->
+          <div class="dropdown">
+            <a class="btn btn-sm btn-os-tan position-relative" href="#" role="button" data-bs-toggle="dropdown" title="Thông báo & Cảnh báo tồn kho">
+              <i class="bi bi-bell-fill"></i>
+              {% if global_unread_notifications_count > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ global_unread_notifications_count }}
+              </span>
+              {% endif %}
+            </a>
+            <div class="dropdown-menu dropdown-menu-end shadow p-0" style="width: 360px; max-height: 440px; overflow-y: auto;">
+              <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom bg-light">
+                <span class="fw-bold small text-uppercase">Thông báo & Cảnh báo</span>
+                <a href="{% url 'notifications:list' %}" class="small text-decoration-none fw-semibold">Xem tất cả</a>
+              </div>
+              {% for notif in global_recent_notifications %}
+              <a href="{% url 'notifications:mark_read' notif.id %}" class="dropdown-item py-2 px-3 border-bottom text-wrap {% if not notif.da_doc %}bg-warning-subtle{% endif %}">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold small">{{ notif.tieu_de }}</span>
+                  {% if not notif.da_doc %}<span class="badge bg-danger rounded-pill">Mới</span>{% endif %}
+                </div>
+                <div class="small text-muted">{{ notif.noi_dung|truncatechars:100 }}</div>
+                <div class="text-secondary" style="font-size: 0.72rem;">{{ notif.created_at|date:"d/m/Y H:i" }}</div>
+              </a>
+              {% empty %}
+              <div class="p-3 text-center text-muted small">Không có thông báo mới.</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- User Profile & Logout -->
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i>
+              <span class="d-none d-md-inline">{{ request.user.display_name }}</span>
+              <span class="badge bg-warning text-dark">{{ request.user.role_badge_label }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li class="px-3 py-2 small text-muted border-bottom">
+                Tài khoản: <strong>{{ request.user.username }}</strong><br>
+                Vai trò: <strong>{{ request.user.role_badge_label }}</strong>
+              </li>
+              <li>
+                <a class="dropdown-item text-danger fw-semibold" href="{% url 'accounts:logout' %}">
+                  <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% if request.user.is_authenticated %}
+  <div class="os-context-bar d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <i class="bi bi-building-check me-1"></i>
+      Phạm vi dữ liệu đang hiển thị:
+      <strong>
+        {% if global_active_branch %}
+          {{ global_active_branch.ma_co_so }} — {{ global_active_branch.ten_co_so }} ({{ global_active_branch.dia_chi }})
+        {% else %}
+          Toàn hệ thống (Tất cả 3 cơ sở Đà Nẵng)
+        {% endif %}
+      </strong>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'notifications:list' %}" class="text-decoration-none text-dark small fw-semibold">
+        <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>Trung tâm cảnh báo tồn kho
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Flash Messages -->
+  <div class="container-fluid mt-3">
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'debug' %}secondary{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'error' or message.tags == 'warning' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Main Content -->
+  <main class="container-fluid py-3 flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="py-3 px-4 mt-auto border-top text-center small text-muted" style="background-color: var(--os-tan-200);">
+    Hệ thống Quản lý Kho & Chuỗi Cung Ứng Cửa hàng Thời trang <strong>Old School</strong> — Đà Nẵng (CS1 Kho tổng Hải Châu • CS2 Thanh Khê • CS3 Ngũ Hành Sơn)
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'js/oldschool.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
