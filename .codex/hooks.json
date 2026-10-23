@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\descriptive-name.cjs'"
+            "command": "node '.codex/hooks/descriptive-name.cjs'"
           }
         ]
       },
@@ -15,11 +15,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\scout-block.cjs'"
+            "command": "node '.codex/hooks/scout-block.cjs'"
           },
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\privacy-block.cjs'"
+            "command": "node '.codex/hooks/privacy-block.cjs'"
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\post-edit-simplify-reminder.cjs'"
+            "command": "node '.codex/hooks/post-edit-simplify-reminder.cjs'"
           }
         ]
       },
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\usage-context-awareness.cjs'",
+            "command": "node '.codex/hooks/usage-context-awareness.cjs'",
             "timeout": 10
           }
         ]
@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\session-init.cjs'"
+            "command": "node '.codex/hooks/session-init.cjs'"
           }
         ]
       }
@@ -61,11 +61,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\dev-rules-reminder.cjs'"
+            "command": "node '.codex/hooks/dev-rules-reminder.cjs'"
           },
           {
             "type": "command",
-            "command": "node 'C:\\Users\\ChuHai\\Documents\\CloudSchool\\.codex\\hooks\\usage-context-awareness.cjs'",
+            "command": "node '.codex/hooks/usage-context-awareness.cjs'",
             "timeout": 30
           }
         ]
