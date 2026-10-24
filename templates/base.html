@@ -179,7 +179,7 @@
         {% if global_active_branch %}
           {{ global_active_branch.ma_co_so }} — {{ global_active_branch.ten_co_so }} ({{ global_active_branch.dia_chi }})
         {% else %}
-          Toàn hệ thống (Tất cả 3 cơ sở Đà Nẵng)
+          Toàn hệ thống ({% if global_system_branches %}Tất cả {{ global_system_branches|length }} cơ sở Đà Nẵng{% else %}Tất cả cơ sở{% endif %})
         {% endif %}
       </strong>
     </div>
@@ -210,7 +210,7 @@
   </main>
 
   <footer class="py-3 px-4 mt-auto border-top text-center small text-muted" style="background-color: var(--os-tan-200);">
-    Hệ thống Quản lý Kho & Chuỗi Cung Ứng Cửa hàng Thời trang <strong>Old School</strong> — Đà Nẵng (CS1 Kho tổng Hải Châu • CS2 Thanh Khê • CS3 Ngũ Hành Sơn)
+    Hệ thống Quản lý Kho & Chuỗi Cung Ứng Cửa hàng Thời trang <strong>Old School</strong> — Đà Nẵng{% if global_system_branches %} ({% for b in global_system_branches %}{{ b.ma_co_so }} {{ b.ten_co_so }}{% if not forloop.last %} • {% endif %}{% endfor %}){% endif %}
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
