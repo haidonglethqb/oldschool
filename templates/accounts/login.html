@@ -20,17 +20,23 @@
             Nền tảng quản trị tồn kho đa cơ sở theo thời gian thực dành cho chuỗi cửa hàng thời trang Old School tại Đà Nẵng.
           </p>
           <ul class="list-unstyled small opacity-90 d-grid gap-2">
+            {% for b in demo_branches %}
+            <li><i class="bi bi-check2-circle me-2 text-warning"></i>{{ b.ma_co_so }}: {{ b.dia_chi }}{% if b.is_central_warehouse %} (Kho tổng){% endif %}</li>
+            {% empty %}
             <li><i class="bi bi-check2-circle me-2 text-warning"></i>CS1: 423 Trưng Nữ Vương, Hải Châu (Kho tổng)</li>
             <li><i class="bi bi-check2-circle me-2 text-warning"></i>CS2: 446 Điện Biên Phủ, Thanh Khê</li>
-            <li><i class="bi bi-check2-circle me-2 text-warning"></i>CS3: 635 Ngô Quyền, Ngũ Hành Sơn</li>
+            {% endfor %}
           </ul>
         </div>
         <div class="small opacity-75 mt-4 pt-3 border-top border-secondary">
           <div class="fw-bold mb-1">Tài khoản Demo (Mật khẩu chung: <code>OldSchool@123</code>):</div>
           <div>• Chủ cửa hàng (Admin): <code>admin_owner</code></div>
-          <div>• Quản lý CS1 (Kho tổng): <code>manager_cs1</code></div>
-          <div>• Quản lý CS2 / CS3: <code>manager_cs2</code> / <code>manager_cs3</code></div>
-          <div>• Nhân viên bán hàng: <code>staff_cs1</code> / <code>staff_cs2</code> / <code>staff_cs3</code></div>
+          {% for b in demo_branches %}
+          <div>• {{ b.ma_co_so }} ({% if b.is_central_warehouse %}Kho tổng{% else %}Cửa hàng{% endif %}): Quản lý <code>manager_{{ b.ma_co_so|lower }}</code> | Nhân viên <code>staff_{{ b.ma_co_so|lower }}</code></div>
+          {% empty %}
+          <div>• CS1 (Kho tổng): Quản lý <code>manager_cs1</code> | Nhân viên <code>staff_cs1</code></div>
+          <div>• CS2 (Cửa hàng): Quản lý <code>manager_cs2</code> | Nhân viên <code>staff_cs2</code></div>
+          {% endfor %}
         </div>
       </div>
 

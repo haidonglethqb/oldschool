@@ -35,6 +35,9 @@ class TestPostgreSQLConcurrencyAndAtomicity:
           fails with `InsufficientStockError` (subclass of `ValidationError`).
         - Final stock is 1 (never -3).
         """
+        if connections["default"].vendor == "sqlite":
+            pytest.skip("Kịch bản đa luồng select_for_update yêu cầu hệ quản trị RDBMS như PostgreSQL.")
+
         cs1 = CoSo.objects.create(
             ma_co_so="CS1",
             ten_co_so="Kho tổng CS1",
@@ -108,51 +111,56 @@ class TestPostgreSQLConcurrencyAndAtomicity:
         SKU A remains 10, SKU B remains 2, and zero `StockMovement` rows are created for that batch.
         """
         cs1 = CoSo.objects.create(
-            ma_co_so="CS1-RB",
-            ten_co_so="Kho Rollback",
+            ma_co_so="CS1",
+            ten_co_so="Kho tổng CS1",
             dia_chi="Đà Nẵng",
-            sdt="02363000000",
+            sdt="02363888101",
             is_central_warehouse=True,
         )
         mgr = User.objects.create_user(
-            username="mgr_rb",
+            username="mgr_atomic",
             password="OldSchool@123",
             role=User.Role.MANAGER,
             branch=cs1,
         )
         create_product_with_variants(
             actor=mgr,
-            ma_san_pham="SP-RB",
-            ten_hang_hoa="Áo Rollback Test",
-            nhom_hang="Áo khoác",
+            ma_san_pham="SP-ROLLBACK",
+            ten_hang_hoa="SP Rollback Test",
+            nhom_hang="Áo thun",
             don_vi_tinh="Cái",
-            don_gia_niem_yet=Decimal("300000"),
+            don_gia_niem_yet=Decimal("150000"),
             variants_data=[
-                {"ma_sku": "SP-RB-A", "mau_sac": "Đen", "kich_co": "S", "don_gia": Decimal("300000")},
-                {"ma_sku": "SP-RB-B", "mau_sac": "Trắng", "kich_co": "L", "don_gia": Decimal("300000")},
+                {"ma_sku": "SKU-OK", "mau_sac": "Đen", "kich_co": "M", "don_gia": Decimal("150000")},
+                {"ma_sku": "SKU-FAIL", "mau_sac": "Trắng", "kich_co": "M", "don_gia": Decimal("150000")},
             ],
         )
-        sku_a = BienThe.objects.get(ma_sku="SP-RB-A")
-        sku_b = BienThe.objects.get(ma_sku="SP-RB-B")
-        set_opening_stock(branch=cs1, variant=sku_a, quantity=10, actor=mgr)
-        set_opening_stock(branch=cs1, variant=sku_b, quantity=2, actor=mgr)
+        v_ok = BienThe.objects.get(ma_sku="SKU-OK")
+        v_fail = BienThe.objects.get(ma_sku="SKU-FAIL")
 
-        movements_before = StockMovement.objects.filter(co_so=cs1).count()
+        set_opening_stock(branch=cs1, variant=v_ok, quantity=10, actor=mgr)
+        set_opening_stock(branch=cs1, variant=v_fail, quantity=2, actor=mgr)
 
-        with pytest.raises(ValidationError):
+        initial_movements_count = StockMovement.objects.count()
+
+        # Attempt batch mutation: Line 1 passes (10 >= 3), Line 2 fails (2 < 5)
+        with pytest.raises(ValidationError) as exc_info:
             apply_stock_movements(
+                actor=mgr,
                 branch=cs1,
                 deltas=[
-                    StockDeltaSpec(variant=sku_a, quantity_delta=-3, idempotency_key="RB-TEST-LINE-1"),
-                    StockDeltaSpec(variant=sku_b, quantity_delta=-5, idempotency_key="RB-TEST-LINE-2"),
+                    StockDeltaSpec(variant=v_ok, quantity_delta=-3, idempotency_key="TEST-ROLLBACK-1"),
+                    StockDeltaSpec(variant=v_fail, quantity_delta=-5, idempotency_key="TEST-ROLLBACK-2"),
                 ],
-                movement_type=StockMovement.MovementType.SALE_OUT,
-                source_doc_type="RollbackTest",
+                movement_type=StockMovement.MovementType.SALES_OUTBOUND,
+                source_doc_type="PhieuXuatHangBan",
                 source_doc_id=999,
-                source_doc_code="RB-999",
-                actor=mgr,
+                source_doc_code="PXB-ATOMIC-FAIL",
             )
 
-        assert TonKho.objects.get(co_so=cs1, bien_the=sku_a).so_luong == 10
-        assert TonKho.objects.get(co_so=cs1, bien_the=sku_b).so_luong == 2
-        assert StockMovement.objects.filter(co_so=cs1).count() == movements_before
+        assert "Không đủ số lượng tồn kho" in str(exc_info.value)
+
+        # Verify atomic rollback: Neither balance changed, zero movements created
+        assert TonKho.objects.get(co_so=cs1, bien_the=v_ok).so_luong == 10
+        assert TonKho.objects.get(co_so=cs1, bien_the=v_fail).so_luong == 2
+        assert StockMovement.objects.count() == initial_movements_count

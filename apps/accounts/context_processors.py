@@ -4,12 +4,16 @@ from apps.branches.models import CoSo
 
 
 def oldschool_global_context(request):
+    system_branches = CoSo.objects.all().order_by("ma_co_so")
+
     if not hasattr(request, "user") or not request.user.is_authenticated:
-        return {}
+        return {
+            "global_system_branches": system_branches,
+        }
 
     user = request.user
     active_branch = get_effective_branch(request, allow_all_for_admin=True)
-    all_branches = CoSo.objects.all() if user.is_business_admin else (
+    all_branches = system_branches if user.is_business_admin else (
         CoSo.objects.filter(id=user.branch_id) if user.branch_id else CoSo.objects.none()
     )
 
@@ -27,6 +31,7 @@ def oldschool_global_context(request):
     return {
         "global_active_branch": active_branch,
         "global_all_branches": all_branches,
+        "global_system_branches": system_branches,
         "global_unread_notifications_count": unread_count,
         "global_recent_notifications": recent_notifications,
     }

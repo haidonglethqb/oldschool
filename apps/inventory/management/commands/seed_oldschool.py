@@ -1,8 +1,8 @@
 """
 Management command `seed_oldschool` (Mục 16 of System.md).
 Idempotently seeds:
-- 3 Đà Nẵng branches (CS1 Kho tổng, CS2, CS3)
-- 7 role-based user accounts (Admin, 3 Branch Managers, 3 Branch Sales Staff)
+- 2 branches by default (CS1 Kho tổng, CS2) or 3 branches with --branches=3
+- 5 role-based user accounts by default (Admin, 2 Branch Managers, 2 Sales Staff) or 7 accounts with 3 branches
 - 3 Suppliers (NCC001, NCC002, NCC003)
 - 6 Fashion Products (SP001..SP006) with 14 SKU Variants across colors & sizes
 - Opening stock balances covering IN_STOCK, LOW_STOCK, and OUT_OF_STOCK
@@ -43,9 +43,23 @@ DEFAULT_PASSWORD = "OldSchool@123"
 class Command(BaseCommand):
     help = "Khởi tạo dữ liệu mẫu chuẩn cho hệ thống Quản lý kho Old School (Mục 16 System.md)."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--branches",
+            type=int,
+            choices=[2, 3],
+            default=2,
+            help="Số lượng cơ sở cần khởi tạo dữ liệu mẫu (2: CS1 Kho tổng & CS2; 3: thêm CS3 Ngũ Hành Sơn). Mặc định là 2.",
+        )
+
     @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write(self.style.MIGRATE_HEADING("=== Bắt đầu khởi tạo dữ liệu Old School ==="))
+        num_branches = options.get("branches", 2)
+        self.stdout.write(
+            self.style.MIGRATE_HEADING(
+                f"=== Bắt đầu khởi tạo dữ liệu Old School ({num_branches} cơ sở) ==="
+            )
+        )
 
         # 1. Branches (Mục 16.1)
         branches_spec = [
@@ -63,14 +77,18 @@ class Command(BaseCommand):
                 "sdt": "02363888102",
                 "is_central_warehouse": False,
             },
-            {
-                "ma_co_so": "CS3",
-                "ten_co_so": "Cơ sở 3 - Ngũ Hành Sơn",
-                "dia_chi": "635 Ngô Quyền, Quận Ngũ Hành Sơn, TP. Đà Nẵng",
-                "sdt": "02363888103",
-                "is_central_warehouse": False,
-            },
         ]
+        if num_branches == 3:
+            branches_spec.append(
+                {
+                    "ma_co_so": "CS3",
+                    "ten_co_so": "Cơ sở 3 - Ngũ Hành Sơn",
+                    "dia_chi": "635 Ngô Quyền, Quận Ngũ Hành Sơn, TP. Đà Nẵng",
+                    "sdt": "02363888103",
+                    "is_central_warehouse": False,
+                }
+            )
+
         branches = {}
         for bspec in branches_spec:
             branch, _ = CoSo.objects.update_or_create(
@@ -79,18 +97,24 @@ class Command(BaseCommand):
             )
             branches[branch.ma_co_so] = branch
 
-        cs1, cs2, cs3 = branches["CS1"], branches["CS2"], branches["CS3"]
+        cs1 = branches["CS1"]
+        cs2 = branches["CS2"]
+        cs3 = branches.get("CS3")
 
         # 2. Users (Mục 16.2)
         users_spec = [
             ("admin_owner", "Nguyễn Văn Chủ (Admin)", User.Role.ADMIN, None, True),
             ("manager_cs1", "Trần Thị Quản Lý CS1", User.Role.MANAGER, cs1, False),
             ("manager_cs2", "Lê Văn Quản Lý CS2", User.Role.MANAGER, cs2, False),
-            ("manager_cs3", "Phạm Thị Quản Lý CS3", User.Role.MANAGER, cs3, False),
             ("staff_cs1", "Hoàng Nhân Viên Bán Hàng CS1", User.Role.STAFF, cs1, False),
             ("staff_cs2", "Vũ Nhân Viên Bán Hàng CS2", User.Role.STAFF, cs2, False),
-            ("staff_cs3", "Đặng Nhân Viên Bán Hàng CS3", User.Role.STAFF, cs3, False),
         ]
+        if num_branches == 3 and cs3:
+            users_spec.extend([
+                ("manager_cs3", "Phạm Thị Quản Lý CS3", User.Role.MANAGER, cs3, False),
+                ("staff_cs3", "Đặng Nhân Viên Bán Hàng CS3", User.Role.STAFF, cs3, False),
+            ])
+
         users = {}
         for username, full_name, role, branch_obj, is_super in users_spec:
             user, _ = User.objects.update_or_create(
@@ -113,7 +137,7 @@ class Command(BaseCommand):
         admin_user = users["admin_owner"]
         mgr_cs1 = users["manager_cs1"]
         mgr_cs2 = users["manager_cs2"]
-        mgr_cs3 = users["manager_cs3"]
+        mgr_cs3 = users.get("manager_cs3")
         staff_cs2 = users["staff_cs2"]
 
         # 3. Suppliers (Mục 16.3)
@@ -228,6 +252,8 @@ class Command(BaseCommand):
                 )
                 variants_map[sku] = variant
                 for b_code, qty in branch_qtys.items():
+                    if b_code not in branches:
+                        continue
                     b_obj = branches[b_code]
                     ensure_stock_balance(b_obj, variant, min_threshold=5)
                     set_opening_stock(
@@ -326,19 +352,35 @@ class Command(BaseCommand):
             )
             dispatch_transfer(actor=mgr_cs1, transfer=t_in_transit)
 
-        if not PhieuDieuChuyen.objects.filter(ma_phieu_dieu_chuyen="PDC-CS1-CS3-DEMO-002").exists():
-            t_done = create_transfer_request(
-                actor=mgr_cs3,
-                co_so_xuat=cs1,
-                co_so_nhan=cs3,
-                ma_phieu_dieu_chuyen="PDC-CS1-CS3-DEMO-002",
-                ly_do="Bổ sung Áo khoác Bomber Kem cho CS3 Ngũ Hành Sơn",
-                line_specs=[
-                    TransferRequestLineSpec(variant_id=variants_map["SP001-KEM-M"].id, so_luong_yeu_cau=4),
-                ],
-            )
-            dispatch_transfer(actor=mgr_cs1, transfer=t_done)
-            receive_transfer(actor=mgr_cs3, transfer=t_done)
+        if num_branches == 3 and cs3 and mgr_cs3:
+            if not PhieuDieuChuyen.objects.filter(ma_phieu_dieu_chuyen="PDC-CS1-CS3-DEMO-002").exists():
+                t_done = create_transfer_request(
+                    actor=mgr_cs3,
+                    co_so_xuat=cs1,
+                    co_so_nhan=cs3,
+                    ma_phieu_dieu_chuyen="PDC-CS1-CS3-DEMO-002",
+                    ly_do="Bổ sung Áo khoác Bomber Kem cho CS3 Ngũ Hành Sơn",
+                    line_specs=[
+                        TransferRequestLineSpec(variant_id=variants_map["SP001-KEM-M"].id, so_luong_yeu_cau=4),
+                    ],
+                )
+                dispatch_transfer(actor=mgr_cs1, transfer=t_done)
+                receive_transfer(actor=mgr_cs3, transfer=t_done)
+        else:
+            # 2 branches mode: completed transfer between CS1 and CS2
+            if not PhieuDieuChuyen.objects.filter(ma_phieu_dieu_chuyen="PDC-CS1-CS2-DEMO-002").exists():
+                t_done_2b = create_transfer_request(
+                    actor=mgr_cs2,
+                    co_so_xuat=cs1,
+                    co_so_nhan=cs2,
+                    ma_phieu_dieu_chuyen="PDC-CS1-CS2-DEMO-002",
+                    ly_do="Bổ sung Áo khoác Bomber Kem cho CS2 Thanh Khê",
+                    line_specs=[
+                        TransferRequestLineSpec(variant_id=variants_map["SP001-KEM-M"].id, so_luong_yeu_cau=4),
+                    ],
+                )
+                dispatch_transfer(actor=mgr_cs1, transfer=t_done_2b)
+                receive_transfer(actor=mgr_cs2, transfer=t_done_2b)
 
         # 8. Sample Stocktake Records (Pending & Approved)
         if not KiemKe.objects.filter(ma_kiem_ke="KK-CS1-DEMO-001").exists():
@@ -397,9 +439,10 @@ class Command(BaseCommand):
             ],
         )
 
+        acc_count = len(users_spec)
         self.stdout.write(
             self.style.SUCCESS(
-                "=== Hoàn tất khởi tạo dữ liệu mẫu Old School (3 cơ sở, 7 tài khoản, 6 SP / 14 SKU, đầy đủ phiếu mẫu & file Excel) ==="
+                f"=== Hoàn tất khởi tạo dữ liệu mẫu Old School ({num_branches} cơ sở, {acc_count} tài khoản, 6 SP / 14 SKU, đầy đủ phiếu mẫu & file Excel) ==="
             )
         )
 

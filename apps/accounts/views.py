@@ -77,6 +77,7 @@ def login_view(request):
         else:
             error_message = "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu."
 
+    demo_branches = CoSo.objects.all().order_by("ma_co_so")
     return render(
         request,
         "accounts/login.html",
@@ -84,6 +85,7 @@ def login_view(request):
             "form": form,
             "error_message": error_message,
             "next": request.GET.get("next", ""),
+            "demo_branches": demo_branches,
         },
     )
 
