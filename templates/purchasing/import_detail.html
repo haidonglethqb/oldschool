@@ -16,6 +16,10 @@
         <span class="badge-os badge-status-approved ms-2">Đã duyệt (Đã cộng tồn kho)</span>
       {% elif receipt.trang_thai == 'PENDING_APPROVAL' %}
         <span class="badge-os badge-status-pending ms-2">Chờ Chủ cửa hàng phê duyệt</span>
+      {% elif receipt.trang_thai == 'RETURN_PROPOSED' %}
+        <span class="badge bg-warning text-dark ms-2"><i class="bi bi-exclamation-octagon me-1"></i>Chờ chủ duyệt trả NCC (Hàng lỗi)</span>
+      {% elif receipt.trang_thai == 'RETURNED_TO_SUPPLIER' %}
+        <span class="badge bg-danger ms-2"><i class="bi bi-x-circle me-1"></i>Đã trả hàng cho NCC (Không nhập kho)</span>
       {% elif receipt.trang_thai == 'RETURNED' %}
         <span class="badge-os badge-status-returned ms-2">Trả lại chỉnh sửa</span>
       {% else %}
@@ -26,21 +30,36 @@
   <div class="d-flex gap-2 flex-wrap">
     <a href="{% url 'purchasing:import_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Danh sách</a>
     <a href="{% url 'purchasing:import_export_excel' receipt.id %}" class="btn btn-sm btn-success">
-      <i class="bi bi-file-earmark-excel me-1"></i>Xuất file Excel (UC-4.10)
+      <i class="bi bi-file-earmark-excel me-1"></i>Xuất file Excel
     </a>
     {% if receipt.is_editable %}
     <a href="{% url 'purchasing:import_update' receipt.id %}" class="btn btn-sm btn-outline-primary">
-      <i class="bi bi-pencil-square me-1"></i>Chỉnh sửa (UC-4.7)
+      <i class="bi bi-pencil-square me-1"></i>Chỉnh sửa
     </a>
+    {% endif %}
+    {% if receipt.trang_thai != 'APPROVED' and receipt.trang_thai != 'RETURNED_TO_SUPPLIER' and request.user.role == 'MANAGER' %}
+    <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reportDefectModal">
+      <i class="bi bi-exclamation-triangle-fill me-1"></i>Báo hàng lỗi trả NCC
+    </button>
     {% endif %}
     {% if receipt.is_deletable %}
     <form method="post" action="{% url 'purchasing:import_delete' receipt.id %}" class="d-inline" onsubmit="return confirm('Xác nhận xóa phiếu nhập kho {{ receipt.ma_phieu_nhap_kho }}?');">
       {% csrf_token %}
-      <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Xóa phiếu (UC-4.8)</button>
+      <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Xóa phiếu</button>
     </form>
     {% endif %}
   </div>
 </div>
+
+{% if receipt.ly_do_loi_ncc %}
+<div class="alert alert-danger border-danger">
+  <div class="fw-bold mb-1"><i class="bi bi-exclamation-octagon-fill me-1"></i>Báo cáo kiểm hàng: Hàng không đạt yêu cầu (Đề xuất trả NCC):</div>
+  <div>{{ receipt.ly_do_loi_ncc }}</div>
+  {% if receipt.nguoi_bao_loi %}
+  <div class="small opacity-75 mt-1">Người kiểm & báo lỗi: <strong>{{ receipt.nguoi_bao_loi.display_name }}</strong> lúc {{ receipt.thoi_gian_bao_loi|date:"d/m/Y H:i" }}</div>
+  {% endif %}
+</div>
+{% endif %}
 
 {% if receipt.ly_do_tra_lai %}
 <div class="alert alert-warning">
@@ -48,23 +67,31 @@
 </div>
 {% endif %}
 
-<!-- Admin Approval Bar (UC-4.9) -->
-{% if request.user.role == 'ADMIN' and receipt.trang_thai != 'APPROVED' %}
+<!-- Admin Approval Bar -->
+{% if request.user.role == 'ADMIN' and receipt.trang_thai != 'APPROVED' and receipt.trang_thai != 'RETURNED_TO_SUPPLIER' %}
 <div class="os-card p-3 mb-4 border-warning bg-warning-subtle">
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
     <div>
-      <h6 class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Phê duyệt phiếu nhập kho (Chủ cửa hàng — UC-4.9)</h6>
-      <p class="small mb-0 text-muted">Khi bấm <strong>Duyệt phiếu nhập</strong>, hệ thống sẽ tự động cộng số lượng vào tồn kho của <strong>{{ receipt.co_so_nhan.ten_co_so }}</strong>.</p>
+      <h6 class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Quyền phê duyệt phiếu nhập (Chủ cửa hàng)</h6>
+      <p class="small mb-0 text-muted">Xem xét kết quả kiểm hàng. Duyệt để cộng tồn kho hoặc Xác nhận trả hàng NCC nếu hàng lỗi.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
       <form method="post" action="{% url 'purchasing:import_approve' receipt.id %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-success fw-semibold">
           <i class="bi bi-check-circle-fill me-1"></i>Duyệt phiếu nhập & Cộng tồn kho
         </button>
       </form>
+      {% if receipt.trang_thai == 'RETURN_PROPOSED' or receipt.ly_do_loi_ncc %}
+      <form method="post" action="{% url 'purchasing:import_confirm_supplier_return' receipt.id %}" onsubmit="return confirm('Xác nhận trả lô hàng lỗi này lại cho Nhà cung cấp (Không nhập tồn kho)?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger fw-semibold">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>Xác nhận trả hàng cho NCC
+        </button>
+      </form>
+      {% endif %}
       {% if receipt.trang_thai != 'RETURNED' %}
-      <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#returnReasonBox">
+      <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#returnReasonBox">
         <i class="bi bi-arrow-return-left me-1"></i>Yêu cầu chỉnh sửa lại
       </button>
       {% endif %}
@@ -89,7 +116,7 @@
         <div class="col-md-3"><strong>Cơ sở nhận:</strong> {{ receipt.co_so_nhan.ma_co_so }} — {{ receipt.co_so_nhan.ten_co_so }}</div>
         <div class="col-md-3"><strong>Ngày lập:</strong> {{ receipt.ngay_nhap|date:"d/m/Y H:i" }}</div>
         <div class="col-md-3"><strong>Người lập phiếu:</strong> {{ receipt.nguoi_tao.display_name }}</div>
-        <div class="col-md-3"><strong>Người duyệt:</strong> {{ receipt.nguoi_duyet.display_name|default:"Chưa duyệt" }}</div>
+        <div class="col-md-3"><strong>Người duyệt / xử lý:</strong> {{ receipt.nguoi_duyet.display_name|default:"Chưa duyệt" }}</div>
         <div class="col-md-3"><strong>Lý do nhập:</strong> {{ receipt.ly_do_nhap }}</div>
         <div class="col-md-3"><strong>Ghi chú:</strong> {{ receipt.ghi_chu|default:"—" }}</div>
       </div>
@@ -135,6 +162,36 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Modal Báo hàng lỗi trả NCC -->
+<div class="modal fade" id="reportDefectModal" tabindex="-1" aria-labelledby="reportDefectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'purchasing:import_propose_return' receipt.id %}" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold text-danger" id="reportDefectModalLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Báo hàng lỗi / Không đạt yêu cầu
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="small text-muted">
+          Quản lý kiểm đếm thực tế phát hiện hàng bị lỗi hoặc không đạt tiêu chuẩn. Thông tin này sẽ gửi ngay đến Chủ cửa hàng để quyết định trả lại lô hàng cho Nhà cung cấp.
+        </p>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Chi tiết tình trạng lỗi / Lý do không nhận hàng *</label>
+          <textarea name="ly_do_loi_ncc" rows="3" class="form-control" placeholder="VD: Hàng lỗi bung chỉ, vải bị ố màu, sai định lượng mẫu cam kết; đề xuất hoàn trả cho nhà cung cấp." required>{{ receipt.ly_do_loi_ncc }}</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-danger">
+          <i class="bi bi-send-fill me-1"></i>Gửi báo cáo cho Chủ
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}

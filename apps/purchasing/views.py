@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from apps.accounts.models import User
-from apps.accounts.permissions import assert_can_manage_imports, role_required
+from apps.accounts.permissions import assert_branch_access, assert_can_manage_imports, role_required
 from apps.branches.models import CoSo
 from apps.catalog.models import BienThe
 from apps.inventory.excel import build_excel_response, parse_import_excel
@@ -19,6 +19,8 @@ from apps.purchasing.selectors import (
 from apps.purchasing.services import (
     ImportLineSpec,
     approve_import_receipt,
+    confirm_supplier_return,
+    propose_supplier_return,
     create_import_receipt,
     create_supplier,
     delete_import_receipt,
@@ -153,7 +155,7 @@ def import_create_view(request):
                     )
                     messages.success(
                         request,
-                        f"Đã tạo phiếu nhập kho {receipt.ma_phieu_nhap_kho} ({receipt.get_trang_thai_display()}).",
+                        f"Đã lưu và phê duyệt phiếu nhập kho {receipt.ma_phieu_nhap_kho} (Tồn kho đã được cập nhật)." if (submit_flag and request.user.role == User.Role.ADMIN and approve_import_receipt(receipt_id=receipt.id, admin_user=request.user)) else f"Đã tạo phiếu nhập kho {receipt.ma_phieu_nhap_kho} ({receipt.get_trang_thai_display()}).",
                     )
                     return redirect("purchasing:import_detail", receipt_id=receipt.id)
                 except ValidationError as exc:
@@ -422,3 +424,35 @@ def supplier_list_create_view(request):
             "search_query": search_query,
         },
     )
+
+
+
+@role_required(User.Role.ADMIN, User.Role.MANAGER)
+@require_POST
+def import_propose_return_view(request, receipt_id: int):
+    """Manager reports defective goods and requests returning to supplier."""
+    receipt = get_object_or_404(PhieuNhapKho.objects.select_related("co_so_nhan"), pk=receipt_id)
+    assert_branch_access(request.user, receipt.co_so_nhan)
+    reason = request.POST.get("ly_do_loi_ncc", "").strip()
+    try:
+        propose_supplier_return(actor=request.user, receipt=receipt, reason=reason)
+        messages.success(request, f"Đã gửi báo cáo hàng lỗi lô {receipt.ma_phieu_nhap_kho} đến Chủ cửa hàng.")
+    except (ValidationError, PermissionDenied) as exc:
+        msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
+        messages.error(request, msg)
+    return redirect("purchasing:import_detail", receipt_id=receipt.id)
+
+
+@role_required(User.Role.ADMIN)
+@require_POST
+def import_confirm_supplier_return_view(request, receipt_id: int):
+    """Admin confirms returning defective goods to supplier."""
+    receipt = get_object_or_404(PhieuNhapKho.objects.select_related("co_so_nhan"), pk=receipt_id)
+    admin_note = request.POST.get("ghi_chu_chu", "").strip()
+    try:
+        confirm_supplier_return(actor=request.user, receipt=receipt, admin_note=admin_note)
+        messages.success(request, f"Đã xác nhận trả hàng cho Nhà cung cấp đối với lô {receipt.ma_phieu_nhap_kho}.")
+    except (ValidationError, PermissionDenied) as exc:
+        msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
+        messages.error(request, msg)
+    return redirect("purchasing:import_detail", receipt_id=receipt.id)

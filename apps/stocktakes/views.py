@@ -155,7 +155,7 @@ def stocktake_create_view(request):
                     )
                     messages.success(
                         request,
-                        f"Đã tạo và gửi biên bản kiểm kê {stocktake.ma_kiem_ke} ({stocktake.get_trang_thai_display()}).",
+                        f"Đã lưu biên bản kiểm kê {stocktake.ma_kiem_ke}." if request.user.role == User.Role.ADMIN else f"Đã tạo và gửi biên bản kiểm kê {stocktake.ma_kiem_ke} ({stocktake.get_trang_thai_display()}).",
                     )
                     return redirect("stocktakes:stocktake_detail", stocktake_id=stocktake.id)
                 except ValidationError as exc:

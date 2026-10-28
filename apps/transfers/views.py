@@ -91,7 +91,7 @@ def transfer_detail_view(request, transfer_id: int):
 def transfer_create_view(request):
     user_branch = get_effective_branch(request, allow_all_for_admin=False)
     central_wh = CoSo.get_central_warehouse()
-    default_source = central_wh if central_wh and central_wh.id != user_branch.id else CoSo.objects.exclude(id=user_branch.id).first()
+    default_dest = CoSo.objects.exclude(id=user_branch.id).first() if user_branch else None
 
     variants = list(
         BienThe.objects.select_related("san_pham").filter(san_pham__trang_thai="ACTIVE", trang_thai="ACTIVE")
@@ -130,7 +130,12 @@ def transfer_create_view(request):
                     ghi_chu=form.cleaned_data["ghi_chu"],
                     line_specs=specs,
                 )
-                messages.success(request, f"Đã tạo phiếu yêu cầu điều chuyển {transfer.ma_phieu_dieu_chuyen}.")
+                transfer_action = request.POST.get("transfer_action", "dispatch_now")
+                if transfer_action == "dispatch_now" and (request.user.role == User.Role.ADMIN or (request.user.branch_id and request.user.branch_id == transfer.co_so_xuat_id)):
+                    transfer = dispatch_transfer(actor=request.user, transfer=transfer)
+                    messages.success(request, f"Đã lập phiếu và xuất điều chuyển {transfer.ma_phieu_dieu_chuyen} sang {transfer.co_so_nhan.ten_co_so} (Đã trừ tồn kho {transfer.co_so_xuat.ma_co_so}).")
+                else:
+                    messages.success(request, f"Đã tạo phiếu yêu cầu điều chuyển {transfer.ma_phieu_dieu_chuyen}.")
                 return redirect("transfers:transfer_detail", transfer_id=transfer.id)
             except (ValueError, ValidationError, PermissionDenied) as exc:
                 msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
@@ -138,8 +143,8 @@ def transfer_create_view(request):
     else:
         form = TransferCreateForm(
             initial={
-                "co_so_xuat": default_source.id if default_source else None,
-                "co_so_nhan": user_branch.id if user_branch else None,
+                "co_so_xuat": user_branch.id if user_branch else None,
+                "co_so_nhan": default_dest.id if default_dest else None,
             }
         )
 

@@ -8,27 +8,27 @@
       <i class="bi bi-file-earmark-plus me-2"></i>
       {% if is_edit %}Chỉnh sửa Phiếu Nhập Kho: {{ receipt.ma_phieu_nhap_kho }}{% else %}Tạo Phiếu Nhập Kho Mới (Kho tổng CS1){% endif %}
     </h4>
-    <p class="text-muted small mb-0">Hỗ trợ nhập thủ công (UC-4.2) hoặc tải lên từ file Excel .xlsx (UC-4.1)</p>
+    <p class="text-muted small mb-0">Hỗ trợ nhập thủ công hoặc tải lên từ file Excel .xlsx</p>
   </div>
   <div class="d-flex gap-2">
     <a href="{% url 'inventory:download_template' 'import' %}" class="btn btn-sm btn-outline-success">
       <i class="bi bi-download me-1"></i>Tải file Excel mẫu (.xlsx)
     </a>
     <a href="{% url 'purchasing:supplier_list' %}" class="btn btn-sm btn-os-tan">
-      <i class="bi bi-plus-circle me-1"></i>Thêm Nhà cung cấp mới (UC-4.11)
+      <i class="bi bi-plus-circle me-1"></i>Thêm Nhà cung cấp mới
     </a>
     <a href="{% url 'purchasing:import_list' %}" class="btn btn-sm btn-outline-secondary">Quay lại</a>
   </div>
 </div>
 
 {% if not is_edit %}
-<!-- Excel Upload Card (UC-4.1) -->
+<!-- Excel Upload Card -->
 <div class="os-card p-3 mb-4">
   <form method="post" enctype="multipart/form-data" class="row g-2 align-items-center">
     {% csrf_token %}
     <input type="hidden" name="form_action" value="upload_excel">
     <div class="col-md-4">
-      <label class="form-label small fw-bold mb-1"><i class="bi bi-file-earmark-spreadsheet text-success me-1"></i>Tải dữ liệu dòng hàng từ file Excel (.xlsx — UC-4.1)</label>
+      <label class="form-label small fw-bold mb-1"><i class="bi bi-file-earmark-spreadsheet text-success me-1"></i>Tải dữ liệu dòng hàng từ file Excel (.xlsx)</label>
       <input type="file" name="excel_file" accept=".xlsx" class="form-control form-control-sm" required>
     </div>
     <div class="col-md-3 mt-4">
@@ -129,7 +129,7 @@
         <i class="bi bi-save me-1"></i>Lưu bản nháp
       </button>
       <button type="submit" name="form_action" value="submit" class="btn btn-os-primary px-4">
-        <i class="bi bi-send-check me-1"></i>Lưu & Gửi chờ phê duyệt
+        {% if request.user.role == 'ADMIN' %}<i class="bi bi-check-circle me-1"></i>Lưu{% else %}<i class="bi bi-send-check me-1"></i>Lưu & Gửi chờ phê duyệt{% endif %}
       </button>
     </div>
   </div>

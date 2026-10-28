@@ -49,7 +49,9 @@ def report_dashboard_view(request):
     chart_sales = [r["sale_out_qty"] for r in report_data["top_selling_chart"]]
     chart_closing = [r["closing_qty"] for r in report_data["top_selling_chart"]]
 
-    colors = list(BienThe.objects.values_list("mau_sac", flat=True).distinct().order_by("mau_sac"))
+    standard_colors = ["Đen", "Trắng", "Xanh", "Nâu", "Xám", "Be", "Đỏ", "Kem", "Vàng"]
+    db_colors = list(BienThe.objects.values_list("mau_sac", flat=True).distinct())
+    colors = sorted(list(dict.fromkeys(standard_colors + [c for c in db_colors if c])))
     sizes = list(BienThe.objects.values_list("kich_co", flat=True).distinct().order_by("kich_co"))
 
     return render(
