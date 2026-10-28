@@ -6,7 +6,7 @@
     <h4 class="fw-bold mb-0">
       <i class="bi bi-box-seam me-2"></i>{% if is_edit %}Cập nhật mặt hàng: {{ product.ma_san_pham }}{% else %}Thêm mới mặt hàng & Biến thể (SKU){% endif %}
     </h4>
-    <p class="text-muted small mb-0">Quản lý thông tin hàng hóa chung và các biến thể màu sắc / kích cỡ (UC-3.3, UC-3.5)</p>
+    <p class="text-muted small mb-0">Quản lý thông tin hàng hóa chung và các biến thể màu sắc / kích cỡ</p>
   </div>
   <a href="{% url 'catalog:product_list' %}" class="btn btn-sm btn-outline-secondary">
     <i class="bi bi-arrow-left me-1"></i>Quay lại danh mục
@@ -19,20 +19,21 @@
     <div class="os-card p-3">
       <h6 class="fw-bold border-bottom pb-2 mb-3">Thông tin sản phẩm gốc</h6>
       <div class="mb-3">
-        <label class="form-label small fw-semibold">Mã hàng hóa *</label>
+        <label class="form-label small fw-semibold">Mã sản phẩm *</label>
         {{ form.ma_san_pham }}
-        {% if form.ma_san_pham.errors %}<div class="text-danger small">{{ form.ma_san_pham.errors|join:", " }}</div>{% endif %}
+        {% if form.ma_san_pham.errors %}<div class="text-danger small">{{ form.ma_san_pham.errors.0 }}</div>{% endif %}
       </div>
       <div class="mb-3">
         <label class="form-label small fw-semibold">Tên hàng hóa *</label>
         {{ form.ten_hang_hoa }}
+        {% if form.ten_hang_hoa.errors %}<div class="text-danger small">{{ form.ten_hang_hoa.errors.0 }}</div>{% endif %}
       </div>
       <div class="row g-2 mb-3">
-        <div class="col-md-7">
+        <div class="col-md-6">
           <label class="form-label small fw-semibold">Nhóm hàng hóa *</label>
           {{ form.nhom_hang }}
         </div>
-        <div class="col-md-5">
+        <div class="col-md-6">
           <label class="form-label small fw-semibold">Đơn vị tính *</label>
           {{ form.don_vi_tinh }}
         </div>
@@ -54,6 +55,23 @@
       <div class="mb-3">
         <label class="form-label small fw-semibold">Hình ảnh minh họa</label>
         {{ form.hinh_anh }}
+        <div class="mt-2 d-flex align-items-center gap-3">
+          <div id="imagePreviewContainer" class="border rounded p-1 bg-light text-center d-flex align-items-center justify-content-center" style="width: 140px; height: 140px; overflow: hidden;">
+            {% if form.instance.hinh_anh %}
+              <img id="imagePreview" src="{{ form.instance.hinh_anh.url }}" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: cover;" class="rounded">
+              <div id="imagePlaceholder" class="text-muted small" style="display: none;"><i class="bi bi-image fs-1 d-block"></i>Xem trước</div>
+            {% else %}
+              <img id="imagePreview" src="" alt="Preview" style="display: none; max-width: 100%; max-height: 100%; object-fit: cover;" class="rounded">
+              <div id="imagePlaceholder" class="text-muted small"><i class="bi bi-image fs-1 d-block"></i>Xem trước ảnh</div>
+            {% endif %}
+          </div>
+          <div class="small text-muted">
+            <div>Ảnh xem trước trực quan sẽ tự động hiển thị ngay khi chọn tệp.</div>
+            <button type="button" id="clearImageBtn" class="btn btn-sm btn-outline-danger mt-2" style="display: none;" onclick="clearSelectedImage()">
+              <i class="bi bi-trash me-1"></i>Hủy chọn ảnh
+            </button>
+          </div>
+        </div>
       </div>
       <div class="mb-2">
         <label class="form-label small fw-semibold">Ghi chú / Mô tả</label>
@@ -89,7 +107,7 @@
                 <input type="hidden" name="variant_id[]" value="{{ v.id }}">
                 <input type="text" name="variant_sku[]" value="{{ v.ma_sku }}" class="form-control form-control-sm">
               </td>
-              <td><input type="text" name="variant_color[]" value="{{ v.mau_sac }}" class="form-control form-control-sm" required></td>
+              <td><input type="text" name="variant_color[]" value="{{ v.mau_sac }}" class="form-control form-control-sm" list="colorOptions" required></td>
               <td><input type="text" name="variant_size[]" value="{{ v.kich_co }}" class="form-control form-control-sm" required></td>
               <td><input type="number" name="variant_price[]" value="{{ v.don_gia }}" class="form-control form-control-sm" min="0"></td>
               <td><input type="number" name="variant_threshold[]" value="{{ v.min_threshold|default:5 }}" class="form-control form-control-sm" min="0"></td>
@@ -101,7 +119,7 @@
                 <input type="hidden" name="variant_id[]" value="">
                 <input type="text" name="variant_sku[]" class="form-control form-control-sm" placeholder="Tự động">
               </td>
-              <td><input type="text" name="variant_color[]" value="Đen" class="form-control form-control-sm" required></td>
+              <td><input type="text" name="variant_color[]" value="Đen" class="form-control form-control-sm" list="colorOptions" required></td>
               <td><input type="text" name="variant_size[]" value="M" class="form-control form-control-sm" required></td>
               <td><input type="number" name="variant_price[]" class="form-control form-control-sm" placeholder="Theo giá SP" min="0"></td>
               <td><input type="number" name="variant_threshold[]" value="5" class="form-control form-control-sm" min="0"></td>
@@ -121,13 +139,65 @@
   </div>
 </form>
 
+<datalist id="colorOptions">
+  <option value="Đen">
+  <option value="Trắng">
+  <option value="Xanh">
+  <option value="Nâu">
+  <option value="Xám">
+  <option value="Be">
+  <option value="Đỏ">
+  <option value="Kem">
+  <option value="Vàng">
+  <option value="Hồng">
+</datalist>
+
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+  const fileInput = document.querySelector("input[name='hinh_anh']");
+  const previewImg = document.getElementById("imagePreview");
+  const placeholder = document.getElementById("imagePlaceholder");
+  const clearBtn = document.getElementById("clearImageBtn");
+
+  if (fileInput) {
+    fileInput.addEventListener("change", function(e) {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          if (previewImg) {
+            previewImg.src = evt.target.result;
+            previewImg.style.display = "block";
+          }
+          if (placeholder) placeholder.style.display = "none";
+          if (clearBtn) clearBtn.style.display = "inline-block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+});
+
+function clearSelectedImage() {
+  const fileInput = document.querySelector("input[name='hinh_anh']");
+  const previewImg = document.getElementById("imagePreview");
+  const placeholder = document.getElementById("imagePlaceholder");
+  const clearBtn = document.getElementById("clearImageBtn");
+  if (fileInput) fileInput.value = "";
+  if (previewImg) {
+    previewImg.src = "";
+    previewImg.style.display = "none";
+  }
+  if (placeholder) placeholder.style.display = "block";
+  if (clearBtn) clearBtn.style.display = "none";
+}
+
 function addVariantRow() {
   const tbody = document.querySelector("#variantTable tbody");
   const tr = document.createElement("tr");
   tr.innerHTML = `
     <td><input type="hidden" name="variant_id[]" value=""><input type="text" name="variant_sku[]" class="form-control form-control-sm" placeholder="Tự động"></td>
-    <td><input type="text" name="variant_color[]" class="form-control form-control-sm" placeholder="VD: Trắng" required></td>
+    <td><input type="text" name="variant_color[]" class="form-control form-control-sm" placeholder="VD: Nâu" list="colorOptions" required></td>
     <td><input type="text" name="variant_size[]" class="form-control form-control-sm" placeholder="VD: L" required></td>
     <td><input type="number" name="variant_price[]" class="form-control form-control-sm" placeholder="Theo giá SP" min="0"></td>
     <td><input type="number" name="variant_threshold[]" value="5" class="form-control form-control-sm" min="0"></td>

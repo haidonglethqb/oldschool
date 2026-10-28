@@ -3,10 +3,33 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <div>
-    <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2"></i>Tạo Phiếu Yêu Cầu Điều Chuyển Nội Bộ (UC-5.3)</h4>
+    <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2"></i>Tạo Phiếu Xuất & Điều Chuyển Nội Bộ</h4>
     <p class="text-muted small mb-0">Yêu cầu luân chuyển hàng hóa từ Kho tổng hoặc cơ sở còn tồn sang cơ sở đang thiếu hàng</p>
   </div>
   <a href="{% url 'transfers:transfer_list' %}" class="btn btn-sm btn-outline-secondary">Quay lại</a>
+</div>
+
+<div class="row g-2 mb-3">
+  <div class="col-md-3">
+    <a href="{% url 'sales_outbound:outbound_create' %}" class="text-decoration-none">
+      <div class="p-3 border rounded-3 bg-light d-flex align-items-center gap-3 opacity-75">
+        <div class="bg-white p-2 rounded"><i class="bi bi-bag-check fs-4 text-secondary"></i></div>
+        <div>
+          <div class="fw-bold text-secondary">Xuất bán hàng</div>
+          <div class="text-muted small">Xuất hàng cho đơn khách</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3">
+    <div class="p-3 border rounded-3 bg-white shadow-sm border-2 border-dark d-flex align-items-center gap-3">
+      <div class="bg-light p-2 rounded"><i class="bi bi-arrow-left-right fs-4 text-dark"></i></div>
+      <div>
+        <div class="fw-bold text-dark">Xuất điều chuyển</div>
+        <div class="text-muted small">Chuyển hàng sang cơ sở khác</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <form method="post">
@@ -78,8 +101,11 @@
 
     <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
       <a href="{% url 'transfers:transfer_list' %}" class="btn btn-outline-secondary">Hủy</a>
-      <button type="submit" class="btn btn-os-primary px-4">
-        <i class="bi bi-send-check me-1"></i>Gửi yêu cầu điều chuyển
+      <button type="submit" name="transfer_action" value="dispatch_now" class="btn btn-os-primary px-4">
+        <i class="bi bi-box-arrow-right me-1"></i>Lưu & Xuất điều chuyển ngay
+      </button>
+      <button type="submit" name="transfer_action" value="request" class="btn btn-outline-secondary">
+        <i class="bi bi-send me-1"></i>Tạo yêu cầu điều chuyển
       </button>
     </div>
   </div>

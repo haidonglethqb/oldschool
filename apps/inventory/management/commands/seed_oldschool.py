@@ -65,15 +65,15 @@ class Command(BaseCommand):
         branches_spec = [
             {
                 "ma_co_so": "CS1",
-                "ten_co_so": "Cơ sở 1 - Hải Châu (Kho tổng)",
-                "dia_chi": "423 Trưng Nữ Vương, Quận Hải Châu, TP. Đà Nẵng",
+                "ten_co_so": "Cơ sở 1 - Thanh Khê (Kho tổng)",
+                "dia_chi": "50 Văn Cao, Thanh Khê, Đà Nẵng",
                 "sdt": "02363888101",
                 "is_central_warehouse": True,
             },
             {
                 "ma_co_so": "CS2",
-                "ten_co_so": "Cơ sở 2 - Thanh Khê",
-                "dia_chi": "446 Điện Biên Phủ, Quận Thanh Khê, TP. Đà Nẵng",
+                "ten_co_so": "Cơ sở 2 - Ngũ Hành Sơn",
+                "dia_chi": "16 Châu Thị Vĩnh Tế, Ngũ Hành Sơn, Đà Nẵng",
                 "sdt": "02363888102",
                 "is_central_warehouse": False,
             },
@@ -103,11 +103,11 @@ class Command(BaseCommand):
 
         # 2. Users (Mục 16.2)
         users_spec = [
-            ("admin_owner", "Nguyễn Văn Chủ (Admin)", User.Role.ADMIN, None, True),
-            ("manager_cs1", "Trần Thị Quản Lý CS1", User.Role.MANAGER, cs1, False),
-            ("manager_cs2", "Lê Văn Quản Lý CS2", User.Role.MANAGER, cs2, False),
-            ("staff_cs1", "Hoàng Nhân Viên Bán Hàng CS1", User.Role.STAFF, cs1, False),
-            ("staff_cs2", "Vũ Nhân Viên Bán Hàng CS2", User.Role.STAFF, cs2, False),
+            ("admin_owner", "Nguyễn Ngọc Bảo Yến", User.Role.ADMIN, None, True),
+            ("manager_cs1", "Nguyễn Thị Hoài Mơ", User.Role.MANAGER, cs1, False),
+            ("manager_cs2", "Nguyễn Bảo Hoài Như", User.Role.MANAGER, cs2, False),
+            ("staff_cs1", "Trần Thị Yến Nhi", User.Role.STAFF, cs1, False),
+            ("staff_cs2", "Trần Lê Anh Thư", User.Role.STAFF, cs2, False),
         ]
         if num_branches == 3 and cs3:
             users_spec.extend([
@@ -166,6 +166,8 @@ class Command(BaseCommand):
                     ("SP001-DEN-M", "Đen", "M", Decimal("450000"), {"CS1": 40, "CS2": 12, "CS3": 4}),
                     ("SP001-DEN-L", "Đen", "L", Decimal("450000"), {"CS1": 35, "CS2": 3, "CS3": 10}),
                     ("SP001-KEM-M", "Kem", "M", Decimal("460000"), {"CS1": 25, "CS2": 8, "CS3": 0}),
+                    ("SP001-NAU-L", "Nâu", "L", Decimal("460000"), {"CS1": 18, "CS2": 6, "CS3": 2}),
+                    ("SP001-DO-M", "Đỏ", "M", Decimal("460000"), {"CS1": 15, "CS2": 5, "CS3": 0}),
                 ],
             ),
             (
@@ -189,6 +191,8 @@ class Command(BaseCommand):
                 [
                     ("SP003-XANH-M", "Xanh", "M", Decimal("390000"), {"CS1": 32, "CS2": 14, "CS3": 6}),
                     ("SP003-DEN-L", "Đen", "L", Decimal("390000"), {"CS1": 26, "CS2": 2, "CS3": 8}),
+                    ("SP003-XAM-L", "Xám", "L", Decimal("390000"), {"CS1": 20, "CS2": 8, "CS3": 4}),
+                    ("SP003-BE-M", "Be", "M", Decimal("390000"), {"CS1": 22, "CS2": 10, "CS3": 5}),
                 ],
             ),
             (

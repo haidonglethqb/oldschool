@@ -6,15 +6,15 @@
   <div>
     <h4 class="fw-bold mb-0"><i class="bi bi-box-arrow-in-down me-2"></i>Danh sách Phiếu Nhập Kho (Kho tổng CS1)</h4>
     <p class="text-muted small mb-0">
-      Quản lý chứng từ nhập hàng từ Nhà cung cấp. Tồn kho chỉ tăng sau khi Chủ cửa hàng (Admin) phê duyệt (UC-4.1 đến UC-4.10)
+      Quản lý chứng từ nhập hàng từ Nhà cung cấp. Tồn kho chỉ tăng sau khi Chủ cửa hàng (Admin) phê duyệt.
     </p>
   </div>
   <div class="d-flex gap-2">
     <a href="{% url 'purchasing:import_report_export' %}?q={{ filters.q }}&supplier={{ filters.supplier }}&status={{ filters.status }}&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}" class="btn btn-sm btn-success">
-      <i class="bi bi-file-earmark-excel-fill me-1"></i>Xuất báo cáo nhập kho (UC-4.10)
+      <i class="bi bi-file-earmark-excel-fill me-1"></i>Xuất báo cáo nhập kho
     </a>
     <a href="{% url 'purchasing:supplier_list' %}" class="btn btn-sm btn-os-tan">
-      <i class="bi bi-building me-1"></i>Nhà cung cấp (UC-4.11)
+      <i class="bi bi-building me-1"></i>Nhà cung cấp
     </a>
     <a href="{% url 'purchasing:import_create' %}" class="btn btn-sm btn-os-primary">
       <i class="bi bi-plus-lg me-1"></i>Tạo phiếu nhập kho
@@ -22,7 +22,7 @@
   </div>
 </div>
 
-<!-- Import Activity Summary KPIs (UC-4.11) -->
+<!-- Import Activity Summary KPIs -->
 <div class="row g-3 mb-3">
   <div class="col-md-3">
     <div class="os-kpi-card">
@@ -125,7 +125,7 @@
               <span class="badge-os badge-status-approved">Đã duyệt</span>
             {% elif r.trang_thai == 'PENDING_APPROVAL' %}
               <span class="badge-os badge-status-pending">Chờ duyệt</span>
-            {% elif r.trang_thai == 'RETURNED' %}
+            {% elif r.trang_thai == 'RETURN_PROPOSED' %}<span class="badge bg-warning text-dark">Chờ trả NCC</span>{% elif r.trang_thai == 'RETURNED_TO_SUPPLIER' %}<span class="badge bg-danger">Đã trả NCC</span>{% elif r.trang_thai == 'RETURNED' %}
               <span class="badge-os badge-status-returned">Trả lại chỉnh sửa</span>
             {% else %}
               <span class="badge bg-secondary">Bản nháp</span>
@@ -134,7 +134,7 @@
           <td class="text-end">
             <div class="btn-group btn-group-sm">
               <a href="{% url 'purchasing:import_detail' r.id %}" class="btn btn-outline-dark" title="Xem chi tiết"><i class="bi bi-eye"></i></a>
-              <a href="{% url 'purchasing:import_export_excel' r.id %}" class="btn btn-outline-success" title="Xuất Excel (UC-4.10)"><i class="bi bi-file-earmark-excel"></i></a>
+              <a href="{% url 'purchasing:import_export_excel' r.id %}" class="btn btn-outline-success" title="Xuất Excel"><i class="bi bi-file-earmark-excel"></i></a>
               {% if r.is_editable %}
               <a href="{% url 'purchasing:import_update' r.id %}" class="btn btn-outline-primary" title="Chỉnh sửa"><i class="bi bi-pencil"></i></a>
               {% endif %}

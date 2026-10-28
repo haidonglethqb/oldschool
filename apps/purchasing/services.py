@@ -328,3 +328,66 @@ def return_import_receipt(*, actor: User, receipt: PhieuNhapKho, reason: str = "
         target_url=url,
     )
     return receipt
+
+
+@transaction.atomic
+def propose_supplier_return(*, actor: User, receipt: PhieuNhapKho, reason: str) -> PhieuNhapKho:
+    """Manager reports defective goods and proposes returning to supplier."""
+    assert_can_manage_imports(actor, receipt.co_so_nhan)
+    receipt = PhieuNhapKho.objects.select_for_update().get(pk=receipt.pk)
+    if receipt.trang_thai == PhieuNhapKho.Status.APPROVED:
+        raise ValidationError("Không thể báo trả hàng đối với lô hàng đã được phê duyệt nhập kho.")
+    if not (reason or "").strip():
+        raise ValidationError("Vui lòng nhập lý do hàng lỗi / không đạt yêu cầu kiểm hàng.")
+
+    receipt.trang_thai = PhieuNhapKho.Status.RETURN_PROPOSED
+    receipt.ly_do_loi_ncc = reason.strip()
+    receipt.nguoi_bao_loi = actor
+    receipt.thoi_gian_bao_loi = timezone.now()
+    receipt.save(update_fields=["trang_thai", "ly_do_loi_ncc", "nguoi_bao_loi", "thoi_gian_bao_loi", "updated_at"])
+
+    try:
+        url = reverse("purchasing:import_detail", args=[receipt.id])
+    except Exception:
+        url = "/purchasing/"
+    notify_admins(
+        notification_type=ThongBao.NotificationType.IMPORT_RETURNED,
+        title=f"Báo lỗi trả NCC lô hàng: {receipt.ma_phieu_nhap_kho}",
+        content=f"Quản lý {actor.display_name} báo lỗi lô hàng {receipt.ma_phieu_nhap_kho} từ NCC {receipt.nha_cung_cap.ten_nha_cung_cap}. Lý do: {reason.strip()}",
+        branch=receipt.co_so_nhan,
+        related_entity_type="PhieuNhapKho",
+        related_entity_id=receipt.id,
+        target_url=url,
+    )
+    return receipt
+
+
+@transaction.atomic
+def confirm_supplier_return(*, actor: User, receipt: PhieuNhapKho, admin_note: str = "") -> PhieuNhapKho:
+    """Admin confirms returning defective goods to supplier without adding stock."""
+    assert_roles(actor, User.Role.ADMIN)
+    receipt = PhieuNhapKho.objects.select_for_update().get(pk=receipt.pk)
+    if receipt.trang_thai == PhieuNhapKho.Status.APPROVED:
+        raise ValidationError("Không thể xác nhận trả hàng cho phiếu nhập đã phê duyệt nhập kho.")
+
+    receipt.trang_thai = PhieuNhapKho.Status.RETURNED_TO_SUPPLIER
+    receipt.nguoi_duyet = actor
+    receipt.thoi_gian_duyet = timezone.now()
+    if admin_note.strip():
+        receipt.ghi_chu = f"{receipt.ghi_chu}\n[Chủ xác nhận trả NCC]: {admin_note.strip()}".strip()
+    receipt.save(update_fields=["trang_thai", "nguoi_duyet", "thoi_gian_duyet", "ghi_chu", "updated_at"])
+
+    try:
+        url = reverse("purchasing:import_detail", args=[receipt.id])
+    except Exception:
+        url = "/purchasing/"
+    notify_branch_managers(
+        branch=receipt.co_so_nhan,
+        notification_type=ThongBao.NotificationType.IMPORT_APPROVED,
+        title=f"Đã xác nhận trả hàng NCC cho lô: {receipt.ma_phieu_nhap_kho}",
+        content=f"Chủ cửa hàng {actor.display_name} đã xác nhận trả hàng về NCC {receipt.nha_cung_cap.ten_nha_cung_cap}. Lô hàng không nhập kho.",
+        related_entity_type="PhieuNhapKho",
+        related_entity_id=receipt.id,
+        target_url=url,
+    )
+    return receipt

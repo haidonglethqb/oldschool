@@ -121,7 +121,9 @@ def create_stocktake(
         nguoi_kiem_ke=(nguoi_kiem_ke or actor.display_name).strip(),
         muc_dich=(muc_dich or "Kiểm kê định kỳ cuối ngày").strip(),
         ghi_chu=(ghi_chu or "").strip(),
-        trang_thai=KiemKe.Status.PENDING,
+        trang_thai=KiemKe.Status.APPROVED if actor.role == User.Role.ADMIN else KiemKe.Status.PENDING,
+        duyet_boi=actor if actor.role == User.Role.ADMIN else None,
+        thoi_gian_duyet=timezone.now() if actor.role == User.Role.ADMIN else None,
         tao_boi=actor,
     )
 
@@ -143,7 +145,8 @@ def create_stocktake(
         url = reverse("stocktakes:stocktake_detail", args=[stocktake.id])
     except Exception:
         url = "/stocktakes/"
-    notify_admins(
+    if actor.role != User.Role.ADMIN:
+        notify_admins(
         notification_type=ThongBao.NotificationType.STOCKTAKE_SUBMITTED,
         title=f"[{co_so.ma_co_so}] Biên bản kiểm kê chờ duyệt: {stocktake.ma_kiem_ke}",
         content=(

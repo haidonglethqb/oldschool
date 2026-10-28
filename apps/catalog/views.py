@@ -91,7 +91,9 @@ def product_list_view(request):
     page_obj = paginator.get_page(request.GET.get("page"))
 
     categories = list(SanPham.objects.values_list("nhom_hang", flat=True).distinct().order_by("nhom_hang"))
-    colors = list(BienThe.objects.values_list("mau_sac", flat=True).distinct().order_by("mau_sac"))
+    standard_colors = ["Đen", "Trắng", "Xanh", "Nâu", "Xám", "Be", "Đỏ", "Kem", "Vàng"]
+    db_colors = list(BienThe.objects.values_list("mau_sac", flat=True).distinct())
+    colors = sorted(list(dict.fromkeys(standard_colors + [c for c in db_colors if c])))
     sizes = list(BienThe.objects.values_list("kich_co", flat=True).distinct().order_by("kich_co"))
 
     return render(

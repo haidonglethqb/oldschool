@@ -33,6 +33,8 @@ class PhieuNhapKho(models.Model):
         PENDING_APPROVAL = "PENDING_APPROVAL", "Chờ duyệt"
         RETURNED = "RETURNED", "Trả lại chỉnh sửa"
         APPROVED = "APPROVED", "Đã duyệt"
+        RETURN_PROPOSED = "RETURN_PROPOSED", "Chờ chủ duyệt trả NCC (Hàng lỗi)"
+        RETURNED_TO_SUPPLIER = "RETURNED_TO_SUPPLIER", "Đã trả hàng cho NCC"
 
     ma_phieu_nhap_kho = models.CharField("Mã phiếu nhập kho", max_length=50, unique=True, db_index=True)
     nha_cung_cap = models.ForeignKey(
@@ -81,6 +83,16 @@ class PhieuNhapKho(models.Model):
     )
     thoi_gian_duyet = models.DateTimeField("Thời gian phê duyệt / xử lý", null=True, blank=True)
     ly_do_tra_lai = models.TextField("Lý do trả lại / từ chối", blank=True, default="")
+    ly_do_loi_ncc = models.TextField("Lý do hàng lỗi / không đạt yêu cầu", blank=True, default="")
+    nguoi_bao_loi = models.ForeignKey(
+        "accounts.User",
+        verbose_name="Người báo hàng lỗi",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="phieu_nhap_bao_loi",
+    )
+    thoi_gian_bao_loi = models.DateTimeField("Thời gian báo lỗi", null=True, blank=True)
     created_at = models.DateTimeField("Thời gian tạo", auto_now_add=True)
     updated_at = models.DateTimeField("Cập nhật lần cuối", auto_now=True)
 
@@ -105,6 +117,7 @@ class PhieuNhapKho(models.Model):
             self.Status.DRAFT,
             self.Status.PENDING_APPROVAL,
             self.Status.RETURNED,
+            self.Status.RETURN_PROPOSED,
         }
 
     @property
@@ -113,6 +126,7 @@ class PhieuNhapKho(models.Model):
             self.Status.DRAFT,
             self.Status.PENDING_APPROVAL,
             self.Status.RETURNED,
+            self.Status.RETURN_PROPOSED,
         }
 
     @property

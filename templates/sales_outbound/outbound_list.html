@@ -6,7 +6,7 @@
   <div>
     <h4 class="fw-bold mb-0"><i class="bi bi-receipt me-2"></i>Quản lý Phiếu Xuất Hàng Bán</h4>
     <p class="text-muted small mb-0">
-      Lập phiếu xuất bán cho khách hàng, kiểm tra tồn kho thực tế và ghi nhận trừ kho nguyên tử (UC-5.2, UC-5.4 đến UC-5.12)
+      Lập phiếu xuất bán cho khách hàng, kiểm tra tồn kho thực tế và ghi nhận trừ kho nguyên tử
     </p>
   </div>
   <div class="d-flex gap-2">
@@ -23,7 +23,7 @@
 
 {% if pending_requests and request.user.role != 'STAFF' %}
 <div class="os-card p-3 mb-4 border-warning bg-warning-subtle">
-  <h6 class="fw-bold mb-2"><i class="bi bi-bell-fill text-warning-emphasis me-1"></i>Yêu cầu xuất hàng bán đang chờ Quản lý xử lý (Hình 5)</h6>
+  <h6 class="fw-bold mb-2"><i class="bi bi-bell-fill text-warning-emphasis me-1"></i>Yêu cầu xuất hàng bán đang chờ Quản lý xử lý</h6>
   <div class="d-flex flex-wrap gap-2">
     {% for req in pending_requests %}
     <div class="bg-white border rounded p-2 d-flex align-items-center gap-3 small shadow-sm">
@@ -110,7 +110,7 @@
             <div class="btn-group btn-group-sm">
               <a href="{% url 'sales_outbound:outbound_detail' r.id %}" class="btn btn-outline-dark" title="Xem chi tiết"><i class="bi bi-eye"></i></a>
               {% if r.is_printable %}
-              <a href="{% url 'sales_outbound:outbound_print' r.id %}" target="_blank" class="btn btn-outline-success" title="In phiếu xuất (UC-5.12)"><i class="bi bi-printer"></i></a>
+              <a href="{% url 'sales_outbound:outbound_print' r.id %}" target="_blank" class="btn btn-outline-success" title="In phiếu xuất"><i class="bi bi-printer"></i></a>
               {% endif %}
               {% if r.is_editable and request.user.role != 'STAFF' %}
               <a href="{% url 'sales_outbound:outbound_update' r.id %}" class="btn btn-outline-primary" title="Chỉnh sửa"><i class="bi bi-pencil"></i></a>
