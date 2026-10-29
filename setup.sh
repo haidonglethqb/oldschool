@@ -75,7 +75,13 @@ fi
 echo "[4/6] Kiểm tra trạng thái Cơ sở dữ liệu..."
 if [ "$RESET_DB" -eq 1 ] && [ -f "db.sqlite3" ]; then
   rm -f db.sqlite3
-  echo "  -> Đã xóa db.sqlite3 cũ."
+  echo "  -> Đã xóa db.sqlite3 cũ theo tùy chọn --reset-db."
+elif [ "$BRANCHES" -eq 2 ] && [ -f "db.sqlite3" ]; then
+  HAS_CS3=$("$VENV_PY" -c "import os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings'); django.setup(); from apps.branches.models import CoSo; print('YES' if CoSo.objects.filter(ma_co_so='CS3').exists() else 'NO')" 2>/dev/null || true)
+  if [ "$HAS_CS3" = "YES" ]; then
+    rm -f db.sqlite3
+    echo "  -> Phát hiện DB cũ có CS3, tự động làm mới DB để chuẩn hóa về đúng 2 cơ sở (CS1 & CS2)."
+  fi
 fi
 
 # 5. Migrate & Seed

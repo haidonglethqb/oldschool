@@ -3,6 +3,7 @@ from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from apps.accounts.models import User
 from apps.accounts.permissions import assert_branch_access, assert_can_manage_imports, role_required
@@ -60,6 +61,33 @@ def _extract_import_lines_from_post(request) -> list[ImportLineSpec]:
     return specs
 
 
+def _extract_initial_import_lines(request) -> list[dict]:
+    variant_ids = request.POST.getlist("line_variant_id")
+    quantities = request.POST.getlist("line_so_luong")
+    prices = request.POST.getlist("line_don_gia")
+    discounts = request.POST.getlist("line_chiet_khau")
+    notes = request.POST.getlist("line_ghi_chu")
+
+    lines = []
+    int_vids = [int(v) for v in variant_ids if str(v).isdigit()]
+    v_map = {v.id: v for v in BienThe.objects.select_related("san_pham").filter(id__in=int_vids)}
+    for idx, vid in enumerate(variant_ids):
+        if not str(vid).strip():
+            continue
+        v_obj = v_map.get(int(vid)) if str(vid).isdigit() else None
+        lines.append({
+            "variant_id": int(vid) if str(vid).isdigit() else "",
+            "ma_sku": v_obj.ma_sku if v_obj else "",
+            "ten_hang_hoa": v_obj.full_display_name if v_obj else "",
+            "so_luong": quantities[idx] if idx < len(quantities) else "1",
+            "don_gia": prices[idx] if idx < len(prices) else "0",
+            "chiet_khau": discounts[idx] if idx < len(discounts) else "0",
+            "thanh_tien": "",
+            "ghi_chu": notes[idx] if idx < len(notes) else "",
+        })
+    return lines
+
+
 @role_required(User.Role.ADMIN, User.Role.MANAGER)
 def import_list_view(request):
     assert_can_manage_imports(request.user)
@@ -83,14 +111,15 @@ def import_list_view(request):
         date_to=date_to,
     )
     summary = get_import_activity_summary(receipts)
+
     return render(
         request,
         "purchasing/import_list.html",
         {
             "receipts": receipts,
-            "summary": summary,
-            "suppliers": NhaCungCap.objects.all(),
+            "suppliers": get_all_suppliers(),
             "status_choices": PhieuNhapKho.Status.choices,
+            "summary": summary,
             "filters": {
                 "q": search_query,
                 "status": status_filter,
@@ -140,6 +169,7 @@ def import_create_view(request):
             header_form = ImportReceiptHeaderForm(request.POST)
         else:
             header_form = ImportReceiptHeaderForm(request.POST)
+            initial_lines = _extract_initial_import_lines(request)
             if header_form.is_valid():
                 try:
                     line_specs = _extract_import_lines_from_post(request)
@@ -206,6 +236,7 @@ def import_update_view(request, receipt_id: int):
 
     if request.method == "POST":
         header_form = ImportReceiptHeaderForm(request.POST)
+        initial_lines = _extract_initial_import_lines(request)
         if header_form.is_valid():
             try:
                 line_specs = _extract_import_lines_from_post(request)
@@ -408,8 +439,12 @@ def supplier_list_create_view(request):
                     sdt=form.cleaned_data["sdt"],
                 )
                 messages.success(request, f"Đã thêm nhà cung cấp {supplier.ten_nha_cung_cap} ({supplier.ma_nha_cung_cap}).")
-                next_url = request.POST.get("next") or "purchasing:supplier_list"
-                return redirect(next_url)
+                next_url = request.POST.get("next")
+                if next_url and url_has_allowed_host_and_scheme(
+                    url=next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+                ):
+                    return redirect(next_url)
+                return redirect("purchasing:supplier_list")
             except ValidationError as exc:
                 messages.error(request, "; ".join(exc.messages))
     else:

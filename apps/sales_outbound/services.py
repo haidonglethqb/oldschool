@@ -1,8 +1,8 @@
 """
-Sales Outbound Request & Receipt Services (Phase 4 - UC-5.1, UC-5.2, UC-5.4 to UC-5.13).
+Sales Outbound Request & Receipt Services (Phase 4 - UC-5.1 to UC-5.13).
 Enforces:
 - Branch isolation (Manager/Staff only operate on their own branch)
-- Atomic stock deduction with `select_for_update()` ONLY when receipt is finalized (`COMPLETED`, UC-5.11)
+- Atomic stock deduction with `select_for_update()` ONLY when receipt is finalized (`COMPLETED`, UC-5.6)
 - Automatic low-stock evaluation after deduction (UC-5.13)
 - Strict separation between Sales Outbound (`PhieuXuatHangBan`) and Interbranch Transfer (`PhieuDieuChuyen`)
 """
@@ -44,34 +44,28 @@ class OutboundReceiptLineSpec:
 
 def generate_next_request_code(branch: CoSo) -> str:
     prefix = f"YCX-{branch.ma_co_so}-{timezone.localdate().strftime('%Y%m%d')}-"
-    last = (
-        YeuCauXuatHang.objects.filter(ma_yeu_cau__startswith=prefix)
-        .order_by("-ma_yeu_cau")
-        .first()
+    existing_codes = YeuCauXuatHang.objects.filter(ma_yeu_cau__startswith=prefix).values_list(
+        "ma_yeu_cau", flat=True
     )
-    seq = 1
-    if last:
-        try:
-            seq = int(last.ma_yeu_cau.split("-")[-1]) + 1
-        except ValueError:
-            seq = YeuCauXuatHang.objects.count() + 1
-    return f"{prefix}{seq:03d}"
+    max_seq = 0
+    for code in existing_codes:
+        suffix = code[len(prefix):]
+        if suffix.isdigit():
+            max_seq = max(max_seq, int(suffix))
+    return f"{prefix}{max_seq + 1:03d}"
 
 
 def generate_next_outbound_code(branch: CoSo) -> str:
     prefix = f"PXB-{branch.ma_co_so}-{timezone.localdate().strftime('%Y%m%d')}-"
-    last = (
-        PhieuXuatHangBan.objects.filter(ma_phieu_xuat_hang_ban__startswith=prefix)
-        .order_by("-ma_phieu_xuat_hang_ban")
-        .first()
+    existing_codes = PhieuXuatHangBan.objects.filter(ma_phieu_xuat_hang_ban__startswith=prefix).values_list(
+        "ma_phieu_xuat_hang_ban", flat=True
     )
-    seq = 1
-    if last:
-        try:
-            seq = int(last.ma_phieu_xuat_hang_ban.split("-")[-1]) + 1
-        except ValueError:
-            seq = PhieuXuatHangBan.objects.count() + 1
-    return f"{prefix}{seq:03d}"
+    max_seq = 0
+    for code in existing_codes:
+        suffix = code[len(prefix):]
+        if suffix.isdigit():
+            max_seq = max(max_seq, int(suffix))
+    return f"{prefix}{max_seq + 1:03d}"
 
 
 @transaction.atomic
@@ -195,7 +189,6 @@ def _validate_outbound_lines(branch: CoSo, line_specs: list[OutboundReceiptLineS
         if qty <= 0:
             raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Số lượng xuất kho phải lớn hơn 0.")
 
-        # Pre-check current stock availability at creation/update time (UC-5.1, UC-5.2, UC-5.9)
         balance = TonKho.objects.filter(co_so=branch, bien_the=variant).first()
         avail = balance.so_luong if balance else 0
         if qty > avail:
@@ -303,7 +296,7 @@ def update_outbound_receipt(
     phuong_thuc_giao: str = "",
     ghi_chu: str = "",
 ) -> PhieuXuatHangBan:
-    """Update an unfinalized Sales Outbound Receipt (UC-5.9)."""
+    """Update an unfinalized Sales Outbound Receipt (UC-5.5)."""
     assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
     receipt = PhieuXuatHangBan.objects.select_for_update().select_related("co_so").get(pk=receipt.pk)
     assert_branch_access(actor, receipt.co_so)
@@ -339,7 +332,7 @@ def update_outbound_receipt(
 @transaction.atomic
 def finalize_outbound_receipt(*, actor: User, receipt: PhieuXuatHangBan) -> PhieuXuatHangBan:
     """
-    Finalize a Sales Outbound Receipt (`Ghi nhận xuất kho`, UC-5.11).
+    Finalize a Sales Outbound Receipt (`Ghi nhận xuất kho`, UC-5.6).
     Atomically locks branch stock rows, verifies sufficiency, deducts stock,
     creates `SALE_OUT` ledger movements, and triggers low-stock warnings (UC-5.13).
     """
@@ -412,7 +405,7 @@ def finalize_outbound_receipt(*, actor: User, receipt: PhieuXuatHangBan) -> Phie
 
 @transaction.atomic
 def delete_outbound_receipt(*, actor: User, receipt: PhieuXuatHangBan) -> str:
-    """Delete an unfinalized Sales Outbound Receipt (UC-5.10)."""
+    """Delete an unfinalized Sales Outbound Receipt (UC-5.7)."""
     assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
     receipt = PhieuXuatHangBan.objects.select_for_update(of=("self",)).select_related("yeu_cau_xuat").get(pk=receipt.pk)
     assert_branch_access(actor, receipt.co_so)

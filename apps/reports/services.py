@@ -29,7 +29,7 @@ def export_inventory_report_excel(report_data: dict) -> HttpResponse:
         "Tổng xuất",
         "Tồn cuối kỳ",
         "Đang vận chuyển",
-        "Đơn giá (VNĐ)",
+        "Đơn giá vốn (VNĐ)",
         "Giá trị tồn kho (VNĐ)",
         "Trạng thái",
     ]
@@ -94,7 +94,7 @@ def save_report_snapshots(*, actor: User, report_data: dict) -> int:
     """Persist snapshot rows into `BaoCao` table for historical audit."""
     branch = report_data["effective_branch"]
     scope_code = branch.ma_co_so if branch else "ALL"
-    stamp = timezone.now().strftime("%Y%m%d%H%M%S")
+    stamp = timezone.now().strftime("%Y%m%d%H%M%S%f")[:17]
     count = 0
     for idx, r in enumerate(report_data["rows"], start=1):
         code = f"BC-{scope_code}-{stamp}-{idx:03d}"

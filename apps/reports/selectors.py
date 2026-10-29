@@ -7,6 +7,7 @@ Computes period metrics directly from immutable `StockMovement` ledger and `TonK
 - Tồn cuối kỳ (`closing_qty`)
 - Hàng đang vận chuyển (`in_transit_qty`) from `DISPATCHED` interbranch transfers
 - Phân loại: Bán chạy (`best_selling`), Bán chậm / Tồn lâu (`slow_moving`), Sắp hết / Hết hàng (`low_stock`)
+- Giá vốn bình quân (`unit_price` / `cost_price`) tính theo DEC-07 từ các phiếu nhập đã duyệt
 """
 from datetime import date, datetime, time
 from decimal import Decimal
@@ -16,6 +17,7 @@ from apps.accounts.models import User
 from apps.branches.models import CoSo
 from apps.catalog.models import BienThe
 from apps.inventory.models import StockMovement, TonKho
+from apps.purchasing.models import ChiTietPhieuNhapKho, PhieuNhapKho
 from apps.transfers.models import ChiTietPhieuDieuChuyen, PhieuDieuChuyen
 
 
@@ -124,6 +126,25 @@ def build_inventory_report(
     in_transit_agg = in_transit_qs.values("bien_the_id").annotate(transit_qty=Sum("so_luong_xuat"))
     in_transit_map = {row["bien_the_id"]: int(row["transit_qty"] or 0) for row in in_transit_agg}
 
+    # Average cost per DEC-07: weighted average unit import price from APPROVED receipts
+    approved_import_lines = (
+        ChiTietPhieuNhapKho.objects.filter(
+            bien_the_id__in=variant_ids,
+            phieu_nhap_kho__trang_thai=PhieuNhapKho.Status.APPROVED,
+        )
+        .values("bien_the_id")
+        .annotate(
+            total_qty=Sum("so_luong"),
+            total_amount=Sum("thanh_tien"),
+        )
+    )
+    avg_cost_map: dict[int, Decimal] = {}
+    for item in approved_import_lines:
+        qty = item["total_qty"] or 0
+        amt = item["total_amount"] or Decimal("0")
+        if qty > 0:
+            avg_cost_map[item["bien_the_id"]] = (amt / Decimal(qty)).quantize(Decimal("1"))
+
     rows = []
     totals = {
         "opening_qty": 0,
@@ -167,23 +188,23 @@ def build_inventory_report(
             status_code = "OUT_OF_STOCK"
             status_label = "Hết hàng"
             badge_class = "badge-out-of-stock"
-            totals["out_of_stock_count"] += 1
         elif closing_qty <= min_thresh:
             status_code = "LOW_STOCK"
             status_label = "Sắp hết hàng"
             badge_class = "badge-low-stock"
-            totals["low_stock_count"] += 1
         else:
             status_code = "IN_STOCK"
             status_label = "Còn hàng"
             badge_class = "badge-in-stock"
 
-        unit_price = v.don_gia
+        cost_price = avg_cost_map.get(vid, Decimal("0"))
+        selling_price = v.don_gia
+        unit_price = cost_price  # gia_von per DEC-07
         inv_value = Decimal(max(0, closing_qty)) * unit_price
-        sales_rev = Decimal(sale_out_qty) * unit_price
+        sales_rev = Decimal(sale_out_qty) * selling_price
 
         is_best_selling = sale_out_qty >= 3
-        is_slow_moving = sale_out_qty == 0 and closing_qty > min_thresh
+        is_slow_moving = sale_out_qty == 0 and closing_qty > 0  # per DEC-07
 
         row_item = {
             "variant": v,
@@ -207,6 +228,8 @@ def build_inventory_report(
             "min_threshold": min_thresh,
             "in_transit_qty": in_transit_qty,
             "unit_price": unit_price,
+            "cost_price": cost_price,
+            "selling_price": selling_price,
             "inventory_value": inv_value,
             "sales_revenue": sales_rev,
             "status_code": status_code,
@@ -228,6 +251,11 @@ def build_inventory_report(
             continue
 
         rows.append(row_item)
+        if status_code == "OUT_OF_STOCK":
+            totals["out_of_stock_count"] += 1
+        elif status_code == "LOW_STOCK":
+            totals["low_stock_count"] += 1
+
         totals["opening_qty"] += opening_qty
         totals["import_in_qty"] += import_in_qty
         totals["transfer_in_qty"] += transfer_in_qty
