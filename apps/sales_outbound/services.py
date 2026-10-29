@@ -80,8 +80,8 @@ def create_outbound_request(
     phuong_thuc_giao: str = YeuCauXuatHang.DeliveryMethod.COUNTER,
     ghi_chu: str = "",
 ) -> YeuCauXuatHang:
-    """Create a Sales Outbound Request from Staff or Manager (Hình 5 - Proposed Workflow)."""
-    assert_roles(actor, User.Role.STAFF, User.Role.MANAGER, User.Role.ADMIN)
+    """Create a counter sales outbound request submitted by sales staff."""
+    assert_roles(actor, User.Role.STAFF)
     assert_branch_access(actor, co_so)
 
     if not line_specs:

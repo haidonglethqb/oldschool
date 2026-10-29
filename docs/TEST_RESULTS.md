@@ -48,3 +48,23 @@ Tài liệu này ghi nhận kết quả thực thi bộ kiểm thử tự độn
 | `tests/test_ui_views.py` | `test_download_all_excel_templates_and_variant_stock_api` | **EC-09**: Kiểm tra tải cả 3 file Excel mẫu (`import`, `outbound`, `stocktake`) khi có biến thể `Decimal` và API `api_variant_stock` | ✅ PASS |
 | `tests/test_concurrency.py` | `test_scenario_6_concurrent_outbound_finalization_prevents_negative_stock` | **Scenario 6**: 2 luồng đồng thời cùng chốt xuất trên PostgreSQL (`select_for_update`), đúng 1 luồng thành công và 1 luồng bị chặn, không âm kho | ⏭️ SKIPPED (Yêu cầu PostgreSQL live server) |
 | `tests/test_concurrency.py` | `test_scenario_10_multiline_atomic_rollback_on_partial_failure` | **Scenario 10**: Phiếu nhiều dòng có 1 dòng thiếu tồn kho sẽ rollback toàn bộ giao dịch nguyên tử (`@transaction.atomic`) | ✅ PASS |
+
+## 3. Đợt sửa kiểm kê, Excel mẫu và quyền từ quầy — 29/10/2026
+
+Đã tái hiện lỗi trước sửa ở cả ba bộ đọc Excel: mẫu do web sinh đặt tên cột tại dòng 4 nhưng parser lấy dòng 1, dẫn đến báo thiếu cột. Các thay đổi hiện gồm nhận diện dòng tên cột, cột tồn kiểm kê riêng, loại bỏ nút lưu lồng nhau và giới hạn tạo yêu cầu từ quầy cho `STAFF`.
+
+| Kiểm tra đã xác nhận | Kết quả |
+|---|---|
+| `tests/test_sales_outbound.py tests/test_accounts.py tests/test_ui_views.py` | **11 passed**, 26.09s |
+| Suite mục tiêu: kiểm kê, nhập, xuất, UI, tài khoản, thông báo và hồi quy mới | **37 passed**, 84.29s; gồm **19 test hồi quy mới** |
+| `.venv/Scripts/python.exe -m pytest -q --durations=5` | **54 passed, 1 skipped**, 115.16s |
+| `.venv/Scripts/python.exe manage.py check` | **0 vấn đề** |
+| QA trình duyệt Edge với SQLite riêng | **46/46 đạt**, không có JavaScript page error |
+
+QA trình duyệt đã kiểm tra Admin, Quản lý CS1/CS2 và Nhân viên CS1/CS2; cột tồn tách riêng, đổi SKU giữ số kiểm đếm, tồn bằng 0, thêm dòng, upload cả ba mẫu tải từ web, form lỗi và chỉnh sửa kiểm kê. Luồng Nhân viên gửi yêu cầu → Quản lý mở lập phiếu với dữ liệu điền sẵn và từ chối yêu cầu cũng đạt. Dữ liệu QA tách khỏi database ứng dụng.
+
+Bằng chứng nằm tại `plans/261029-stocktake-excel-outbound-fixes/reports/browser-results.json`, `stocktake-desktop.png` và `stocktake-narrow.png` trong cùng thư mục.
+
+Suite mục tiêu đã kiểm tra mẫu Excel tải xuống rồi tải lên lại không ghi phiếu/tồn; header dòng 1/dòng 4, Unicode/khoảng trắng, số dòng lỗi, thiếu/trùng cột, fallback số lượng kiểm kê và chặn tạo yêu cầu trái quyền ở HTTP/service. Phạm vi Admin `ALL`, session và từng CS1/CS2 cũng đạt.
+
+Suite đầy đủ chạy với SQLite test database. Một test đa luồng `select_for_update` trong `tests/test_concurrency.py` được bỏ qua do cần PostgreSQL; kiểm thử tương tranh PostgreSQL chưa được xác minh trong đợt này. Không đo code coverage trong đợt chạy này.

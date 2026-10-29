@@ -60,7 +60,9 @@
               {% if request.user.role != 'STAFF' %}
               <li><a class="dropdown-item" href="{% url 'sales_outbound:outbound_create' %}"><i class="bi bi-plus-circle me-2"></i>Tạo phiếu xuất bán</a></li>
               {% endif %}
+              {% if request.user.role == 'STAFF' %}
               <li><a class="dropdown-item" href="{% url 'sales_outbound:request_list' %}"><i class="bi bi-cart-check me-2"></i>Yêu cầu xuất từ quầy bán</a></li>
+              {% endif %}
               {% if request.user.role != 'STAFF' %}
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header text-uppercase">Điều chuyển nội bộ</h6></li>
