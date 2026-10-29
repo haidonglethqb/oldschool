@@ -17,9 +17,16 @@ from django.db import transaction
 from apps.accounts.models import User
 from apps.branches.models import CoSo
 from apps.catalog.models import BienThe, SanPham
+from apps.inventory.models import StockMovement, TonKho
 from apps.inventory.services import ensure_stock_balance, set_opening_stock
+from apps.notifications.models import ThongBao
 from apps.purchasing.models import NhaCungCap, PhieuNhapKho
-from apps.purchasing.services import ImportLineSpec, approve_import_receipt, create_import_receipt
+from apps.purchasing.services import (
+    ImportLineSpec,
+    approve_import_receipt,
+    create_import_receipt,
+    return_import_receipt,
+)
 from apps.sales_outbound.models import PhieuXuatHangBan, YeuCauXuatHang
 from apps.sales_outbound.services import (
     OutboundReceiptLineSpec,
@@ -28,7 +35,12 @@ from apps.sales_outbound.services import (
     create_outbound_request,
 )
 from apps.stocktakes.models import KiemKe
-from apps.stocktakes.services import StocktakeLineSpec, approve_stocktake, create_stocktake, reject_stocktake
+from apps.stocktakes.services import (
+    StocktakeLineSpec,
+    approve_stocktake,
+    create_stocktake,
+    reject_stocktake,
+)
 from apps.transfers.models import PhieuDieuChuyen
 from apps.transfers.services import (
     TransferRequestLineSpec,
@@ -88,6 +100,20 @@ class Command(BaseCommand):
                     "is_central_warehouse": False,
                 }
             )
+        else:
+            # Chế độ 2 cơ sở: Nếu CSDL từng seed 3 cơ sở trước đó, dọn dẹp an toàn các bản ghi của CS3
+            cs3_qs = CoSo.objects.filter(ma_co_so="CS3")
+            if cs3_qs.exists():
+                PhieuDieuChuyen.objects.filter(co_so_xuat__ma_co_so="CS3").delete()
+                PhieuDieuChuyen.objects.filter(co_so_nhan__ma_co_so="CS3").delete()
+                KiemKe.objects.filter(co_so__ma_co_so="CS3").delete()
+                PhieuXuatHangBan.objects.filter(co_so__ma_co_so="CS3").delete()
+                YeuCauXuatHang.objects.filter(co_so__ma_co_so="CS3").delete()
+                StockMovement.objects.filter(co_so__ma_co_so="CS3").delete()
+                TonKho.objects.filter(co_so__ma_co_so="CS3").delete()
+                ThongBao.objects.filter(co_so__ma_co_so="CS3").delete()
+                User.objects.filter(username__in=["manager_cs3", "staff_cs3"]).delete()
+                cs3_qs.delete()
 
         branches = {}
         for bspec in branches_spec:
@@ -297,6 +323,23 @@ class Command(BaseCommand):
                 submit_for_approval=True,
             )
 
+        if not PhieuNhapKho.objects.filter(ma_phieu_nhap_kho="PNK-DEMO-003").exists():
+            r3 = create_import_receipt(
+                actor=mgr_cs1,
+                nha_cung_cap=suppliers["NCC003"],
+                ma_phieu_nhap_kho="PNK-DEMO-003",
+                ly_do_nhap="Nhập túi Canvas đợt 2 (Bị trả lại do sai đơn giá thỏa thuận)",
+                line_specs=[
+                    ImportLineSpec(variant_id=variants_map["SP006-DEN-FS"].id, so_luong=30, don_gia=Decimal("120000")),
+                ],
+                submit_for_approval=True,
+            )
+            return_import_receipt(
+                actor=admin_user,
+                receipt=r3,
+                reason="Đơn giá nhà cung cấp tính 120.000đ/cái chưa trừ 10% chiết khấu hợp đồng năm. Yêu cầu lập lại phiếu.",
+            )
+
         # 6. Sample Sales Outbound Request & Receipts
         if not YeuCauXuatHang.objects.exists():
             create_outbound_request(
@@ -386,6 +429,19 @@ class Command(BaseCommand):
                 dispatch_transfer(actor=mgr_cs1, transfer=t_done_2b)
                 receive_transfer(actor=mgr_cs2, transfer=t_done_2b)
 
+        # Mẫu phiếu điều chuyển vừa tạo (REQUESTED - đang chờ kho xuất gửi đi)
+        if not PhieuDieuChuyen.objects.filter(ma_phieu_dieu_chuyen="PDC-CS1-CS2-DEMO-003").exists():
+            create_transfer_request(
+                actor=mgr_cs2,
+                co_so_xuat=cs1,
+                co_so_nhan=cs2,
+                ma_phieu_dieu_chuyen="PDC-CS1-CS2-DEMO-003",
+                ly_do="Yêu cầu điều chuyển gấp Quần Jeans Nữ cho sự kiện sale cuối tuần (Chờ xuất hàng)",
+                line_specs=[
+                    TransferRequestLineSpec(variant_id=variants_map["SP003-XANH-M"].id, so_luong_yeu_cau=6),
+                ],
+            )
+
         # 8. Sample Stocktake Records (Pending & Approved)
         if not KiemKe.objects.filter(ma_kiem_ke="KK-CS1-DEMO-001").exists():
             create_stocktake(
@@ -413,6 +469,23 @@ class Command(BaseCommand):
                 ],
             )
             approve_stocktake(actor=admin_user, stocktake=st2)
+
+        if not KiemKe.objects.filter(ma_kiem_ke="KK-CS1-DEMO-003").exists():
+            st3 = create_stocktake(
+                actor=mgr_cs1,
+                co_so=cs1,
+                ma_kiem_ke="KK-CS1-DEMO-003",
+                nguoi_kiem_ke="Trần Thị Quản Lý CS1",
+                muc_dich="Kiểm kê đột xuất kệ Quần Jeans (Bị từ chối duyệt)",
+                line_specs=[
+                    StocktakeLineSpec(variant_id=variants_map["SP003-DEN-L"].id, so_luong_thuc_te=15, xu_ly="Chênh lệch lớn so với hệ thống"),
+                ],
+            )
+            reject_stocktake(
+                actor=admin_user,
+                stocktake=st3,
+                reason="Lệch số lượng quá lớn so với sổ sách tồn kho. Yêu cầu kiểm tra camera kho và đếm lại toàn bộ kệ trước khi gửi duyệt lại.",
+            )
 
         # 9. Generate Sample Excel Files on Disk (`sample_data/excel/`)
         excel_dir = Path(settings.BASE_DIR) / "sample_data" / "excel"
@@ -446,7 +519,7 @@ class Command(BaseCommand):
         acc_count = len(users_spec)
         self.stdout.write(
             self.style.SUCCESS(
-                f"=== Hoàn tất khởi tạo dữ liệu mẫu Old School ({num_branches} cơ sở, {acc_count} tài khoản, 6 SP / 14 SKU, đầy đủ phiếu mẫu & file Excel) ==="
+                f"=== Hoàn tất khởi tạo dữ liệu mẫu Old School ({num_branches} cơ sở, {acc_count} tài khoản, 6 SP / {len(variants_map)} SKU, đầy đủ phiếu mẫu & file Excel) ==="
             )
         )
 

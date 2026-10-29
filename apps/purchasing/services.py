@@ -30,18 +30,15 @@ class ImportLineSpec:
 
 def generate_next_import_code() -> str:
     prefix = f"PNK-{timezone.localdate().strftime('%Y%m%d')}-"
-    last = (
-        PhieuNhapKho.objects.filter(ma_phieu_nhap_kho__startswith=prefix)
-        .order_by("-ma_phieu_nhap_kho")
-        .first()
+    existing_codes = PhieuNhapKho.objects.filter(ma_phieu_nhap_kho__startswith=prefix).values_list(
+        "ma_phieu_nhap_kho", flat=True
     )
-    seq = 1
-    if last:
-        try:
-            seq = int(last.ma_phieu_nhap_kho.split("-")[-1]) + 1
-        except ValueError:
-            seq = PhieuNhapKho.objects.count() + 1
-    return f"{prefix}{seq:03d}"
+    max_seq = 0
+    for code in existing_codes:
+        suffix = code[len(prefix):]
+        if suffix.isdigit():
+            max_seq = max(max_seq, int(suffix))
+    return f"{prefix}{max_seq + 1:03d}"
 
 
 def create_supplier(*, actor: User, ma_nha_cung_cap: str, ten_nha_cung_cap: str, dia_chi: str, sdt: str) -> NhaCungCap:
@@ -199,8 +196,13 @@ def update_import_receipt(
         receipt.ly_do_nhap = ly_do_nhap.strip()
     receipt.ghi_chu = (ghi_chu or "").strip()
     receipt.tong_tien = grand_total
-    if submit_for_approval:
-        receipt.trang_thai = PhieuNhapKho.Status.PENDING_APPROVAL
+
+    previous_status = receipt.trang_thai
+    receipt.trang_thai = (
+        PhieuNhapKho.Status.PENDING_APPROVAL
+        if submit_for_approval
+        else PhieuNhapKho.Status.DRAFT
+    )
     receipt.save()
 
     receipt.lines.all().delete()
@@ -213,6 +215,25 @@ def update_import_receipt(
             chiet_khau=item["chiet_khau"],
             thanh_tien=item["thanh_tien"],
             ghi_chu=item["ghi_chu"],
+        )
+
+    if submit_for_approval and previous_status != PhieuNhapKho.Status.PENDING_APPROVAL:
+        try:
+            target_url = reverse("purchasing:import_detail", args=[receipt.id])
+        except Exception:
+            target_url = "/purchasing/"
+        notify_admins(
+            notification_type=ThongBao.NotificationType.IMPORT_SUBMITTED,
+            title=f"Phiếu nhập kho {receipt.ma_phieu_nhap_kho} đã được cập nhật & gửi duyệt",
+            content=(
+                f"Quản lý {actor.display_name} ({receipt.co_so_nhan.ten_co_so}) "
+                f"đã cập nhật và gửi duyệt lại phiếu nhập {receipt.ma_phieu_nhap_kho} "
+                f"(Tổng tiền: {int(receipt.tong_tien):,} đ)."
+            ),
+            branch=receipt.co_so_nhan,
+            related_entity_type="PhieuNhapKho",
+            related_entity_id=receipt.id,
+            target_url=target_url,
         )
 
     return receipt

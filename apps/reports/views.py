@@ -2,6 +2,7 @@
 import json
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from apps.accounts.models import User
 from apps.accounts.permissions import get_effective_branch, role_required
@@ -75,6 +76,7 @@ def report_dashboard_view(request):
                 "stock_status": stock_status,
                 "tab": report_tab,
             },
+            "selected_branch": selected_branch,
         },
     )
 
@@ -100,12 +102,34 @@ def report_variant_detail_view(request, variant_id: int):
 @require_POST
 def report_save_snapshot_view(request):
     selected_branch = get_effective_branch(request, allow_all_for_admin=True)
+    q = request.POST.get("q", "").strip()
+    category = request.POST.get("category", "").strip()
+    color = request.POST.get("color", "").strip()
+    size = request.POST.get("size", "").strip()
+    stock_status = request.POST.get("stock_status", "").strip()
+    tab = request.POST.get("tab", "all").strip()
+    date_from = request.POST.get("date_from", "").strip()
+    date_to = request.POST.get("date_to", "").strip()
+
     report_data = build_inventory_report(
         user=request.user,
         selected_branch=selected_branch,
-        date_from_str=request.POST.get("date_from", ""),
-        date_to_str=request.POST.get("date_to", ""),
+        date_from_str=date_from,
+        date_to_str=date_to,
+        search_query=q,
+        category=category,
+        color=color,
+        size=size,
+        stock_status=stock_status,
+        report_tab=tab,
     )
     saved_count = save_report_snapshots(actor=request.user, report_data=report_data)
     messages.success(request, f"Đã lưu bản chụp báo cáo ({saved_count} dòng SKU) vào hệ thống.")
-    return redirect("reports:report_dashboard")
+
+    params = request.POST.copy()
+    params.pop("csrfmiddlewaretoken", None)
+    query_str = params.urlencode()
+    redirect_url = reverse("reports:report_dashboard")
+    if query_str:
+        redirect_url = f"{redirect_url}?{query_str}"
+    return redirect(redirect_url)
