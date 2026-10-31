@@ -10,13 +10,20 @@
     </p>
   </div>
   <div class="d-flex gap-2">
-    <a href="?date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&tab={{ filters.tab }}&export=excel" class="btn btn-sm btn-success">
+    <a href="?date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&color={{ filters.color }}&size={{ filters.size }}&stock_status={{ filters.stock_status }}&tab={{ filters.tab }}&export=excel" class="btn btn-sm btn-success">
       <i class="bi bi-file-earmark-excel-fill me-1"></i>Xuất file Excel
+    </a>
     </a>
     <form method="post" action="{% url 'reports:report_save_snapshot' %}" class="d-inline">
       {% csrf_token %}
       <input type="hidden" name="date_from" value="{{ filters.date_from }}">
       <input type="hidden" name="date_to" value="{{ filters.date_to }}">
+      <input type="hidden" name="q" value="{{ filters.q }}">
+      <input type="hidden" name="category" value="{{ filters.category }}">
+      <input type="hidden" name="color" value="{{ filters.color }}">
+      <input type="hidden" name="size" value="{{ filters.size }}">
+      <input type="hidden" name="stock_status" value="{{ filters.stock_status }}">
+      <input type="hidden" name="tab" value="{{ filters.tab }}">
       <button type="submit" class="btn btn-sm btn-os-tan">
         <i class="bi bi-camera me-1"></i>Lưu bản chụp báo cáo
       </button>
@@ -116,19 +123,19 @@
 
   <ul class="nav nav-pills gap-1 small">
     <li class="nav-item">
-      <a class="nav-link py-1 px-3 {% if filters.tab == 'all' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=all&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Tất cả mặt hàng</a>
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'all' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=all&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&color={{ filters.color }}&size={{ filters.size }}&stock_status={{ filters.stock_status }}">Tất cả mặt hàng</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link py-1 px-3 {% if filters.tab == 'best_selling' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=best_selling&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Hàng bán chạy</a>
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'best_selling' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=best_selling&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&color={{ filters.color }}&size={{ filters.size }}&stock_status={{ filters.stock_status }}">Hàng bán chạy</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link py-1 px-3 {% if filters.tab == 'slow_moving' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=slow_moving&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Hàng bán chậm / Tồn cao</a>
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'slow_moving' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=slow_moving&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&color={{ filters.color }}&size={{ filters.size }}&stock_status={{ filters.stock_status }}">Hàng bán chậm / Tồn cao</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link py-1 px-3 {% if filters.tab == 'low_stock' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=low_stock&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Sắp hết / Hết hàng</a>
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'low_stock' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=low_stock&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&color={{ filters.color }}&size={{ filters.size }}&stock_status={{ filters.stock_status }}">Sắp hết / Hết hàng</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link py-1 px-3 {% if filters.tab == 'in_transit' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=in_transit&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}">Đang điều chuyển</a>
+      <a class="nav-link py-1 px-3 {% if filters.tab == 'in_transit' %}active bg-dark{% else %}text-dark bg-light{% endif %}" href="?tab=in_transit&date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&color={{ filters.color }}&size={{ filters.size }}&stock_status={{ filters.stock_status }}">Đang điều chuyển</a>
     </li>
   </ul>
 </div>
@@ -143,8 +150,12 @@
 
 <!-- Detailed Report Table -->
 <div class="os-card">
+  <div class="os-card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-table me-2"></i>Bảng Tổng Hợp Số Liệu Chi Tiết</span>
+    <span class="badge bg-secondary">{{ report.rows|length }} biến thể SKU</span>
+  </div>
   <div class="table-responsive">
-    <table class="table os-table">
+    <table class="table os-table table-hover align-middle mb-0">
       <thead>
         <tr>
           <th>Mã SKU</th>
@@ -218,13 +229,19 @@ document.addEventListener("DOMContentLoaded", function () {
           label: "Tồn kho cuối kỳ",
           data: closingData,
           backgroundColor: "#DEC2A8",
-        }
-      ]
+        },
+      ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-    }
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0 },
+        },
+      },
+    },
   });
 });
 </script>
