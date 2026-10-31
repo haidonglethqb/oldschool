@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load humanize %}
-{% block title %}Yêu cầu xuất hàng bán từ quầy | Old School{% endblock %}
+{% block title %}Yêu cầu xuất hàng bán | Old School{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <div>
-    <h4 class="fw-bold mb-0"><i class="bi bi-cart-check me-2"></i>Yêu cầu Xuất Hàng Bán từ Quầy (Hình 5 — Quy trình Xuất bán)</h4>
+    <h4 class="fw-bold mb-0"><i class="bi bi-cart-check me-2"></i>Yêu cầu Xuất Hàng Bán</h4>
     <p class="text-muted small mb-0">
-      Nhân viên bán hàng gửi yêu cầu xuất kho khi có đơn hàng; Quản lý cơ sở kiểm tra và lập Phiếu xuất hàng bán
+      Nhân viên lập yêu cầu xuất khi ngoài kệ trưng bày hết hàng cần vào kho lấy; Quản lý cơ sở kiểm tra và duyệt lập Phiếu xuất kho
     </p>
   </div>
   <a href="{% url 'sales_outbound:outbound_list' %}" class="btn btn-sm btn-outline-secondary">
@@ -21,27 +21,13 @@
       <h6 class="fw-bold border-bottom pb-2 mb-3">Tạo Yêu cầu Xuất Hàng Bán ({{ target_branch.ten_co_so }})</h6>
       <form method="post">
         {% csrf_token %}
-        <div class="mb-2">
-          <label class="form-label small fw-semibold">Tên khách hàng / Mã đơn *</label>
-          {{ form.ten_khach_hang }}
-        </div>
-        <div class="row g-2 mb-2">
-          <div class="col-md-6">
-            <label class="form-label small fw-semibold">Số điện thoại</label>
-            {{ form.sdt_khach_hang }}
-          </div>
-          <div class="col-md-6">
-            <label class="form-label small fw-semibold">Phương thức *</label>
-            {{ form.phuong_thuc_giao }}
-          </div>
-        </div>
-        <div class="mb-2">
-          <label class="form-label small fw-semibold">Địa chỉ nhận hàng</label>
-          {{ form.dia_chi_giao }}
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Lý do xuất kho *</label>
+          {{ form.ly_do_xuat }}
         </div>
         <div class="mb-3">
-          <label class="form-label small fw-semibold">Ghi chú</label>
-          {{ form.ghi_chu }}
+          <label class="form-label small fw-semibold">Ghi chú thêm (nếu có)</label>
+          {{ form.ghi_chu_them }}
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-1">
@@ -79,7 +65,7 @@
             <tr>
               <th>Mã yêu cầu</th>
               <th>Cơ sở</th>
-              <th>Khách hàng</th>
+              <th>Lý do xuất kho</th>
               <th>Mặt hàng yêu cầu</th>
               <th>Người tạo</th>
               <th class="text-center">Trạng thái</th>
@@ -91,7 +77,7 @@
             <tr>
               <td class="fw-bold">{{ req.ma_yeu_cau }}</td>
               <td>{{ req.co_so.ma_co_so }}</td>
-              <td>{{ req.ten_khach_hang }}</td>
+              <td class="small">{{ req.ghi_chu|default:req.ten_khach_hang }}</td>
               <td class="small">
                 {% for l in req.lines.all %}
                   <div><code>{{ l.bien_the.ma_sku }}</code> x <strong>{{ l.so_luong }}</strong></div>

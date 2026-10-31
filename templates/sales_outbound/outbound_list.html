@@ -12,14 +12,12 @@
   <div class="d-flex gap-2">
     {% if request.user.role == 'STAFF' %}
     <a href="{% url 'sales_outbound:request_list' %}" class="btn btn-sm btn-os-tan">
-      <i class="bi bi-cart-check me-1"></i>Yêu cầu xuất từ quầy ({{ pending_requests|length }} chờ)
+      <i class="bi bi-cart-check me-1"></i>Yêu cầu xuất hàng bán ({{ pending_requests|length }} chờ)
     </a>
     {% endif %}
-    {% if request.user.role != 'STAFF' %}
     <a href="{% url 'sales_outbound:outbound_create' %}" class="btn btn-sm btn-os-primary">
       <i class="bi bi-plus-lg me-1"></i>Tạo phiếu xuất hàng bán
     </a>
-    {% endif %}
   </div>
 </div>
 

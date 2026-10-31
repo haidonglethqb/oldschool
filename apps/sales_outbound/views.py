@@ -169,7 +169,7 @@ def outbound_print_view(request, receipt_id: int):
     return render(request, "sales_outbound/outbound_print.html", {"receipt": receipt, "lines": receipt.lines.all()})
 
 
-@role_required(User.Role.ADMIN, User.Role.MANAGER)
+@role_required(User.Role.ADMIN, User.Role.MANAGER, User.Role.STAFF)
 def outbound_create_view(request):
     target_branch = get_effective_branch(request, allow_all_for_admin=False)
     assert_branch_access(request.user, target_branch)
@@ -261,7 +261,7 @@ def outbound_create_view(request):
     )
 
 
-@role_required(User.Role.ADMIN, User.Role.MANAGER)
+@role_required(User.Role.ADMIN, User.Role.MANAGER, User.Role.STAFF)
 def outbound_update_view(request, receipt_id: int):
     receipt = get_object_or_404(
         PhieuXuatHangBan.objects.select_related("co_so").prefetch_related("lines", "lines__bien_the"),
@@ -335,7 +335,7 @@ def outbound_update_view(request, receipt_id: int):
     )
 
 
-@role_required(User.Role.ADMIN, User.Role.MANAGER)
+@role_required(User.Role.ADMIN, User.Role.MANAGER, User.Role.STAFF)
 @require_POST
 def outbound_finalize_view(request, receipt_id: int):
     receipt = get_object_or_404(PhieuXuatHangBan, pk=receipt_id)
@@ -382,14 +382,14 @@ def request_list_create_view(request):
                     if not str(vid).strip():
                         continue
                     specs.append(OutboundRequestLineSpec(variant_id=int(vid), so_luong=int(qtys[idx])))
+                ly_do = form.cleaned_data["ly_do_xuat"].strip()
+                extra_note = form.cleaned_data.get("ghi_chu_them", "").strip()
+                full_reason = f"{ly_do} | {extra_note}".strip(" |") if extra_note else ly_do
                 req_obj = create_outbound_request(
                     actor=request.user,
                     co_so=target_branch,
-                    ten_khach_hang=form.cleaned_data["ten_khach_hang"],
-                    sdt_khach_hang=form.cleaned_data["sdt_khach_hang"],
-                    dia_chi_giao=form.cleaned_data["dia_chi_giao"],
-                    phuong_thuc_giao=form.cleaned_data["phuong_thuc_giao"],
-                    ghi_chu=form.cleaned_data["ghi_chu"],
+                    ten_khach_hang="Xuất bổ sung quầy/kệ",
+                    ghi_chu=full_reason,
                     line_specs=specs,
                 )
                 messages.success(request, f"Đã gửi yêu cầu xuất hàng bán {req_obj.ma_yeu_cau} tới Quản lý cơ sở.")
