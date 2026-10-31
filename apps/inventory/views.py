@@ -36,7 +36,12 @@ def api_variant_stock_view(request):
 @login_required
 def download_excel_template_view(request, template_type: str):
     """Download ready-to-use .xlsx templates for Import, Outbound, or Stocktake."""
-    sample_variants = list(BienThe.objects.select_related("san_pham").filter(trang_thai="ACTIVE")[:3])
+    sample_variants = list(
+        BienThe.objects.select_related("san_pham").filter(
+            trang_thai="ACTIVE",
+            san_pham__trang_thai="ACTIVE",
+        )[:3]
+    )
 
     if template_type == "import":
         headers = ["Mã SKU", "Số lượng", "Đơn giá", "Chiết khấu", "Ghi chú"]

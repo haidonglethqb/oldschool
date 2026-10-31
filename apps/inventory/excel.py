@@ -8,6 +8,7 @@ Supports:
 """
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
+import unicodedata
 import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from django.conf import settings
@@ -49,7 +50,7 @@ def validate_uploaded_xlsx(uploaded_file) -> tuple[openpyxl.Workbook | None, str
 def _normalize_header(val) -> str:
     if val is None:
         return ""
-    s = str(val).strip().lower()
+    s = " ".join(unicodedata.normalize("NFC", str(val)).lower().split())
     mapping = {
         "mã sku": "ma_sku",
         "ma_sku": "ma_sku",
@@ -78,6 +79,22 @@ def _normalize_header(val) -> str:
         "xu_ly": "xu_ly",
     }
     return mapping.get(s, s)
+
+
+def _find_header_row(raw_rows, required_sets):
+    """Find a complete header in the preamble, retaining its physical row offset."""
+    for row_index, row in enumerate(raw_rows[:20]):
+        headers = [_normalize_header(cell) for cell in row]
+        required = next((columns for columns in required_sets if columns <= set(headers)), None)
+        if required is None:
+            continue
+        duplicates = sorted(name for name in required if headers.count(name) > 1)
+        if duplicates:
+            return {}, row_index + 1, (
+                f"Dòng {row_index + 1}: Cột bắt buộc bị trùng: {', '.join(duplicates)}."
+            )
+        return {name: headers.index(name) for name in headers if name}, row_index + 1, None
+    return {}, 0, None
 
 
 def _resolve_variant(code: str) -> BienThe | None:
@@ -117,19 +134,18 @@ def parse_import_excel(uploaded_file) -> dict:
     if not raw_rows:
         return {"valid": False, "file_error": "File Excel trống.", "rows": [], "errors": ["File Excel trống."]}
 
-    headers = [_normalize_header(c) for c in raw_rows[0]]
-    required = {"ma_sku", "so_luong", "don_gia"}
-    missing = required - set(headers)
-    if missing:
-        msg = "File thiếu cột bắt buộc. Cần có: Mã SKU (hoặc Mã hàng), Số lượng, Đơn giá."
+    col_idx, header_row, header_error = _find_header_row(
+        raw_rows, [{"ma_sku", "so_luong", "don_gia"}]
+    )
+    if header_error or not col_idx:
+        msg = header_error or "File thiếu cột bắt buộc. Cần có: Mã SKU (hoặc Mã hàng), Số lượng, Đơn giá."
         return {"valid": False, "file_error": msg, "rows": [], "errors": [msg]}
 
-    col_idx = {name: headers.index(name) for name in headers if name}
     parsed_rows = []
     errors = []
     seen_skus = set()
 
-    for idx, row in enumerate(raw_rows[1:], start=2):
+    for idx, row in enumerate(raw_rows[header_row:], start=header_row + 1):
         if not row or all(cell is None or str(cell).strip() == "" for cell in row):
             continue
         sku_raw = str(row[col_idx["ma_sku"]] or "").strip()
@@ -223,19 +239,18 @@ def parse_outbound_excel(uploaded_file, branch: CoSo) -> dict:
     if not raw_rows:
         return {"valid": False, "file_error": "File Excel trống.", "rows": [], "errors": ["File Excel trống."]}
 
-    headers = [_normalize_header(c) for c in raw_rows[0]]
-    required = {"ma_sku", "so_luong"}
-    missing = required - set(headers)
-    if missing:
-        msg = "File thiếu cột bắt buộc. Cần có: Mã SKU (hoặc Mã hàng), Số lượng."
+    col_idx, header_row, header_error = _find_header_row(
+        raw_rows, [{"ma_sku", "so_luong"}]
+    )
+    if header_error or not col_idx:
+        msg = header_error or "File thiếu cột bắt buộc. Cần có: Mã SKU (hoặc Mã hàng), Số lượng."
         return {"valid": False, "file_error": msg, "rows": [], "errors": [msg]}
 
-    col_idx = {name: headers.index(name) for name in headers if name}
     parsed_rows = []
     errors = []
     seen_skus = set()
 
-    for idx, row in enumerate(raw_rows[1:], start=2):
+    for idx, row in enumerate(raw_rows[header_row:], start=header_row + 1):
         if not row or all(cell is None or str(cell).strip() == "" for cell in row):
             continue
         sku_raw = str(row[col_idx["ma_sku"]] or "").strip()
@@ -324,18 +339,19 @@ def parse_stocktake_excel(uploaded_file, branch: CoSo) -> dict:
     if not raw_rows:
         return {"valid": False, "file_error": "File Excel trống.", "rows": [], "errors": ["File Excel trống."]}
 
-    headers = [_normalize_header(c) for c in raw_rows[0]]
-    qty_col_name = "so_luong_thuc_te" if "so_luong_thuc_te" in headers else ("so_luong" if "so_luong" in headers else "")
-    if "ma_sku" not in headers or not qty_col_name:
-        msg = "File thiếu dữ liệu bắt buộc. Cần có cột: Mã hàng (hoặc Mã SKU) và Số lượng thực tế."
+    col_idx, header_row, header_error = _find_header_row(
+        raw_rows, [{"ma_sku", "so_luong_thuc_te"}, {"ma_sku", "so_luong"}]
+    )
+    if header_error or not col_idx:
+        msg = header_error or "File thiếu dữ liệu bắt buộc. Cần có cột: Mã hàng (hoặc Mã SKU) và Số lượng thực tế."
         return {"valid": False, "file_error": msg, "rows": [], "errors": [msg]}
 
-    col_idx = {name: headers.index(name) for name in headers if name}
+    qty_col_name = "so_luong_thuc_te" if "so_luong_thuc_te" in col_idx else "so_luong"
     parsed_rows = []
     errors = []
     seen_skus = set()
 
-    for idx, row in enumerate(raw_rows[1:], start=2):
+    for idx, row in enumerate(raw_rows[header_row:], start=header_row + 1):
         if not row or all(cell is None or str(cell).strip() == "" for cell in row):
             continue
         sku_raw = str(row[col_idx["ma_sku"]] or "").strip()

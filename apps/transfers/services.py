@@ -32,18 +32,15 @@ class TransferRequestLineSpec:
 
 def generate_next_transfer_code(source_branch: CoSo, dest_branch: CoSo) -> str:
     prefix = f"PDC-{source_branch.ma_co_so}-{dest_branch.ma_co_so}-{timezone.localdate().strftime('%Y%m%d')}-"
-    last = (
-        PhieuDieuChuyen.objects.filter(ma_phieu_dieu_chuyen__startswith=prefix)
-        .order_by("-ma_phieu_dieu_chuyen")
-        .first()
+    existing_codes = PhieuDieuChuyen.objects.filter(ma_phieu_dieu_chuyen__startswith=prefix).values_list(
+        "ma_phieu_dieu_chuyen", flat=True
     )
-    seq = 1
-    if last:
-        try:
-            seq = int(last.ma_phieu_dieu_chuyen.split("-")[-1]) + 1
-        except ValueError:
-            seq = PhieuDieuChuyen.objects.count() + 1
-    return f"{prefix}{seq:03d}"
+    max_seq = 0
+    for code in existing_codes:
+        suffix = code[len(prefix):]
+        if suffix.isdigit():
+            max_seq = max(max_seq, int(suffix))
+    return f"{prefix}{max_seq + 1:03d}"
 
 
 @transaction.atomic

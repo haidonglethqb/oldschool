@@ -67,14 +67,15 @@
     </div>
 
     <div class="table-responsive">
-      <table class="table table-sm align-middle" id="stocktakeLinesTable">
+      <table class="table table-sm align-middle" id="stocktakeLinesTable" style="min-width: 850px;">
         <thead class="table-light">
           <tr>
-            <th style="width: 38%;">Sản phẩm / SKU (Tồn hệ thống tại {{ target_branch.ma_co_so }}) *</th>
-            <th style="width: 16%;">Số lượng thực tế *</th>
-            <th style="width: 22%;">Hướng xử lý chênh lệch</th>
-            <th style="width: 18%;">Ghi chú</th>
-            <th style="width: 6%;"></th>
+            <th scope="col" style="width: 34%;">Sản phẩm / SKU *</th>
+            <th scope="col" class="text-end" style="width: 14%;">Tồn hệ thống tại {{ target_branch.ma_co_so }}</th>
+            <th scope="col" style="width: 14%;">Số lượng thực tế *</th>
+            <th scope="col" style="width: 20%;">Hướng xử lý chênh lệch</th>
+            <th scope="col" style="width: 14%;">Ghi chú</th>
+            <th scope="col" style="width: 4%;"><span class="visually-hidden">Thao tác</span></th>
           </tr>
         </thead>
         <tbody>
@@ -84,12 +85,13 @@
               <select name="line_variant_id" class="form-select form-select-sm" required>
                 <option value="">-- Chọn SKU --</option>
                 {% for v in variants %}
-                <option value="{{ v.id }}" {% if row.variant_id == v.id %}selected{% endif %}>
-                  {{ v.ma_sku }} — {{ v.full_display_name }} [Hệ thống: {{ v.system_qty }}]
+                <option value="{{ v.id }}" data-system-qty="{{ v.system_qty }}" {% if row.variant_id == v.id %}selected{% endif %}>
+                  {{ v.ma_sku }} — {{ v.full_display_name }}
                 </option>
                 {% endfor %}
               </select>
             </td>
+            <td class="text-end fw-semibold stocktake-system-qty" aria-live="polite">{% for v in variants %}{% if row.variant_id == v.id %}{{ v.system_qty }}{% endif %}{% endfor %}</td>
             <td><input type="number" name="line_so_luong_thuc_te" value="{{ row.so_luong_thuc_te }}" min="0" class="form-control form-control-sm" required></td>
             <td><input type="text" name="line_xu_ly" value="{{ row.xu_ly }}" class="form-control form-control-sm"></td>
             <td><input type="text" name="line_ghi_chu" value="{{ row.ghi_chu }}" class="form-control form-control-sm"></td>
@@ -101,12 +103,13 @@
             <td>
               <select name="line_variant_id" class="form-select form-select-sm" required>
                 {% for opt in variants %}
-                <option value="{{ opt.id }}" {% if opt.id == v.id %}selected{% endif %}>
-                  {{ opt.ma_sku }} — {{ opt.full_display_name }} [Hệ thống: {{ opt.system_qty }}]
+                <option value="{{ opt.id }}" data-system-qty="{{ opt.system_qty }}" {% if opt.id == v.id %}selected{% endif %}>
+                  {{ opt.ma_sku }} — {{ opt.full_display_name }}
                 </option>
                 {% endfor %}
               </select>
             </td>
+            <td class="text-end fw-semibold stocktake-system-qty" aria-live="polite">{{ v.system_qty }}</td>
             <td><input type="number" name="line_so_luong_thuc_te" value="{{ v.system_qty }}" min="0" class="form-control form-control-sm" required></td>
             <td><input type="text" name="line_xu_ly" class="form-control form-control-sm" placeholder="VD: Khớp / Kiểm tra lại"></td>
             <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm"></td>
@@ -121,7 +124,11 @@
     <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
       <a href="{% url 'stocktakes:stocktake_list' %}" class="btn btn-outline-secondary">Hủy</a>
       <button type="submit" name="form_action" value="submit" class="btn btn-os-primary px-4">
-      {% if request.user.role == 'ADMIN' %}<button type="submit" name="form_action" value="submit" class="btn btn-os-primary px-4"><i class="bi bi-save me-1"></i>Lưu</button>{% else %}<button type="submit" name="form_action" value="submit" class="btn btn-os-primary px-4"><i class="bi bi-send-check me-1"></i>Lưu & Gửi chờ phê duyệt</button>{% endif %}
+        {% if request.user.role == 'ADMIN' %}
+        <i class="bi bi-save me-1" aria-hidden="true"></i>Lưu
+        {% else %}
+        <i class="bi bi-send-check me-1" aria-hidden="true"></i>Lưu & Gửi chờ phê duyệt
+        {% endif %}
       </button>
     </div>
   </div>
@@ -133,10 +140,11 @@
       <select name="line_variant_id" class="form-select form-select-sm" required>
         <option value="">-- Chọn SKU sản phẩm --</option>
         {% for v in variants %}
-        <option value="{{ v.id }}">{{ v.ma_sku }} — {{ v.full_display_name }} [Hệ thống: {{ v.system_qty }}]</option>
+        <option value="{{ v.id }}" data-system-qty="{{ v.system_qty }}">{{ v.ma_sku }} — {{ v.full_display_name }}</option>
         {% endfor %}
       </select>
     </td>
+    <td class="text-end fw-semibold stocktake-system-qty" aria-live="polite">—</td>
     <td><input type="number" name="line_so_luong_thuc_te" value="0" min="0" class="form-control form-control-sm" required></td>
     <td><input type="text" name="line_xu_ly" class="form-control form-control-sm"></td>
     <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm"></td>
@@ -145,9 +153,25 @@
 </template>
 
 <script>
+function syncStocktakeSystemQty(row) {
+  const select = row.querySelector('select[name="line_variant_id"]');
+  const cell = row.querySelector('.stocktake-system-qty');
+  const option = select.selectedOptions[0];
+  cell.textContent = select.value && option ? option.dataset.systemQty ?? '—' : '—';
+}
+
 function addStocktakeLine() {
   const tpl = document.getElementById("stocktakeLineTemplate");
-  document.querySelector("#stocktakeLinesTable tbody").appendChild(tpl.content.cloneNode(true));
+  const row = tpl.content.cloneNode(true).querySelector('tr');
+  document.querySelector("#stocktakeLinesTable tbody").appendChild(row);
+  syncStocktakeSystemQty(row);
 }
+
+document.querySelector('#stocktakeLinesTable tbody').addEventListener('change', function (event) {
+  if (event.target.matches('select[name="line_variant_id"]')) {
+    syncStocktakeSystemQty(event.target.closest('tr'));
+  }
+});
+document.querySelectorAll('#stocktakeLinesTable tbody tr').forEach(syncStocktakeSystemQty);
 </script>
 {% endblock %}

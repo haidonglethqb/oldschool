@@ -21,6 +21,26 @@ from apps.transfers.services import (
 )
 
 
+def _extract_initial_transfer_lines(request):
+    vids = request.POST.getlist("line_variant_id")
+    qtys = request.POST.getlist("line_so_luong")
+    notes = request.POST.getlist("line_ghi_chu")
+    lines = []
+    for idx, vid in enumerate(vids):
+        if not str(vid).strip():
+            continue
+        try:
+            vid_val = int(vid)
+        except ValueError:
+            vid_val = vid
+        lines.append({
+            "variant_id": vid_val,
+            "so_luong": qtys[idx] if idx < len(qtys) else "",
+            "ghi_chu": notes[idx] if idx < len(notes) else "",
+        })
+    return lines
+
+
 @role_required(User.Role.ADMIN, User.Role.MANAGER)
 def transfer_list_view(request):
     selected_branch = get_effective_branch(request, allow_all_for_admin=True)
@@ -103,8 +123,10 @@ def transfer_create_view(request):
     for v in variants:
         v.stock_by_branch = branch_stocks.get(v.id, {})
 
+    initial_lines = []
     if request.method == "POST":
         form = TransferCreateForm(request.POST)
+        initial_lines = _extract_initial_transfer_lines(request)
         if form.is_valid():
             vids = request.POST.getlist("line_variant_id")
             qtys = request.POST.getlist("line_so_luong")
@@ -155,6 +177,7 @@ def transfer_create_view(request):
             "form": form,
             "variants": variants,
             "branches": CoSo.objects.all(),
+            "initial_lines": initial_lines,
         },
     )
 
