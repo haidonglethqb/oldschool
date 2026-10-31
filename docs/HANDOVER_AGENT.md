@@ -198,10 +198,10 @@ oldschool/
 | **Purchasing** | `/purchasing/export-report/` | `purchasing:import_report_export` | `import_report_export_view` | `ADMIN`, `MANAGER` (CS1) |
 | **Purchasing** | `/purchasing/suppliers/` | `purchasing:supplier_list` | `supplier_list_create_view` | `ADMIN`, `MANAGER` (CS1) |
 | **Sales Outbound** | `/outbound/` | `sales_outbound:outbound_list` | `outbound_list_view` | `ADMIN`, `MANAGER`, `STAFF` |
-| **Sales Outbound** | `/outbound/create/` | `sales_outbound:outbound_create` | `outbound_create_view` | `ADMIN`, `MANAGER` |
+| **Sales Outbound** | `/outbound/create/` | `sales_outbound:outbound_create` | `outbound_create_view` | `ADMIN`, `MANAGER`, `STAFF` |
 | **Sales Outbound** | `/outbound/<int:receipt_id>/` | `sales_outbound:outbound_detail` | `outbound_detail_view` | `ADMIN`, `MANAGER`, `STAFF` |
-| **Sales Outbound** | `/outbound/<int:receipt_id>/edit/` | `sales_outbound:outbound_update` | `outbound_update_view` | `ADMIN`, `MANAGER` |
-| **Sales Outbound** | `/outbound/<int:receipt_id>/finalize/` | `sales_outbound:outbound_finalize` | `outbound_finalize_view` | `ADMIN`, `MANAGER` (`POST`) |
+| **Sales Outbound** | `/outbound/<int:receipt_id>/edit/` | `sales_outbound:outbound_update` | `outbound_update_view` | `ADMIN`, `MANAGER`, `STAFF` |
+| **Sales Outbound** | `/outbound/<int:receipt_id>/finalize/` | `sales_outbound:outbound_finalize` | `outbound_finalize_view` | `ADMIN`, `MANAGER`, `STAFF` (`POST`) |
 | **Sales Outbound** | `/outbound/<int:receipt_id>/delete/` | `sales_outbound:outbound_delete` | `outbound_delete_view` | `ADMIN`, `MANAGER` (`POST`) |
 | **Sales Outbound** | `/outbound/<int:receipt_id>/print/` | `sales_outbound:outbound_print` | `outbound_print_view` | `ADMIN`, `MANAGER`, `STAFF` |
 | **Sales Outbound** | `/outbound/requests/` | `sales_outbound:request_list` | `request_list_create_view` | `ADMIN`, `MANAGER`, `STAFF` |

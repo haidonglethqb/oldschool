@@ -95,6 +95,17 @@ class TestAuthenticationAndRBAC:
             line_specs=[OutboundReceiptLineSpec(variant_id=v_m.id, so_luong=1)],
             finalize_immediately=False,
         )
+        out_cs2 = create_outbound_receipt(
+            actor=users["mgr_cs2"],
+            co_so=branches["CS2"],
+            ma_phieu_xuat_hang_ban="PXB-RBAC-CS2",
+            ten_khach_hang="Khách CS2",
+            sdt="0905999888",
+            dia_chi="Đà Nẵng",
+            phuong_thuc_giao="COUNTER",
+            line_specs=[OutboundReceiptLineSpec(variant_id=v_m.id, so_luong=1)],
+            finalize_immediately=False,
+        )
         st_cs1 = create_stocktake(
             actor=users["mgr_cs1"],
             co_so=branches["CS1"],
@@ -105,13 +116,17 @@ class TestAuthenticationAndRBAC:
             line_specs=[StocktakeLineSpec(variant_id=v_m.id, so_luong_thuc_te=20)],
         )
 
-        # 1. STAFF attempting direct POST to approve/finalize/delete endpoints -> 403
+        # 1. STAFF attempting direct unauthorized POST to approve/delete or cross-branch finalize -> 403
         client.force_login(users["staff_cs1"])
         assert client.post(reverse("purchasing:import_approve", args=[receipt.id])).status_code == 403
         assert client.post(reverse("purchasing:import_delete", args=[receipt.id])).status_code == 403
-        assert client.post(reverse("sales_outbound:outbound_finalize", args=[out_cs1.id])).status_code == 403
         assert client.post(reverse("sales_outbound:outbound_delete", args=[out_cs1.id])).status_code == 403
         assert client.post(reverse("stocktakes:stocktake_approve", args=[st_cs1.id])).status_code == 403
+        # Cross-branch outbound finalize blocked -> 403
+        assert client.post(reverse("sales_outbound:outbound_finalize", args=[out_cs2.id])).status_code == 403
+        # STAFF can finalize their own branch's receipt -> 302
+        finalize_resp = client.post(reverse("sales_outbound:outbound_finalize", args=[out_cs1.id]))
+        assert finalize_resp.status_code == 302
 
         # 2. CS1 Manager attempting Admin-only approval endpoints -> 403
         client.force_login(users["mgr_cs1"])

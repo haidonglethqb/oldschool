@@ -127,8 +127,8 @@ def create_outbound_request(
     notify_branch_managers(
         branch=co_so,
         notification_type=ThongBao.NotificationType.OUTBOUND_REQUESTED,
-        title=f"[{co_so.ma_co_so}] Yêu cầu xuất bán mới: {req.ma_yeu_cau}",
-        content=f"Nhân viên {actor.display_name} gửi yêu cầu xuất hàng bán ({req.ten_khach_hang}).",
+        title=f"[{co_so.ma_co_so}] Yêu cầu xuất hàng bán mới: {req.ma_yeu_cau}",
+        content=f"Nhân viên {actor.display_name} gửi yêu cầu xuất hàng bán: {req.ghi_chu or req.ten_khach_hang}.",
         related_entity_type="YeuCauXuatHang",
         related_entity_id=req.id,
         target_url=url,
@@ -231,7 +231,7 @@ def create_outbound_receipt(
     finalize_immediately: bool = False,
 ) -> PhieuXuatHangBan:
     """Create a Sales Outbound Receipt (UC-5.1, UC-5.2)."""
-    assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
+    assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN, User.Role.STAFF)
     assert_branch_access(actor, co_so)
 
     code = (ma_phieu_xuat_hang_ban or "").strip().upper() or generate_next_outbound_code(co_so)
@@ -297,7 +297,7 @@ def update_outbound_receipt(
     ghi_chu: str = "",
 ) -> PhieuXuatHangBan:
     """Update an unfinalized Sales Outbound Receipt (UC-5.5)."""
-    assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
+    assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN, User.Role.STAFF)
     receipt = PhieuXuatHangBan.objects.select_for_update().select_related("co_so").get(pk=receipt.pk)
     assert_branch_access(actor, receipt.co_so)
     if not receipt.is_editable:
@@ -336,7 +336,7 @@ def finalize_outbound_receipt(*, actor: User, receipt: PhieuXuatHangBan) -> Phie
     Atomically locks branch stock rows, verifies sufficiency, deducts stock,
     creates `SALE_OUT` ledger movements, and triggers low-stock warnings (UC-5.13).
     """
-    assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
+    assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN, User.Role.STAFF)
     receipt = (
         PhieuXuatHangBan.objects.select_for_update(of=("self",))
         .select_related("co_so", "yeu_cau_xuat")

@@ -23,8 +23,11 @@ Hệ thống **Old School** thực thi kiểm soát truy cập dựa trên vai t
 
 3. **`STAFF` — Nhân viên bán hàng (`CS1`, `CS2`, `CS3`)**:
    - Bắt buộc gắn chặt với 1 cơ sở (`user.branch`).
-   - Được phép tra cứu Danh mục hàng hóa & tồn kho cơ sở (`UC-3`, `UC-5.1`), tạo Yêu cầu xuất hàng bán từ quầy (`Hình 5`), xem danh sách/chi tiết Phiếu xuất hàng bán và in phiếu xuất đã hoàn tất (`UC-5.12`).
-   - Bị chặn hoàn toàn khỏi các màn hình: Nhập kho, Điều chuyển nội bộ, Kiểm kê kho, Báo cáo tổng hợp và Thêm/Sửa/Xóa sản phẩm.
+   - Được phép tra cứu Danh mục hàng hóa & tồn kho cơ sở (`UC-3`, `UC-5.1`).
+   - **Tạo & Ghi nhận Phiếu xuất bán trực tiếp tại quầy**: Nhân viên được phép lập phiếu xuất bán và chốt xuất kho trừ tồn ngay tại cơ sở để phục vụ khách mua lẻ mà không cần quản lý phê duyệt (`UC-5.2`–`UC-5.11`).
+   - **Tạo Yêu cầu xuất hàng bán nội bộ**: Khi ngoài kệ/quầy hết hàng, nhân viên lập yêu cầu xuất bổ sung từ kho ra quầy (chỉ gồm Lý do xuất và mặt hàng, không có thông tin khách hàng) gửi Quản lý phê duyệt.
+   - Được xem danh sách/chi tiết và in phiếu xuất đã hoàn tất (`UC-5.12`).
+   - Bị chặn hoàn toàn khỏi các màn hình: Nhập kho, Điều chuyển nội bộ, Kiểm kê kho, Báo cáo tổng hợp, Xóa phiếu xuất và Thêm/Sửa/Xóa sản phẩm.
 
 ---
 
@@ -39,16 +42,18 @@ Hệ thống **Old School** thực thi kiểm soát truy cập dựa trên vai t
 | Lập / Sửa / Xóa Phiếu nhập kho chưa duyệt (`UC-4.1`–`UC-4.8`) | ✅ | ✅ | ❌ (`403`) | ❌ (`403`) |
 | Thêm Nhà cung cấp mới (`UC-4.11`) | ✅ | ✅ | ❌ (`403`) | ❌ (`403`) |
 | **Phê duyệt / Trả lại Phiếu nhập kho (`UC-4.9`)** | ✅ (**Duy nhất**) | ❌ (`403`) | ❌ (`403`) | ❌ (`403`) |
-| Tạo Yêu cầu xuất hàng bán từ quầy (`Hình 5`) | ❌ (`403`) | ❌ (`403`) | ❌ (`403`) | ✅ (Tại cơ sở) |
-| Xem Yêu cầu xuất hàng bán từ quầy | ✅ (Toàn chuỗi / Cơ sở) | ✅ (Chỉ CS1) | ✅ (Chỉ CS2/CS3) | ✅ (Tại cơ sở) |
+| Tạo Yêu cầu xuất hàng bán nội bộ | ❌ (`403`) | ❌ (`403`) | ❌ (`403`) | ✅ (Tại cơ sở) |
+| Xem Yêu cầu xuất hàng bán | ✅ (Toàn chuỗi / Cơ sở) | ✅ (Chỉ CS1) | ✅ (Chỉ CS2/CS3) | ✅ (Tại cơ sở) |
 | Lập Phiếu xuất từ yêu cầu / Từ chối yêu cầu | ✅ | ✅ (Chỉ CS1) | ✅ (Chỉ CS2/CS3) | ❌ (`403`) |
-| Lập / Sửa / Xóa / Ghi nhận Phiếu xuất bán (`UC-5.2`–`UC-5.11`) | ✅ | ✅ (Tại CS1) | ✅ (Tại CS2/CS3) | ❌ (`403`) |
+| Lập / Sửa / Ghi nhận Phiếu xuất bán (`UC-5.2`–`UC-5.11`) | ✅ | ✅ (Tại CS1) | ✅ (Tại CS2/CS3) | ✅ (Tại cơ sở) |
+| Xóa Phiếu xuất hàng bán chưa chốt (`UC-5.7`) | ✅ | ✅ (Tại CS1) | ✅ (Tại CS2/CS3) | ❌ (`403`) |
 | Xem & In Phiếu xuất hàng bán đã hoàn tất (`UC-5.12`) | ✅ | ✅ (Tại CS1) | ✅ (Tại CS2/CS3) | ✅ (Tại cơ sở) |
 | Tạo / Xuất / Nhận Phiếu điều chuyển nội bộ (`UC-5.3`) | ✅ | ✅ (Liên quan CS1) | ✅ (Liên quan CS2/CS3) | ❌ (`403`) |
 | Lập / Sửa / Xóa Biên bản kiểm kê chưa duyệt (`UC-6.1`–`UC-6.9`) | ✅ | ✅ (Tại CS1) | ✅ (Tại CS2/CS3) | ❌ (`403`) |
 | **Phê duyệt / Từ chối Biên bản kiểm kê (`UC-6.10`)** | ✅ (**Duy nhất**) | ❌ (`403`) | ❌ (`403`) | ❌ (`403`) |
 | Xem Báo cáo & Xuất Excel (`UC-7.1`–`UC-7.5`) | ✅ (Toàn chuỗi / Cơ sở) | ✅ (Chỉ CS1) | ✅ (Chỉ CS2/CS3) | ❌ (`403`) |
 
-## 3. Yêu cầu xuất từ quầy — cập nhật 29/10/2026
+## 3. Quy trình Xuất bán & Yêu cầu xuất kho — cập nhật 31/10/2026
 
-Menu, nút truy cập nhanh và form tạo yêu cầu chỉ hiển thị cho `STAFF`. Tài khoản `ADMIN`/`MANAGER` bị chặn tạo tại cả HTTP POST và service; vẫn mở được danh sách xử lý từ thông báo hoặc thẻ yêu cầu chờ để lập phiếu hay từ chối. Yêu cầu cũ và liên kết xử lý được giữ nguyên. Quy tắc áp dụng theo vai trò, kể cả khi mở thêm cơ sở.
+- **Xuất bán trực tiếp**: Nhân viên (`STAFF`) được quyền lập phiếu xuất bán và chốt xuất kho ngay tại quầy (`save_and_finalize`) để bán hàng cho khách mà không cần chờ duyệt, chỉ trong phạm vi cơ sở mình làm việc. Thao tác xóa phiếu xuất vẫn dành riêng cho Quản lý / Admin.
+- **Yêu cầu xuất hàng bán nội bộ**: Dùng khi quầy/kệ hết hàng cần vào kho lấy bổ sung. Form yêu cầu của Nhân viên chỉ gồm **Lý do xuất kho** và **Mặt hàng cần xuất**, không yêu cầu thông tin khách hàng. Quản lý nhận thông báo và phê duyệt lập phiếu xuất kho. Tài khoản `ADMIN`/`MANAGER` bị chặn tạo tại cả HTTP POST và service; mở danh sách để duyệt hoặc từ chối.
