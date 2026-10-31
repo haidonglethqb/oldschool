@@ -19,6 +19,16 @@ from apps.catalog.services import (
 from apps.inventory.models import StockStatus, TonKho
 
 
+class SubmittedVariantRow:
+    def __init__(self, item: dict):
+        self.id = item.get("id") or ""
+        self.ma_sku = item.get("ma_sku", "")
+        self.mau_sac = item.get("mau_sac", "")
+        self.kich_co = item.get("kich_co", "")
+        self.don_gia = item.get("don_gia", "")
+        self.min_threshold = item.get("muc_ton_toi_thieu", 5)
+
+
 def _extract_variants_from_post(request, default_price: Decimal) -> list[dict]:
     ids = request.POST.getlist("variant_id[]")
     skus = request.POST.getlist("variant_sku[]")
@@ -153,7 +163,16 @@ def product_detail_view(request, pk: int):
 def product_create_view(request):
     """Handle UC-3.3: Create new product and its SKU variants."""
     form = ProductForm(request.POST or None, request.FILES or None)
+    submitted_variants = []
     if request.method == "POST":
+        p_str = request.POST.get("don_gia_niem_yet") or "0"
+        try:
+            default_p = Decimal(p_str)
+        except InvalidOperation:
+            default_p = Decimal("0")
+        raw_variants = _extract_variants_from_post(request, default_p)
+        submitted_variants = [SubmittedVariantRow(item) for item in raw_variants]
+
         if form.is_valid():
             cd = form.cleaned_data
             variants_data = _extract_variants_from_post(request, cd["don_gia_niem_yet"])
@@ -185,7 +204,7 @@ def product_create_view(request):
         {
             "form": form,
             "is_edit": False,
-            "existing_variants": [],
+            "existing_variants": submitted_variants,
         },
     )
 
@@ -207,7 +226,17 @@ def product_edit_view(request, pk: int):
         initial={"muc_ton_toi_thieu": initial_threshold},
     )
 
+    submitted_variants = None
     if request.method == "POST":
+        p_str = request.POST.get("don_gia_niem_yet") or str(product.don_gia_niem_yet)
+        try:
+            default_p = Decimal(p_str)
+        except InvalidOperation:
+            default_p = product.don_gia_niem_yet
+        raw_variants = _extract_variants_from_post(request, default_p)
+        if raw_variants:
+            submitted_variants = [SubmittedVariantRow(item) for item in raw_variants]
+
         if form.is_valid():
             cd = form.cleaned_data
             variants_data = _extract_variants_from_post(request, cd["don_gia_niem_yet"])
@@ -233,10 +262,13 @@ def product_edit_view(request, pk: int):
         else:
             messages.error(request, "Vui lòng kiểm tra lại dữ liệu nhập.")
 
-    existing_variants = list(product.variants.all())
-    for v in existing_variants:
-        v_bal = TonKho.objects.filter(bien_the=v).first()
-        v.min_threshold = v_bal.muc_ton_toi_thieu if v_bal else initial_threshold
+    if submitted_variants is None:
+        existing_variants = list(product.variants.all())
+        for v in existing_variants:
+            v_bal = TonKho.objects.filter(bien_the=v).first()
+            v.min_threshold = v_bal.muc_ton_toi_thieu if v_bal else initial_threshold
+    else:
+        existing_variants = submitted_variants
 
     return render(
         request,

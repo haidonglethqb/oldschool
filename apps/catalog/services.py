@@ -7,6 +7,7 @@ from apps.accounts.permissions import assert_roles
 from apps.catalog.models import BienThe, SanPham
 from apps.inventory.models import StockMovement, TonKho
 from apps.inventory.services import ensure_variant_balances_across_branches
+from apps.notifications.services import sync_low_stock_alert
 from apps.purchasing.models import ChiTietPhieuNhapKho
 from apps.sales_outbound.models import ChiTietPhieuXuatHangBan, ChiTietYeuCauXuatHang
 from apps.stocktakes.models import ChiTietKiemKe
@@ -137,7 +138,11 @@ def update_product_and_variants(
                 continue
             price = Decimal(str(v_item.get("don_gia", product.don_gia_niem_yet)))
             sku = (v_item.get("ma_sku") or "").strip().upper() or generate_sku(product.ma_san_pham, mau, size)
-            threshold = v_item.get("muc_ton_toi_thieu", min_threshold)
+            threshold = (
+                v_item.get("muc_ton_toi_thieu")
+                if v_item.get("muc_ton_toi_thieu") is not None
+                else v_item.get("min_threshold", min_threshold)
+            )
 
             if vid:
                 if BienThe.objects.exclude(pk=vid).filter(ma_sku__iexact=sku).exists():
@@ -154,7 +159,10 @@ def update_product_and_variants(
                 variant.full_clean()
                 variant.save()
                 if threshold is not None:
-                    TonKho.objects.filter(bien_the=variant).update(muc_ton_toi_thieu=max(0, int(threshold)))
+                    new_th = max(0, int(threshold))
+                    TonKho.objects.filter(bien_the=variant).update(muc_ton_toi_thieu=new_th)
+                    for tk in TonKho.objects.select_related("co_so", "bien_the__san_pham").filter(bien_the=variant):
+                        sync_low_stock_alert(tk)
             else:
                 if BienThe.objects.filter(ma_sku__iexact=sku).exists():
                     raise ValidationError(f"Mã SKU '{sku}' đã tồn tại.")
@@ -176,7 +184,10 @@ def update_product_and_variants(
                 )
 
     elif min_threshold is not None:
-        TonKho.objects.filter(bien_the__san_pham=product).update(muc_ton_toi_thieu=max(0, int(min_threshold)))
+        new_th = max(0, int(min_threshold))
+        TonKho.objects.filter(bien_the__san_pham=product).update(muc_ton_toi_thieu=new_th)
+        for tk in TonKho.objects.select_related("co_so", "bien_the__san_pham").filter(bien_the__san_pham=product):
+            sync_low_stock_alert(tk)
 
     return product
 
@@ -225,4 +236,6 @@ def toggle_product_business_status(*, actor: User, product: SanPham) -> SanPham:
         product.trang_thai = SanPham.Status.ACTIVE
         product.variants.all().update(trang_thai=BienThe.Status.ACTIVE)
     product.save(update_fields=["trang_thai", "updated_at"])
+    for tk in TonKho.objects.select_related("co_so", "bien_the__san_pham").filter(bien_the__san_pham=product):
+        sync_low_stock_alert(tk)
     return product

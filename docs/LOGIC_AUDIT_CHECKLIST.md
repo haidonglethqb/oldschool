@@ -8,13 +8,13 @@ Tài liệu này ghi nhận kết quả rà soát logic từng dòng mã nguồn
 
 | Hạng mục Kiểm tra | Quy tắc Nghiệp vụ & Kỹ thuật | Tệp Triển khai | Kết quả |
 | :--- | :--- | :--- | :--- |
-| **DB-01** | Sử dụng **PostgreSQL 16** làm cơ sở dữ liệu chính thức (không dùng SQLite) | `config/settings.py`, `.env` | `[x] ĐẠT` |
+| **DB-01** | Hỗ trợ **PostgreSQL 16** làm cơ sở dữ liệu chính thức và SQLite trong môi trường phát triển/kiểm thử | `config/settings.py`, `.env` | `[x] ĐẠT` |
 | **DB-02** | Đầy đủ **19 thực thể dữ liệu** (14 bảng ERD gốc trong DOCX + 5 bảng mở rộng cho quy trình đề xuất Hình 4–6) | `apps/*/models.py`, `docs/DATABASE_DESIGN.md` | `[x] ĐẠT` |
-| **DB-03** | Ràng buộc mức CSDL `CheckConstraint(so_luong >= 0)` trên `TonKho` — tuyệt đối không cho phép tồn kho âm | `apps/inventory/models.py` (`tonkho_so_luong_gte_0`) | `[x] ĐẠT` |
-| **DB-04** | Ràng buộc duy nhất `UniqueConstraint(bien_the, co_so)` trên `TonKho` | `apps/inventory/models.py` (`unique_tonkho_bienthe_coso`) | `[x] ĐẠT` |
+| **DB-03** | Ràng buộc mức CSDL `CheckConstraint(so_luong >= 0)` trên `TonKho` — tuyệt đối không cho phép tồn kho âm | `apps/inventory/models.py` (`ton_kho_nonnegative_quantities`) | `[x] ĐẠT` |
+| **DB-04** | Ràng buộc duy nhất `UniqueConstraint(bien_the, co_so)` trên `TonKho` | `apps/inventory/models.py` (`uniq_branch_variant_stock`) | `[x] ĐẠT` |
 | **DB-05** | Khóa dòng bi quan `select_for_update()` theo thứ tự định sẵn (`ORDER BY bien_the_id ASC`) để chống Race Condition và Deadlock | `apps/inventory/services.py` (`apply_stock_movements`) | `[x] ĐẠT` |
 | **DB-06** | Tương thích PostgreSQL `SELECT ... FOR UPDATE` khi đi kèm `select_related` trên khóa ngoại nullable (`of=("self",)`) | `apps/sales_outbound/services.py` (`finalize_outbound_receipt`) | `[x] ĐẠT` |
-| **DB-07** | Mọi biến động tồn kho đều ghi nhận vào sổ cái bất biến `StockMovement` kèm `idempotency_key` chống ghi trùng | `apps/inventory/models.py`, `apps/inventory/services.py` | `[x] ĐẠT` |
+| **DB-07** | Mọi biến động tồn kho đều ghi nhận vào sổ cái bất biến `StockMovement` | `apps/inventory/models.py`, `apps/inventory/services.py` | `[x] ĐẠT` |
 | **DB-08** | Zero pending migrations (`python manage.py makemigrations --check --dry-run` trả về `No changes detected`) | `apps/*/migrations/` | `[x] ĐẠT` |
 
 ---
@@ -40,16 +40,16 @@ Tài liệu này ghi nhận kết quả rà soát logic từng dòng mã nguồn
 - `[x]` **UC-3.1 & UC-3.2**: Hiển thị danh sách và chi tiết sản phẩm kèm biến thể SKU (`Màu sắc`, `Kích cỡ`, `Đơn giá`) và tồn kho phân tách theo từng cơ sở (`Còn hàng`, `Sắp hết hàng`, `Hết hàng`).
 - `[x]` **UC-3.3**: Tạo sản phẩm mới kèm nhiều biến thể SKU; tự động khởi tạo dòng `TonKho` (`so_luong = 0`, `muc_ton_toi_thieu`) cho tất cả cơ sở.
 - `[x]` **UC-3.4**: Kiểm tra phát sinh giao dịch (`has_product_transactions`) trên toàn bộ bảng chứng từ và sổ cái `StockMovement`. Nếu chưa phát sinh giao dịch và tồn bằng 0 → cho phép xóa vật lý; nếu đã phát sinh giao dịch → chặn xóa vật lý với thông báo tiếng Việt rõ ràng và hướng dẫn chuyển sang `Ngừng kinh doanh`.
-- `[x]` **UC-3.5**: Cập nhật thông tin sản phẩm, thêm/sửa biến thể SKU và cập nhật ngưỡng tồn tối thiểu (`muc_ton_toi_thieu`).
+- `[x]` **UC-3.5**: Cập nhật thông tin sản phẩm, thêm/sửa biến thể SKU và cập nhật ngưỡng tồn tối thiểu (`muc_ton_toi_thieu`), đồng thời đồng bộ cảnh báo tồn kho.
 - `[x]` **UC-3.6 & UC-3.7**: Tìm kiếm theo Mã hàng, Mã SKU, Tên hàng; lọc theo Nhóm hàng, Màu sắc, Kích cỡ, Tình trạng tồn kho và Trạng thái kinh doanh.
 
 ### 3.2. Quản lý Nhập kho từ Nhà cung cấp (`UC-4`, `UC-4.1` → `UC-4.11` & Hình 4)
 - `[x]` **UC-4.1**: Tải lên file Excel (`.xlsx`), kiểm tra định dạng/cột bắt buộc/mã SKU/số lượng/đơn giá/chiết khấu, hiển thị bảng xem trước (preview) trước khi lưu.
-- `[x]` **UC-4.2**: Tạo phiếu nhập kho tại Kho tổng `CS1` (`DRAFT` hoặc `PENDING_APPROVAL`); tính chính xác `thanh_tien = so_luong * don_gia - chiet_khau` và `tong_tien`. **Chưa cộng tồn kho khi chưa duyệt (`DEC-01`)**.
+- `[x]` **UC-4.2**: Tạo phiếu nhập kho tại Kho tổng `CS1` (`DRAFT` hoặc `PENDING_APPROVAL`); tính chính xác `thanh_tien = so_luong * don_gia - chiet_khau` (chiết khấu VNĐ theo `DEC-08`) và `tong_tien`. **Chưa cộng tồn kho khi chưa duyệt (`DEC-01`)**.
 - `[x]` **UC-4.3 & UC-4.4**: Xem danh sách và chi tiết phiếu nhập kho kèm lịch sử người lập, người duyệt và lý do trả lại (nếu có).
 - `[x]` **UC-4.5 & UC-4.6**: Tìm kiếm theo mã phiếu/tên NCC; lọc theo Nhà cung cấp, Trạng thái và Khoảng thời gian (`Từ ngày` - `Đến ngày`), cảnh báo rõ ràng nếu `Từ ngày > Đến ngày`.
-- `[x]` **UC-4.7 & UC-4.8**: Cho phép sửa/xóa phiếu nhập khi ở trạng thái `DRAFT`, `PENDING_APPROVAL`, `RETURNED`; chặn tuyệt đối sửa/xóa khi đã `APPROVED`.
-- `[x]` **UC-4.9**: Chủ cửa hàng (`ADMIN`) phê duyệt phiếu nhập (`APPROVED` $\rightarrow$ cộng tồn kho nguyên tử tại `CS1` + ghi `StockMovement.IMPORT_IN`) hoặc trả lại phiếu kèm lý do (`RETURNED` $\rightarrow$ giữ nguyên tồn kho).
+- `[x]` **UC-4.7 & UC-4.8**: Cho phép sửa/xóa phiếu nhập khi ở trạng thái `DRAFT`, `PENDING_APPROVAL`, `RETURNED`; chặn tuyệt đối sửa/xóa khi đã `APPROVED`. Hỗ trợ lưu nháp và tự động gửi thông báo Admin khi gửi lại duyệt.
+- `[x]` **UC-4.9**: Chủ cửa hàng (`ADMIN`) phê duyệt phiếu nhập (`APPROVED` $\rightarrow$ cộng tồn kho nguyên tử tại `CS1` + ghi `StockMovement.LoaiThayDoi.PURCHASE_IN`) hoặc trả lại phiếu kèm lý do (`RETURNED` $\rightarrow$ giữ nguyên tồn kho).
 - `[x]` **UC-4.10 & UC-4.11**: Xem thẻ tổng hợp hoạt động nhập kho theo kỳ, xuất Excel từng phiếu nhập (`import_export_excel`) và xuất Excel báo cáo tổng hợp hoạt động nhập kho theo kỳ (`import_report_export`), quản lý danh sách & thêm mới Nhà cung cấp (`supplier_list`).
 
 ### 3.3. Quản lý Xuất kho Bán hàng, Điều chuyển Liên Cơ sở & Cảnh báo Tồn kho (`UC-1.5`, `WF-5.0`, `UC-5.1` → `UC-5.13` & Hình 5)
@@ -63,7 +63,7 @@ Tài liệu này ghi nhận kết quả rà soát logic từng dòng mã nguồn
 - `[x]` **UC-5.7**: Xóa phiếu xuất khi còn `PENDING`; chặn xóa khi đã `COMPLETED`.
 - `[x]` **UC-5.8, UC-5.9, UC-5.10, UC-5.11**: Xem danh sách, chi tiết, tìm kiếm và lọc phiếu xuất theo cơ sở, trạng thái, khoảng ngày (cảnh báo nếu `Từ ngày > Đến ngày`).
 - `[x]` **UC-5.12**: In phiếu xuất kho (`outbound_print`) chỉ khả dụng khi phiếu đã `COMPLETED`.
-- `[x]` **UC-5.13**: Tự động sinh cảnh báo tồn kho thấp (`ThongBao.LOW_STOCK`) ngay khi `so_luong <= muc_ton_toi_thieu`, chống trùng lặp thông báo đang mở (`is_resolved=False`) và tự động đóng cảnh báo khi tồn kho được nhập/điều chuyển bổ sung vượt ngưỡng.
+- `[x]` **UC-5.13**: Tự động sinh cảnh báo tồn kho thấp (`ThongBao.LoaiThongBao.LOW_STOCK_ALERT`) ngay khi `so_luong <= muc_ton_toi_thieu` cho cả Quản lý và Chủ cửa hàng, chống trùng lặp thông báo đang mở (`da_giai_quyet=False`) và tự động đóng cảnh báo khi tồn kho được nhập/điều chuyển bổ sung vượt ngưỡng hoặc khi ngừng kinh doanh.
 
 ### 3.4. Quản lý Kiểm kê Định kỳ & Đột xuất (`UC-1.6`, `UC-6.1` → `UC-6.10` & Hình 6)
 - `[x]` **UC-6.1 & UC-6.2**: Xem danh sách và chi tiết biên bản kiểm kê theo phạm vi cơ sở, hiển thị đầy đủ tồn hệ thống snapshot, tồn thực tế, chênh lệch và tổng số SKU `Khớp / Thiếu / Thừa`.
@@ -76,7 +76,7 @@ Tài liệu này ghi nhận kết quả rà soát logic từng dòng mã nguồn
 ### 3.5. Báo cáo Nhập - Xuất - Tồn & Phân tích Chuỗi Cung Ứng (`UC-1.7`, `UC-7.1` → `UC-7.5`)
 - `[x]` **UC-7.1 & UC-7.2**: Tính toán chính xác phương trình cân bằng tồn kho theo kỳ:
   $$\text{Tồn cuối kỳ} = \text{Tồn đầu kỳ} + (\text{Nhập NCC} + \text{Nhập ĐC}) - (\text{Xuất bán} + \text{Xuất ĐC})$$
-  Hiển thị biểu đồ trực quan Chart.js, phân nhóm `Hàng bán chạy`, `Hàng bán chậm / Tồn cao`, `Sắp hết / Hết hàng`, `Đang điều chuyển`, và drill-down sổ cái từng SKU (`report_variant_detail`).
+  Định giá giá vốn bình quân theo `DEC-07` từ các phiếu nhập kho đã phê duyệt (`APPROVED`). Hàng chậm luân chuyển tính theo `sale_out_qty == 0 and closing_qty > 0`.
 - `[x]` **UC-7.3**: Xuất báo cáo Nhập - Xuất - Tồn ra file Excel (`.xlsx`) có chống Formula Injection.
 - `[x]` **UC-7.4 & UC-7.5**: Tìm kiếm theo Mã SP/SKU/Tên hàng; lọc theo Cơ sở, Khoảng thời gian (`Từ ngày` - `Đến ngày`), Nhóm hàng, Màu sắc, Kích cỡ và Trạng thái tồn kho.
 
@@ -99,20 +99,35 @@ Tài liệu này ghi nhận kết quả rà soát logic từng dòng mã nguồn
 
 ---
 
-## 5. Checklist Các Trường Hợp Biên Nâng Cao (Deep Edge-Case Hardening — Vòng Rà Soát 2 & 3)
+## 5. Danh mục 28 Trường Hợp Biên Nâng Cao (Edge-Case Hardening Checklist EC-01 → EC-28)
 
 | Mã Edge Case | Tình huống Biên (Boundary / Edge Case) | Cơ chế Bảo vệ đã Triển khai | Tệp Kiểm chứng | Kết quả |
 | :--- | :--- | :--- | :--- | :--- |
-| **EC-01** | Quản lý bấm "Lập phiếu xuất" 2 lần trên cùng một `YeuCauXuatHang` (nguy cơ lỗi `IntegrityError` trên `OneToOneField`) | Khóa dòng `YeuCauXuatHang` (`select_for_update()`), kiểm tra `trang_thai == PENDING` và chưa có `PhieuXuatHangBan` liên kết trước khi tạo phiếu | `apps/sales_outbound/services.py`, `tests/test_sales_outbound.py` | `[x] ĐẠT` |
-| **EC-02** | Quản lý xóa một `PhieuXuatHangBan` đang ở trạng thái `PENDING` được tạo từ `YeuCauXuatHang` (nguy cơ `YeuCauXuatHang` bị kẹt vĩnh viễn ở `PROCESSED`) | Tự động hoàn trả `YeuCauXuatHang` về trạng thái `PENDING` (`nguoi_xu_ly=None`, `thoi_gian_xu_ly=None`) khi phiếu xuất `PENDING` liên kết bị xóa | `apps/sales_outbound/services.py`, `tests/test_sales_outbound.py` | `[x] ĐẠT` |
-| **EC-03** | Biến thể SKU con (`BienThe.trang_thai == 'INACTIVE'`) bị ngừng kinh doanh riêng lẻ hoặc sản phẩm cha ngừng kinh doanh được đưa vào phiếu Nhập/Xuất/Điều chuyển/Kiểm kê/Excel | Kiểm tra kép cả `variant.san_pham.trang_thai == 'ACTIVE'` và `variant.trang_thai == 'ACTIVE'` ở mọi Service và bộ đọc Excel; đồng bộ trạng thái biến thể khi đổi trạng thái sản phẩm cha | `apps/*/services.py`, `apps/inventory/excel.py`, `tests/test_catalog.py` | `[x] ĐẠT` |
-| **EC-04** | Cơ sở xuất điều chuyển nhập số lượng thực xuất vượt quá số lượng yêu cầu (`so_luong_xuat > so_luong_yeu_cau`) | Chặn ngay trong `dispatch_transfer` với thông báo lỗi tiếng Việt rõ ràng nếu `qty_out > line.so_luong_yeu_cau` + đặt `max="{{ line.so_luong_yeu_cau }}"` trên form HTML | `apps/transfers/services.py`, `templates/transfers/transfer_detail.html`, `tests/test_transfers.py` | `[x] ĐẠT` |
-| **EC-05** | Admin bấm "Trả lại" một phiếu nhập đã ở trạng thái `RETURNED` hoặc bấm "Từ chối" một biên bản kiểm kê đã `REJECTED` | Kiểm tra chặn thao tác lặp trên phiếu đã `RETURNED` / `REJECTED` trong `return_import_receipt` và `reject_stocktake` | `apps/purchasing/services.py`, `apps/stocktakes/services.py` | `[x] ĐẠT` |
-| **EC-06** | Khi cập nhật sản phẩm (`update_product_and_variants`), người dùng sửa hoặc thêm biến thể bị trùng `ma_sku` hoặc trùng cặp `(mau_sac, kich_co)` | Kiểm tra `exclude(pk=vid)` cho cả `ma_sku` và `(san_pham, mau_sac, kich_co)` trước khi lưu để ném `ValidationError` tiếng Việt thay vì `IntegrityError` | `apps/catalog/services.py` | `[x] ĐẠT` |
+| **EC-01** | Quản lý bấm "Lập phiếu xuất" 2 lần trên cùng một `YeuCauXuatHang` | Khóa dòng `YeuCauXuatHang` (`select_for_update()`), kiểm tra `trang_thai == PENDING` trước khi tạo phiếu | `apps/sales_outbound/services.py` | `[x] ĐẠT` |
+| **EC-02** | Xóa một `PhieuXuatHangBan` đang ở trạng thái `PENDING` được tạo từ `YeuCauXuatHang` | Tự động hoàn trả `YeuCauXuatHang` về trạng thái `PENDING` khi phiếu xuất `PENDING` bị xóa | `apps/sales_outbound/services.py` | `[x] ĐẠT` |
+| **EC-03** | Biến thể hoặc sản phẩm cha bị ngừng kinh doanh được đưa vào giao dịch mới | Kiểm tra kép cả `san_pham.trang_thai == 'ACTIVE'` và `bien_the.trang_thai == 'ACTIVE'` ở mọi dịch vụ | `apps/*/services.py`, `apps/inventory/excel.py` | `[x] ĐẠT` |
+| **EC-04** | Cơ sở xuất điều chuyển nhập số lượng thực xuất vượt quá số lượng yêu cầu | Chặn ngay trong `dispatch_transfer` với lỗi tiếng Việt nếu `qty_out > line.so_luong_yeu_cau` | `apps/transfers/services.py` | `[x] ĐẠT` |
+| **EC-05** | Thao tác lặp lại: Admin bấm "Trả lại" phiếu nhập đã `RETURNED` hoặc "Từ chối" kiểm kê đã `REJECTED` | Kiểm tra chặn thao tác lặp trong `return_import_receipt` và `reject_stocktake` | `apps/purchasing/services.py`, `apps/stocktakes/services.py` | `[x] ĐẠT` |
+| **EC-06** | Cập nhật sản phẩm (`update_product_and_variants`) trùng `ma_sku` hoặc `(mau_sac, kich_co)` | Kiểm tra `exclude(pk=vid)` trước khi lưu để ném `ValidationError` thay vì `IntegrityError` | `apps/catalog/services.py` | `[x] ĐẠT` |
 | **EC-07** | Tham số điều hướng `next=//evil.com` (Open Redirect) trên form Đăng nhập hoặc Chuyển cơ sở | Xác thực bằng `url_has_allowed_host_and_scheme(..., allowed_hosts={request.get_host()})` | `apps/accounts/views.py` | `[x] ĐẠT` |
-| **EC-08** | Đồng bộ số lượng thông báo chưa đọc trên chuông Navbar (`oldschool_global_context`) với trang `/notifications/` cho cả `ADMIN`, `MANAGER`, `STAFF` | Dùng chung hàm `_get_user_notifications_queryset(user, active_branch)` giữa Context Processor và Notification Views | `apps/accounts/context_processors.py`, `apps/notifications/views.py` | `[x] ĐẠT` |
-| **EC-09** | Tải file Excel mẫu Nhập kho (`download_excel_template_view('import')`) khi đã có biến thể `ACTIVE` trong DB gây `TypeError: unsupported operand type(s) for *: 'decimal.Decimal' and 'float'` do phép nhân `v.don_gia * 0.65` | Sửa thành `int(v.don_gia * Decimal("0.65"))` và bổ sung bài kiểm thử tự động tải cả 3 mẫu Excel (`import`, `outbound`, `stocktake`) + API `api_variant_stock` | `apps/inventory/views.py`, `tests/test_ui_views.py` | `[x] ĐẠT` |
-| **EC-10** | Thanh điều hướng (`templates/base.html`) kiểm tra đường dẫn `/sales-outbound/` thay vì `/outbound/` làm tab "Xuất kho & Điều chuyển" không sáng `active` khi ở phân hệ Xuất bán | Sửa điều kiện thành `{% if '/outbound/' in request.path or '/transfers/' in request.path %}active{% endif %}` | `templates/base.html` | `[x] ĐẠT` |
-| **EC-11** | Đường dẫn đích (`target_url`) trong thông báo từ chối yêu cầu xuất hàng (`reject_outbound_request`) dùng chuỗi cứng `/sales-outbound/requests/` thay vì `/outbound/requests/` | Sử dụng `reverse("sales_outbound:request_list")` với fallback `/outbound/requests/` | `apps/sales_outbound/services.py` | `[x] ĐẠT` |
-| **EC-12** | Màn hình chỉnh sửa mặt hàng (`product_edit_view` / `product_form.html`) hiển thị cứng `value="5"` cho cột `Tồn tối thiểu` của từng biến thể thay vì giá trị thực tế trong `TonKho` | Gắn `v.min_threshold` từ `TonKho` cho từng biến thể trong `product_edit_view` và hiển thị `value="{{ v.min_threshold|default:5 }}"` trên `product_form.html` | `apps/catalog/views.py`, `templates/catalog/product_form.html` | `[x] ĐẠT` |
-| **EC-13** | Màn hình chi tiết phiếu nhập (`import_detail.html`) vẫn hiện nút "Yêu cầu chỉnh sửa lại" đối với phiếu nhập đã ở trạng thái `RETURNED` | Ẩn nút "Yêu cầu chỉnh sửa lại" khi `receipt.trang_thai == 'RETURNED'` (đồng bộ với chốt chặn backend `EC-05`) | `templates/purchasing/import_detail.html` | `[x] ĐẠT` |
+| **EC-08** | Đồng bộ số lượng thông báo chưa đọc trên chuông Navbar với trang `/notifications/` | Dùng chung hàm `_get_user_notifications_queryset` giữa Context Processor và Views | `apps/accounts/context_processors.py`, `apps/notifications/views.py` | `[x] ĐẠT` |
+| **EC-09** | Tải file Excel mẫu khi có biến thể Decimal trong DB gây `TypeError` phép nhân với float | Chuyển thành `int(v.don_gia * Decimal("0.65"))` | `apps/inventory/views.py` | `[x] ĐẠT` |
+| **EC-10** | Tab "Xuất kho & Điều chuyển" trên navbar không sáng `active` khi ở phân hệ Xuất bán | Sửa điều kiện thành `{% if '/outbound/' in request.path or '/transfers/' in request.path %}active{% endif %}` | `templates/base.html` | `[x] ĐẠT` |
+| **EC-11** | Đường dẫn đích trong thông báo từ chối yêu cầu xuất dùng chuỗi cứng sai | Sử dụng `reverse("sales_outbound:request_list")` | `apps/sales_outbound/services.py` | `[x] ĐẠT` |
+| **EC-12** | Form sửa mặt hàng hiển thị cứng `value="5"` cho tồn tối thiểu | Gắn `v.min_threshold` từ `TonKho` cho từng biến thể | `apps/catalog/views.py`, `templates/catalog/product_form.html` | `[x] ĐẠT` |
+| **EC-13** | Phiếu nhập đã `RETURNED` vẫn hiện nút "Yêu cầu chỉnh sửa lại" | Ẩn nút "Yêu cầu chỉnh sửa lại" khi `receipt.trang_thai == 'RETURNED'` | `templates/purchasing/import_detail.html` | `[x] ĐẠT` |
+| **EC-14** | `DEC-07`: Giá vốn hàng bán và định giá tồn kho trong Báo cáo | Tính `gia_von` bình quân từ các phiếu nhập kho đã được Admin duyệt (`APPROVED`), dự phòng 0 | `apps/reports/selectors.py` | `[x] ĐẠT` |
+| **EC-15** | Hàng chậm luân chuyển (`slow_moving`) | Tính theo điều kiện chuẩn `sale_out_qty == 0 and closing_qty > 0` | `apps/reports/selectors.py` | `[x] ĐẠT` |
+| **EC-16** | Đếm số lượng SKU `Hết hàng` và `Sắp hết hàng` trên Báo cáo | Tính toán sau khi áp dụng bộ lọc tab và trạng thái để nhất quán với danh sách hiển thị | `apps/reports/selectors.py` | `[x] ĐẠT` |
+| **EC-17** | Bản chụp báo cáo (`BaoCao` snapshot) xung đột mã khi lưu liên tiếp | Thêm microseconds (`%Y%m%d%H%M%S%f[:17]`) vào mã báo cáo triệt tiêu `IntegrityError` | `apps/reports/services.py` | `[x] ĐẠT` |
+| **EC-18** | Lưu bản chụp báo cáo mất các bộ lọc chi tiết | Bảo toàn toàn bộ bộ lọc (`q`, `category`, `color`, `size`, `stock_status`, `tab`) | `apps/reports/views.py` | `[x] ĐẠT` |
+| **EC-19** | Bộ lọc Báo cáo mất tham số khi chuyển tab hoặc xuất Excel | Giữ nguyên `color`, `size`, `stock_status` trên link Excel, form lưu snapshot và tab links | `templates/reports/report_dashboard.html` | `[x] ĐẠT` |
+| **EC-20** | Cảnh báo tồn kho thấp cho cả Quản lý cơ sở và Admin | Gửi thông báo cho cả Manager và Admin; tự đóng khi sản phẩm/biến thể ngừng kinh doanh | `apps/notifications/services.py` | `[x] ĐẠT` |
+| **EC-21** | Admin đánh dấu đã đọc làm mất thông báo chưa đọc của Quản lý | Phân tách bản ghi thông báo riêng cho từng người nhận | `apps/notifications/views.py` | `[x] ĐẠT` |
+| **EC-22** | Đổi ngưỡng tồn tối thiểu hoặc trạng thái kinh doanh không đồng bộ cảnh báo | Kích hoạt `sync_low_stock_alert` ngay khi cập nhật ngưỡng hoặc toggle trạng thái sản phẩm | `apps/catalog/services.py` | `[x] ĐẠT` |
+| **EC-23** | Sinh mã chứng từ tự động (`PNK`, `PXH`, `PDC`, `KK`) sai thứ tự khi vượt 999 | Quét toàn bộ mã hiện có để lấy số lớn nhất thay vì sắp xếp chuỗi từ điển | `apps/*/services.py` | `[x] ĐẠT` |
+| **EC-24** | Sửa phiếu nhập kho hỗ trợ lưu nháp (`DRAFT`) hoặc gửi phê duyệt | Hỗ trợ lưu bản nháp và tự động gửi thông báo Admin khi gửi lại phê duyệt | `apps/purchasing/services.py` | `[x] ĐẠT` |
+| **EC-25** | Sửa biên bản kiểm kê gửi thông báo cho Admin | Gửi thông báo cho Admin khi quản lý cập nhật và gửi lại biên bản kiểm kê | `apps/stocktakes/services.py` | `[x] ĐẠT` |
+| **EC-26** | Tải file Excel mẫu chứa biến thể của sản phẩm đã ngừng kinh doanh | Lọc thêm `san_pham__trang_thai="ACTIVE"` khi lấy SKU mẫu | `apps/inventory/views.py` | `[x] ĐẠT` |
+| **EC-27** | Chống Open Redirect trên toàn hệ thống | Áp dụng `url_has_allowed_host_and_scheme` trên `supplier_list`, `mark_read`, `mark_all_read` | `apps/purchasing/views.py`, `apps/notifications/views.py` | `[x] ĐẠT` |
+| **EC-28** | Mất dữ liệu đã nhập khi form báo lỗi `ValidationError` | Bảo toàn các dòng dữ liệu nhập kho, xuất kho, điều chuyển, kiểm kê và biến thể sản phẩm | `apps/*/views.py`, `templates/*/` | `[x] ĐẠT` |

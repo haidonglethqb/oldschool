@@ -31,18 +31,15 @@ class StocktakeLineSpec:
 
 def generate_next_stocktake_code(branch: CoSo) -> str:
     prefix = f"KK-{branch.ma_co_so}-{timezone.localdate().strftime('%Y%m%d')}-"
-    last = (
-        KiemKe.objects.filter(ma_kiem_ke__startswith=prefix)
-        .order_by("-ma_kiem_ke")
-        .first()
+    existing_codes = KiemKe.objects.filter(ma_kiem_ke__startswith=prefix).values_list(
+        "ma_kiem_ke", flat=True
     )
-    seq = 1
-    if last:
-        try:
-            seq = int(last.ma_kiem_ke.split("-")[-1]) + 1
-        except ValueError:
-            seq = KiemKe.objects.count() + 1
-    return f"{prefix}{seq:03d}"
+    max_seq = 0
+    for code in existing_codes:
+        suffix = code[len(prefix):]
+        if suffix.isdigit():
+            max_seq = max(max_seq, int(suffix))
+    return f"{prefix}{max_seq + 1:03d}"
 
 
 def _validate_and_build_stocktake_lines(branch: CoSo, line_specs: list[StocktakeLineSpec]) -> list[dict]:
@@ -63,26 +60,28 @@ def _validate_and_build_stocktake_lines(branch: CoSo, line_specs: list[Stocktake
             actual_qty = int(spec.so_luong_thuc_te)
         except (ValueError, TypeError) as exc:
             raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Số lượng kiểm thực tế không hợp lệ.") from exc
-        if actual_qty < 0:
-            raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Số lượng thực tế không được nhỏ hơn 0.")
 
-        bal = TonKho.objects.filter(co_so=branch, bien_the=variant).first()
-        sys_qty = bal.so_luong if bal else 0
-        diff = actual_qty - sys_qty
+        if actual_qty < 0:
+            raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Số lượng thực tế kiểm kê không được âm.")
+
+        tk = TonKho.objects.filter(co_so=branch, bien_the=variant).first()
+        system_qty = tk.so_luong if tk else 0
+        diff = actual_qty - system_qty
+
         if diff == 0:
-            recon_status = ChiTietKiemKe.ReconciliationStatus.MATCH
+            status = ChiTietKiemKe.ReconciliationStatus.MATCH
         elif diff < 0:
-            recon_status = ChiTietKiemKe.ReconciliationStatus.SHORTAGE
+            status = ChiTietKiemKe.ReconciliationStatus.SHORTAGE
         else:
-            recon_status = ChiTietKiemKe.ReconciliationStatus.EXCESS
+            status = ChiTietKiemKe.ReconciliationStatus.EXCESS
 
         validated.append(
             {
                 "variant": variant,
-                "so_luong_he_thong": sys_qty,
+                "so_luong_he_thong": system_qty,
                 "so_luong_thuc_te": actual_qty,
                 "chenh_lech": diff,
-                "trang_thai_doi_chieu": recon_status,
+                "trang_thai_doi_chieu": status,
                 "don_vi_tinh": variant.san_pham.don_vi_tinh,
                 "don_gia": variant.don_gia,
                 "xu_ly": (spec.xu_ly or "").strip(),
@@ -104,21 +103,22 @@ def create_stocktake(
     muc_dich: str = "Kiểm kê định kỳ cuối ngày",
     ghi_chu: str = "",
 ) -> KiemKe:
-    """Create an Inventory Count / Stocktake Record (UC-6.1, UC-6.2, UC-6.3)."""
+    """Create a new Stocktake Record at the given branch (UC-6.1 to UC-6.3)."""
     assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
     assert_branch_access(actor, co_so)
 
     code = (ma_kiem_ke or "").strip().upper() or generate_next_stocktake_code(co_so)
     if KiemKe.objects.filter(ma_kiem_ke__iexact=code).exists():
-        raise ValidationError({"ma_kiem_ke": f"Mã biên bản kiểm kê '{code}' đã tồn tại."})
+        raise ValidationError({"ma_kiem_ke": f"Mã kiểm kê '{code}' đã tồn tại."})
 
     validated_lines = _validate_and_build_stocktake_lines(co_so, line_specs)
+    inspector = (nguoi_kiem_ke or actor.display_name).strip()
 
     stocktake = KiemKe.objects.create(
         ma_kiem_ke=code,
         co_so=co_so,
         ngay_kiem=ngay_kiem or timezone.localdate(),
-        nguoi_kiem_ke=(nguoi_kiem_ke or actor.display_name).strip(),
+        nguoi_kiem_ke=inspector,
         muc_dich=(muc_dich or "Kiểm kê định kỳ cuối ngày").strip(),
         ghi_chu=(ghi_chu or "").strip(),
         trang_thai=KiemKe.Status.APPROVED if actor.role == User.Role.ADMIN else KiemKe.Status.PENDING,
@@ -148,7 +148,7 @@ def create_stocktake(
     if actor.role != User.Role.ADMIN:
         notify_admins(
         notification_type=ThongBao.NotificationType.STOCKTAKE_SUBMITTED,
-        title=f"[{co_so.ma_co_so}] Biên bản kiểm kê chờ duyệt: {stocktake.ma_kiem_ke}",
+        title=f"Biên bản kiểm kê chờ duyệt: {stocktake.ma_kiem_ke}",
         content=(
             f"Quản lý {actor.display_name} ({co_so.ten_co_so}) đã gửi biên bản kiểm kê {stocktake.ma_kiem_ke} "
             f"({len(validated_lines)} dòng hàng)."
@@ -171,20 +171,23 @@ def update_stocktake(
     muc_dich: str = "",
     ghi_chu: str = "",
 ) -> KiemKe:
-    """Update an unapproved Stocktake Record (UC-6.8)."""
+    """Update an unapproved Stocktake Record (UC-6.4)."""
     assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
     stocktake = KiemKe.objects.select_for_update().select_related("co_so").get(pk=stocktake.pk)
     assert_branch_access(actor, stocktake.co_so)
     if not stocktake.is_editable:
         raise ValidationError("Không thể chỉnh sửa biên bản kiểm kê đã được phê duyệt.")
 
+    previous_status = stocktake.trang_thai
     validated_lines = _validate_and_build_stocktake_lines(stocktake.co_so, line_specs)
     if nguoi_kiem_ke:
         stocktake.nguoi_kiem_ke = nguoi_kiem_ke.strip()
     if muc_dich:
         stocktake.muc_dich = muc_dich.strip()
-    stocktake.ghi_chu = (ghi_chu or "").strip()
+    if ghi_chu is not None:
+        stocktake.ghi_chu = ghi_chu.strip()
     stocktake.trang_thai = KiemKe.Status.PENDING
+    stocktake.ly_do_tu_choi = ""
     stocktake.save()
 
     stocktake.lines.all().delete()
@@ -201,12 +204,31 @@ def update_stocktake(
             xu_ly=item["xu_ly"],
             ghi_chu=item["ghi_chu"],
         )
+
+    if previous_status == KiemKe.Status.REJECTED or previous_status == KiemKe.Status.PENDING:
+        try:
+            url = reverse("stocktakes:stocktake_detail", args=[stocktake.id])
+        except Exception:
+            url = "/stocktakes/"
+        notify_admins(
+            notification_type=ThongBao.NotificationType.STOCKTAKE_SUBMITTED,
+            title=f"Biên bản kiểm kê {stocktake.ma_kiem_ke} đã được cập nhật & gửi duyệt",
+            content=(
+                f"Quản lý {actor.display_name} ({stocktake.co_so.ten_co_so}) đã cập nhật và gửi duyệt lại "
+                f"biên bản kiểm kê {stocktake.ma_kiem_ke} ({len(validated_lines)} dòng hàng)."
+            ),
+            branch=stocktake.co_so,
+            related_entity_type="KiemKe",
+            related_entity_id=stocktake.id,
+            target_url=url,
+        )
+
     return stocktake
 
 
 @transaction.atomic
 def delete_stocktake(*, actor: User, stocktake: KiemKe) -> str:
-    """Delete an unapproved Stocktake Record (UC-6.9)."""
+    """Delete an unapproved Stocktake Record (UC-6.7)."""
     assert_roles(actor, User.Role.MANAGER, User.Role.ADMIN)
     stocktake = KiemKe.objects.select_for_update().get(pk=stocktake.pk)
     assert_branch_access(actor, stocktake.co_so)

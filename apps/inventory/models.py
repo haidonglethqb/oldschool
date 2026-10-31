@@ -61,6 +61,11 @@ class TonKho(models.Model):
         return StockStatus.IN_STOCK
 
     @property
+    def trang_thai_ton(self) -> str:
+        """Vietnamese alias for stock_status property."""
+        return self.stock_status
+
+    @property
     def stock_status_label(self) -> str:
         return dict(StockStatus.choices).get(self.stock_status, "Còn hàng")
 

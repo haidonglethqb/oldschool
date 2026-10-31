@@ -1,0 +1,195 @@
+{
+  "results": [
+    {
+      "name": "admin_owner counter menu visibility",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "admin_owner request create form",
+      "pass": true
+    },
+    {
+      "name": "admin_owner single stocktake save button",
+      "pass": true
+    },
+    {
+      "name": "admin_owner separate stock column",
+      "pass": true
+    },
+    {
+      "name": "admin_owner default quantities match selected SKU",
+      "pass": true
+    },
+    {
+      "name": "admin_owner manual actual retained",
+      "pass": true
+    },
+    {
+      "name": "admin_owner changed SKU stock",
+      "pass": true
+    },
+    {
+      "name": "admin_owner new row blank stock",
+      "pass": true
+    },
+    {
+      "name": "admin_owner dynamic stock",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 counter menu visibility",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "manager_cs1 request create form",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 single stocktake save button",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 separate stock column",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 default quantities match selected SKU",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 manual actual retained",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 changed SKU stock",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 new row blank stock",
+      "pass": true
+    },
+    {
+      "name": "manager_cs1 dynamic stock",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 counter menu visibility",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "manager_cs2 request create form",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 single stocktake save button",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 separate stock column",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 default quantities match selected SKU",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 manual actual retained",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 changed SKU stock",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 new row blank stock",
+      "pass": true
+    },
+    {
+      "name": "manager_cs2 dynamic stock",
+      "pass": true
+    },
+    {
+      "name": "zero-stock SKU exists in CS2",
+      "pass": true
+    },
+    {
+      "name": "zero displayed as 0",
+      "pass": true
+    },
+    {
+      "name": "staff_cs1 counter menu visibility",
+      "pass": true,
+      "detail": 2
+    },
+    {
+      "name": "staff_cs1 request create form",
+      "pass": true
+    },
+    {
+      "name": "staff_cs2 counter menu visibility",
+      "pass": true,
+      "detail": 2
+    },
+    {
+      "name": "staff_cs2 request create form",
+      "pass": true
+    },
+    {
+      "name": "import real download/upload preview",
+      "pass": true
+    },
+    {
+      "name": "outbound real download/upload preview",
+      "pass": true
+    },
+    {
+      "name": "stocktake real download/upload preview",
+      "pass": true
+    },
+    {
+      "name": "stocktake upload rows",
+      "pass": true
+    },
+    {
+      "name": "stocktake upload stock cells",
+      "pass": true
+    },
+    {
+      "name": "validation error preserves rows",
+      "pass": true
+    },
+    {
+      "name": "validation error preserves stock cells",
+      "pass": true
+    },
+    {
+      "name": "edit stock cells reflect current branch stock",
+      "pass": true
+    },
+    {
+      "name": "STAFF sends actual request",
+      "pass": true
+    },
+    {
+      "name": "manager sees staff request",
+      "pass": true
+    },
+    {
+      "name": "manager conversion prefilled from request",
+      "pass": true
+    },
+    {
+      "name": "manager rejects request",
+      "pass": true
+    },
+    {
+      "name": "zero JS page errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

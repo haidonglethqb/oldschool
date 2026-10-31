@@ -1,7 +1,7 @@
 """Views for Sales Outbound Management (UC-5.1, UC-5.2, UC-5.4 to UC-5.12)."""
 from decimal import Decimal, InvalidOperation
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from apps.accounts.models import User
@@ -65,6 +65,29 @@ def _extract_outbound_lines(request) -> list[OutboundReceiptLineSpec]:
         except (ValueError, InvalidOperation) as exc:
             raise ValidationError(f"Dữ liệu dòng hàng thứ {idx + 1} không hợp lệ.") from exc
     return specs
+
+
+def _extract_initial_outbound_lines(request) -> list[dict]:
+    vids = request.POST.getlist("line_variant_id")
+    qtys = request.POST.getlist("line_so_luong")
+    prices = request.POST.getlist("line_don_gia")
+    notes = request.POST.getlist("line_ghi_chu")
+    int_vids = [int(v) for v in vids if str(v).isdigit()]
+    v_map = {v.id: v for v in BienThe.objects.select_related("san_pham").filter(id__in=int_vids)}
+    lines = []
+    for idx, vid in enumerate(vids):
+        if not str(vid).strip():
+            continue
+        v_obj = v_map.get(int(vid)) if str(vid).isdigit() else None
+        lines.append({
+            "variant_id": int(vid) if str(vid).isdigit() else "",
+            "ma_sku": v_obj.ma_sku if v_obj else "",
+            "ten_hang_hoa": v_obj.full_display_name if v_obj else "",
+            "so_luong": qtys[idx] if idx < len(qtys) else "1",
+            "don_gia": prices[idx] if idx < len(prices) else (str(v_obj.don_gia) if v_obj else "0"),
+            "ghi_chu": notes[idx] if idx < len(notes) else "",
+        })
+    return lines
 
 
 @role_required(User.Role.ADMIN, User.Role.MANAGER, User.Role.STAFF)
@@ -187,6 +210,7 @@ def outbound_create_view(request):
             header_form = OutboundReceiptHeaderForm(request.POST)
         else:
             header_form = OutboundReceiptHeaderForm(request.POST)
+            initial_lines = _extract_initial_outbound_lines(request)
             if header_form.is_valid():
                 try:
                     specs = _extract_outbound_lines(request)
@@ -263,6 +287,7 @@ def outbound_update_view(request, receipt_id: int):
 
     if request.method == "POST":
         header_form = OutboundReceiptHeaderForm(request.POST)
+        initial_lines = _extract_initial_outbound_lines(request)
         if header_form.is_valid():
             try:
                 specs = _extract_outbound_lines(request)
@@ -337,9 +362,13 @@ def outbound_delete_view(request, receipt_id: int):
 
 @role_required(User.Role.ADMIN, User.Role.MANAGER, User.Role.STAFF)
 def request_list_create_view(request):
-    """Sales Staff & Manager view to submit and manage Sales Outbound Requests (Hình 5)."""
-    target_branch = get_effective_branch(request, allow_all_for_admin=False)
-    variants = _get_branch_variant_catalog(target_branch)
+    """Staff submit counter requests; Admin and Managers view and process them."""
+    if request.method == "POST" and request.user.role != User.Role.STAFF:
+        raise PermissionDenied("Chỉ Nhân viên bán hàng được tạo yêu cầu xuất từ quầy.")
+
+    target_branch = get_effective_branch(request, allow_all_for_admin=True)
+    can_create_request = request.user.role == User.Role.STAFF
+    variants = _get_branch_variant_catalog(target_branch) if can_create_request else []
     status_filter = request.GET.get("status", "").strip()
 
     if request.method == "POST":
@@ -369,11 +398,11 @@ def request_list_create_view(request):
                 msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
                 messages.error(request, msg)
     else:
-        form = OutboundRequestForm()
+        form = OutboundRequestForm() if can_create_request else None
 
     requests_qs = get_filtered_outbound_requests(
         user=request.user,
-        selected_branch=target_branch if request.user.role != User.Role.ADMIN else get_effective_branch(request, allow_all_for_admin=True),
+        selected_branch=target_branch,
         status=status_filter,
     )
     return render(

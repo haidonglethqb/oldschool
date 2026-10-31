@@ -15,6 +15,7 @@
 </div>
 
 <div class="row g-3">
+  {% if request.user.role == 'STAFF' %}
   <div class="col-lg-5">
     <div class="os-card p-3">
       <h6 class="fw-bold border-bottom pb-2 mb-3">Tạo Yêu cầu Xuất Hàng Bán ({{ target_branch.ten_co_so }})</h6>
@@ -68,7 +69,8 @@
     </div>
   </div>
 
-  <div class="col-lg-7">
+  {% endif %}
+  <div class="{% if request.user.role == 'STAFF' %}col-lg-7{% else %}col-12{% endif %}">
     <div class="os-card">
       <div class="os-card-header">Danh sách Yêu cầu Xuất Hàng Bán</div>
       <div class="table-responsive">
@@ -129,6 +131,7 @@
   </div>
 </div>
 
+{% if request.user.role == 'STAFF' %}
 <script>
 function addReqLine() {
   const container = document.getElementById("reqLinesContainer");
@@ -140,4 +143,5 @@ function addReqLine() {
   container.appendChild(clone);
 }
 </script>
+{% endif %}
 {% endblock %}

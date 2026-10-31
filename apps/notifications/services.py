@@ -1,7 +1,8 @@
 """Notification and deduplicated low-stock warning services (Mục 7.7, 14 & UC-5.13)."""
+from django.db.models import Q
 from django.urls import reverse
 from apps.accounts.models import User
-from apps.inventory.models import StockStatus, TonKho
+from apps.inventory.models import TonKho
 from apps.notifications.models import ThongBao
 
 
@@ -98,9 +99,11 @@ def notify_branch_managers(
     related_entity_id: int | None = None,
     target_url: str = "",
 ) -> list[ThongBao]:
-    managers = User.objects.filter(role=User.Role.MANAGER, branch=branch, is_active=True)
-    if not managers.exists():
-        # Fallback: create a branch-scoped notification visible to managers/admins
+    target_users = User.objects.filter(
+        (Q(role=User.Role.MANAGER, branch=branch) | Q(role=User.Role.ADMIN)),
+        is_active=True,
+    )
+    if not target_users.exists():
         return [
             create_notification(
                 recipient=None,
@@ -115,7 +118,7 @@ def notify_branch_managers(
             )
         ]
     return notify_users(
-        users=managers,
+        users=target_users,
         notification_type=notification_type,
         title=title,
         content=content,
@@ -133,13 +136,21 @@ def sync_low_stock_alert(ton_kho: TonKho) -> None:
     - If `so_luong <= muc_ton_toi_thieu`: create or update an unresolved LOW_STOCK_ALERT
       for `(co_so, bien_the)` without creating duplicate unresolved warnings.
     - If `so_luong > muc_ton_toi_thieu`: mark any open alerts for `(co_so, bien_the)` as resolved.
+    - If the product or variant is discontinued / inactive: automatically resolve any open alerts.
     """
+    variant = ton_kho.bien_the
+    product = variant.san_pham
     open_alerts = ThongBao.objects.filter(
         loai_thong_bao=ThongBao.NotificationType.LOW_STOCK_ALERT,
         co_so=ton_kho.co_so,
-        bien_the=ton_kho.bien_the,
+        bien_the=variant,
         da_xu_ly=False,
     )
+
+    if variant.trang_thai != "ACTIVE" or product.trang_thai != "ACTIVE":
+        if open_alerts.exists():
+            open_alerts.update(da_xu_ly=True, da_doc=True)
+        return
 
     if ton_kho.so_luong > ton_kho.muc_ton_toi_thieu:
         if open_alerts.exists():
@@ -147,8 +158,6 @@ def sync_low_stock_alert(ton_kho: TonKho) -> None:
         return
 
     status_label = "Hết hàng" if ton_kho.so_luong == 0 else "Sắp hết hàng"
-    variant = ton_kho.bien_the
-    product = variant.san_pham
     title = f"[{ton_kho.co_so.ma_co_so}] Cảnh báo {status_label.lower()}: {variant.ma_sku}"
     content = (
         f"Mã SP: {product.ma_san_pham} | SKU: {variant.ma_sku} ({product.ten_hang_hoa} - "

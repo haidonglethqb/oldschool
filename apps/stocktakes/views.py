@@ -59,6 +59,28 @@ def _extract_stocktake_lines(request) -> list[StocktakeLineSpec]:
     return specs
 
 
+def _extract_initial_stocktake_lines(request):
+    vids = request.POST.getlist("line_variant_id")
+    actuals = request.POST.getlist("line_so_luong_thuc_te")
+    actions = request.POST.getlist("line_xu_ly")
+    notes = request.POST.getlist("line_ghi_chu")
+    lines = []
+    for idx, vid in enumerate(vids):
+        if not str(vid).strip():
+            continue
+        try:
+            vid_val = int(vid)
+        except ValueError:
+            vid_val = vid
+        lines.append({
+            "variant_id": vid_val,
+            "so_luong_thuc_te": actuals[idx] if idx < len(actuals) else "",
+            "xu_ly": actions[idx] if idx < len(actions) else "",
+            "ghi_chu": notes[idx] if idx < len(notes) else "",
+        })
+    return lines
+
+
 @role_required(User.Role.ADMIN, User.Role.MANAGER)
 def stocktake_list_view(request):
     selected_branch = get_effective_branch(request, allow_all_for_admin=True)
@@ -141,6 +163,7 @@ def stocktake_create_view(request):
             header_form = StocktakeHeaderForm(request.POST)
         else:
             header_form = StocktakeHeaderForm(request.POST)
+            initial_lines = _extract_initial_stocktake_lines(request)
             if header_form.is_valid():
                 try:
                     specs = _extract_stocktake_lines(request)
@@ -210,6 +233,7 @@ def stocktake_update_view(request, stocktake_id: int):
 
     if request.method == "POST":
         header_form = StocktakeHeaderForm(request.POST)
+        initial_lines = _extract_initial_stocktake_lines(request)
         if header_form.is_valid():
             try:
                 specs = _extract_stocktake_lines(request)
