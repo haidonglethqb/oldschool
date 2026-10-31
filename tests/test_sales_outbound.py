@@ -165,3 +165,94 @@ class TestSalesOutboundModule:
         req.refresh_from_db()
         assert req.trang_thai == YeuCauXuatHang.Status.PENDING
         assert req.nguoi_xu_ly is None
+
+    def test_staff_can_create_and_finalize_outbound_receipt_directly(
+        self, client, users, branches, sample_catalog
+    ):
+        """Staff can create and immediately finalize sales outbound at counter without approval."""
+        cs1 = branches["CS1"]
+        v_m = sample_catalog["v_m"]
+        client.force_login(users["staff_cs1"])
+
+        # 1. Staff can open outbound create form
+        resp = client.get(reverse("sales_outbound:outbound_create"))
+        assert resp.status_code == 200
+
+        # 2. Staff posts to create and finalize immediately
+        before_stock = TonKho.objects.get(co_so=cs1, bien_the=v_m).so_luong
+        post_data = {
+            "form_action": "save_and_finalize",
+            "ma_phieu_xuat_hang_ban": "",
+            "ten_khach_hang": "Khách mua tại quầy",
+            "sdt": "0912345678",
+            "dia_chi": "Tại cửa hàng CS1",
+            "phuong_thuc_giao": "COUNTER",
+            "ghi_chu": "Bán trực tiếp cho khách",
+            "line_variant_id": [v_m.id],
+            "line_so_luong": [2],
+            "line_don_gia": [str(v_m.don_gia)],
+            "line_ghi_chu": [""],
+        }
+        create_resp = client.post(reverse("sales_outbound:outbound_create"), post_data)
+        assert create_resp.status_code == 302
+
+        created_receipt = PhieuXuatHangBan.objects.latest("pk")
+        assert created_receipt.co_so == cs1
+        assert created_receipt.nguoi_tao == users["staff_cs1"]
+        assert created_receipt.nguoi_ghi_nhan == users["staff_cs1"]
+        assert created_receipt.trang_thai == PhieuXuatHangBan.Status.COMPLETED
+
+        after_stock = TonKho.objects.get(co_so=cs1, bien_the=v_m).so_luong
+        assert after_stock == before_stock - 2
+
+    def test_staff_cross_branch_outbound_blocked(
+        self, client, users, branches, sample_catalog
+    ):
+        """Staff is blocked from accessing or finalizing receipts belonging to other branches."""
+        cs2 = branches["CS2"]
+        v_m = sample_catalog["v_m"]
+        out_cs2 = create_outbound_receipt(
+            actor=users["mgr_cs2"],
+            co_so=cs2,
+            ma_phieu_xuat_hang_ban="PXB-CROSS-001",
+            line_specs=[OutboundReceiptLineSpec(variant_id=v_m.id, so_luong=1)],
+            finalize_immediately=False,
+        )
+
+        client.force_login(users["staff_cs1"])
+        # Attempt to view detail of CS2 receipt -> 403
+        assert client.get(reverse("sales_outbound:outbound_detail", args=[out_cs2.id])).status_code == 403
+        # Attempt to finalize CS2 receipt -> 403
+        assert client.post(reverse("sales_outbound:outbound_finalize", args=[out_cs2.id])).status_code == 403
+
+    def test_staff_create_internal_stock_request_with_reason(
+        self, client, users, branches, sample_catalog
+    ):
+        """Staff can create an internal stock request with reason, manager views and prepares receipt."""
+        cs1 = branches["CS1"]
+        v_m = sample_catalog["v_m"]
+        client.force_login(users["staff_cs1"])
+
+        payload = {
+            "ly_do_xuat": "Hết hàng trên kệ quầy, cần lấy bổ sung gấp",
+            "ghi_chu_them": "Ưu tiên áo đen size M",
+            "line_variant_id": [v_m.id],
+            "line_so_luong": [3],
+        }
+        resp = client.post(reverse("sales_outbound:request_list"), payload)
+        assert resp.status_code == 302
+
+        latest_req = YeuCauXuatHang.objects.latest("pk")
+        assert latest_req.co_so == cs1
+        assert latest_req.nguoi_yeu_cau == users["staff_cs1"]
+        assert "Hết hàng trên kệ quầy" in latest_req.ghi_chu
+        assert latest_req.lines.count() == 1
+        assert latest_req.lines.first().so_luong == 3
+
+        # Manager CS1 views request and opens preparation page
+        client.force_login(users["mgr_cs1"])
+        prep_page = client.get(reverse("sales_outbound:outbound_create"), {"from_request": latest_req.id})
+        assert prep_page.status_code == 200
+        assert prep_page.context["source_request"] == latest_req
+        assert prep_page.context["initial_lines"][0]["variant_id"] == v_m.id
+        assert prep_page.context["initial_lines"][0]["so_luong"] == 3

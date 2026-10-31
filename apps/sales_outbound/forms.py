@@ -4,31 +4,43 @@ from apps.sales_outbound.models import PhieuXuatHangBan, YeuCauXuatHang
 
 
 class OutboundRequestForm(forms.Form):
-    ten_khach_hang = forms.CharField(
-        label="Tên khách hàng / Mã đơn",
-        initial="Khách lẻ tại quầy",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
-    )
-    sdt_khach_hang = forms.CharField(
-        label="Số điện thoại",
+    ly_do_xuat = forms.CharField(
+        label="Lý do xuất kho *",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "VD: Hết hàng trên kệ trưng bày / Khách hỏi mua cần lấy bổ sung...",
+                "required": "required",
+            }
+        ),
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "SĐT khách hàng (nếu có)"}),
     )
-    dia_chi_giao = forms.CharField(
-        label="Địa chỉ nhận hàng",
+    ghi_chu_them = forms.CharField(
+        label="Ghi chú thêm",
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Để trống nếu bán tại quầy"}),
+        widget=forms.Textarea(
+            attrs={"class": "form-control", "rows": 2, "placeholder": "Ghi chú thêm nếu có..."}
+        ),
     )
-    phuong_thuc_giao = forms.ChoiceField(
-        label="Hình thức bán / giao",
-        choices=YeuCauXuatHang.DeliveryMethod.choices,
-        widget=forms.Select(attrs={"class": "form-select"}),
-    )
-    ghi_chu = forms.CharField(
-        label="Ghi chú yêu cầu",
-        required=False,
-        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2}),
-    )
+    # Backward-compatible fields
+    ten_khach_hang = forms.CharField(required=False)
+    sdt_khach_hang = forms.CharField(required=False)
+    dia_chi_giao = forms.CharField(required=False)
+    phuong_thuc_giao = forms.CharField(required=False)
+    ghi_chu = forms.CharField(required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        ly_do = (
+            cleaned_data.get("ly_do_xuat")
+            or cleaned_data.get("ghi_chu")
+            or cleaned_data.get("ten_khach_hang")
+            or ""
+        ).strip()
+        if not ly_do:
+            raise forms.ValidationError("Vui lòng nhập lý do xuất kho.")
+        cleaned_data["ly_do_xuat"] = ly_do
+        return cleaned_data
 
 
 class OutboundReceiptHeaderForm(forms.Form):
