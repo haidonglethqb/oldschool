@@ -117,10 +117,13 @@ class TestCatalogModule:
         assert prod.hinh_anh.url in content_str
         assert "productImageModal" in content_str
 
-        # List view now has image thumbnail
+        # List view now has image thumbnail and delete button
         resp_list = client.get(reverse("catalog:product_list"))
         assert resp_list.status_code == 200
-        assert prod.hinh_anh.url in resp_list.content.decode("utf-8")
+        list_html = resp_list.content.decode("utf-8")
+        assert prod.hinh_anh.url in list_html
+        assert "openDeleteProductModal" in list_html
+        assert "deleteProductModal" in list_html
 
         # Clear image
         update_product_and_variants(

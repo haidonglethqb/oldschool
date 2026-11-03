@@ -27,14 +27,9 @@
         {% if product.trang_thai == 'ACTIVE' %}Ngừng kinh doanh{% else %}Mở bán lại{% endif %}
       </button>
     </form>
-    {% if not has_transactions %}
-    <form method="post" action="{% url 'catalog:product_delete' product.id %}" class="d-inline" onsubmit="return confirm('Xác nhận xóa mặt hàng {{ product.ma_san_pham }}?');">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-sm btn-outline-danger">
-        <i class="bi bi-trash me-1"></i>Xóa mặt hàng
-      </button>
-    </form>
-    {% endif %}
+    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDetailModal">
+      <i class="bi bi-trash me-1"></i>Xóa mặt hàng
+    </button>
     {% endif %}
   </div>
 </div>
@@ -209,6 +204,61 @@
           <i class="bi bi-box-arrow-up-right me-1"></i>Mở ảnh trong tab mới
         </a>
         <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if can_edit %}
+<!-- Modal Xóa Mặt hàng trong trang Chi tiết -->
+<div class="modal fade" id="deleteDetailModal" tabindex="-1" aria-labelledby="deleteDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h6 class="modal-title fw-bold text-danger" id="deleteDetailModalLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa mặt hàng
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body py-3">
+        {% if has_transactions %}
+          <div class="alert alert-danger small mb-3">
+            <i class="bi bi-slash-circle me-1"></i>
+            <strong>Không thể xóa:</strong> Mặt hàng <strong>{{ product.ma_san_pham }} — {{ product.ten_hang_hoa }}</strong> đã phát sinh chứng từ giao dịch hoặc đang có số lượng tồn kho.
+          </div>
+          <p class="small text-muted mb-0">
+            Để đảm bảo tính toàn vẹn của sổ cái kho và chứng từ kế toán, bạn không thể xóa hoàn toàn mặt hàng này khỏi cơ sở dữ liệu. Nếu không muốn tiếp tục kinh doanh mẫu này, vui lòng chuyển sang trạng thái <strong>"Ngừng kinh doanh"</strong>.
+          </p>
+        {% else %}
+          <p class="mb-2">
+            Bạn có chắc chắn muốn xóa vĩnh viễn mặt hàng <strong class="text-danger">{{ product.ma_san_pham }} — {{ product.ten_hang_hoa }}</strong>?
+          </p>
+          <div class="alert alert-warning small mb-0 py-2">
+            <i class="bi bi-info-circle me-1"></i>
+            Toàn bộ dữ liệu của sản phẩm và các biến thể SKU liên quan sẽ bị xóa vĩnh viễn khỏi cơ sở dữ liệu.
+          </div>
+        {% endif %}
+      </div>
+      <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+        {% if has_transactions %}
+          {% if product.trang_thai == 'ACTIVE' %}
+          <form method="post" action="{% url 'catalog:product_toggle_status' product.id %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-os-tan">
+              <i class="bi bi-arrow-repeat me-1"></i>Chuyển sang Ngừng kinh doanh
+            </button>
+          </form>
+          {% endif %}
+        {% else %}
+          <form method="post" action="{% url 'catalog:product_delete' product.id %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger px-3">
+              <i class="bi bi-trash me-1"></i>Xác nhận xóa vĩnh viễn
+            </button>
+          </form>
+        {% endif %}
       </div>
     </div>
   </div>
