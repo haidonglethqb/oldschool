@@ -57,7 +57,9 @@ def create_product_with_variants(
         ghi_chu=(ghi_chu or "").strip(),
         trang_thai=trang_thai or SanPham.Status.ACTIVE,
     )
-    if hinh_anh:
+    if hinh_anh is False:
+        product.hinh_anh = None
+    elif hinh_anh:
         product.hinh_anh = hinh_anh
     product.full_clean()
     product.save()
@@ -124,7 +126,9 @@ def update_product_and_variants(
     product.ghi_chu = (ghi_chu or "").strip()
     if trang_thai in dict(SanPham.Status.choices):
         product.trang_thai = trang_thai
-    if hinh_anh:
+    if hinh_anh is False:
+        product.hinh_anh = None
+    elif hinh_anh:
         product.hinh_anh = hinh_anh
     product.full_clean()
     product.save()

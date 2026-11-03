@@ -41,9 +41,48 @@
 
 <div class="row g-3 mb-4">
   <div class="col-md-5">
-    <div class="os-card p-3 h-100">
-      <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-info-circle me-2"></i>Thông tin chung</h6>
-      <dl class="row mb-0 small">
+    <div class="os-card p-3 h-100 d-flex flex-column">
+      <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+        <h6 class="fw-bold mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin chung</h6>
+        {% if can_edit %}
+        <a href="{% url 'catalog:product_edit' product.id %}" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" title="Chỉnh sửa thông tin / ảnh">
+          <i class="bi bi-pencil me-1"></i>Chỉnh sửa
+        </a>
+        {% endif %}
+      </div>
+
+      <!-- Khung hiển thị hình ảnh sản phẩm -->
+      <div class="mb-3 text-center">
+        {% if product.hinh_anh %}
+          <div class="position-relative d-inline-block w-100 p-2 bg-white rounded border shadow-sm">
+            <a href="{{ product.hinh_anh.url }}" target="_blank" data-bs-toggle="modal" data-bs-target="#productImageModal" class="d-block" title="Nhấp để xem ảnh kích thước lớn">
+              <img src="{{ product.hinh_anh.url }}" alt="{{ product.ten_hang_hoa }}" class="img-fluid rounded" style="max-height: 220px; width: auto; max-width: 100%; object-fit: contain;">
+            </a>
+            <div class="mt-2 d-flex justify-content-center gap-2">
+              <button type="button" class="btn btn-sm btn-light border py-1 px-2 small shadow-sm" data-bs-toggle="modal" data-bs-target="#productImageModal">
+                <i class="bi bi-zoom-in me-1"></i>Phóng to ảnh
+              </button>
+              {% if can_edit %}
+              <a href="{% url 'catalog:product_edit' product.id %}" class="btn btn-sm btn-outline-secondary py-1 px-2 small">
+                <i class="bi bi-arrow-repeat me-1"></i>Đổi ảnh
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="border rounded p-4 text-center text-muted d-flex flex-column align-items-center justify-content-center" style="background-color: #fdfaf6; min-height: 140px;">
+            <i class="bi bi-card-image fs-1 text-secondary opacity-50 mb-1"></i>
+            <span class="small fw-semibold text-secondary">Chưa có hình ảnh minh họa</span>
+            {% if can_edit %}
+              <a href="{% url 'catalog:product_edit' product.id %}" class="btn btn-sm btn-outline-secondary mt-2">
+                <i class="bi bi-upload me-1"></i>Tải ảnh lên
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      <dl class="row mb-0 small flex-grow-1">
         <dt class="col-sm-5 text-muted">Mã hàng hóa:</dt>
         <dd class="col-sm-7 fw-bold">{{ product.ma_san_pham }}</dd>
 
@@ -69,7 +108,7 @@
         </dd>
 
         <dt class="col-sm-5 text-muted">Ghi chú / Mô tả:</dt>
-        <dd class="col-sm-7">{{ product.ghi_chu|default:"Không có ghi chú" }}</dd>
+        <dd class="col-sm-7">{{ product.ghi_chu|default:"Không có ghi chú"|linebreaksbr }}</dd>
       </dl>
     </div>
   </div>
@@ -150,4 +189,29 @@
     </table>
   </div>
 </div>
+
+{% if product.hinh_anh %}
+<!-- Modal Phóng to Ảnh Sản phẩm -->
+<div class="modal fade" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h6 class="modal-title fw-bold" id="productImageModalLabel">
+          <i class="bi bi-image me-2"></i>{{ product.ma_san_pham }} — {{ product.ten_hang_hoa }}
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body text-center p-3">
+        <img src="{{ product.hinh_anh.url }}" alt="{{ product.ten_hang_hoa }}" class="img-fluid rounded border shadow-sm" style="max-height: 70vh; object-fit: contain;">
+      </div>
+      <div class="modal-footer border-top-0 pt-0">
+        <a href="{{ product.hinh_anh.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-box-arrow-up-right me-1"></i>Mở ảnh trong tab mới
+        </a>
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}
