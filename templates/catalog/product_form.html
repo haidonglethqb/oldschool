@@ -8,8 +8,8 @@
     </h4>
     <p class="text-muted small mb-0">Quản lý thông tin hàng hóa chung và các biến thể màu sắc / kích cỡ</p>
   </div>
-  <a href="{% url 'catalog:product_list' %}" class="btn btn-sm btn-outline-secondary">
-    <i class="bi bi-arrow-left me-1"></i>Quay lại danh mục
+  <a href="{% if is_edit %}{% url 'catalog:product_detail' product.id %}{% else %}{% url 'catalog:product_list' %}{% endif %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>{% if is_edit %}Quay lại chi tiết{% else %}Quay lại danh mục{% endif %}
   </a>
 </div>
 
@@ -58,17 +58,20 @@
         <div class="mt-2 d-flex align-items-center gap-3">
           <div id="imagePreviewContainer" class="border rounded p-1 bg-light text-center d-flex align-items-center justify-content-center" style="width: 140px; height: 140px; overflow: hidden;">
             {% if form.instance.hinh_anh %}
-              <img id="imagePreview" src="{{ form.instance.hinh_anh.url }}" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: cover;" class="rounded">
+              <img id="imagePreview" src="{{ form.instance.hinh_anh.url }}" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;" class="rounded">
               <div id="imagePlaceholder" class="text-muted small" style="display: none;"><i class="bi bi-image fs-1 d-block"></i>Xem trước</div>
             {% else %}
-              <img id="imagePreview" src="" alt="Preview" style="display: none; max-width: 100%; max-height: 100%; object-fit: cover;" class="rounded">
+              <img id="imagePreview" src="" alt="Preview" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;" class="rounded">
               <div id="imagePlaceholder" class="text-muted small"><i class="bi bi-image fs-1 d-block"></i>Xem trước ảnh</div>
             {% endif %}
           </div>
           <div class="small text-muted">
             <div>Ảnh xem trước trực quan sẽ tự động hiển thị ngay khi chọn tệp.</div>
+            {% if form.instance.hinh_anh %}
+              <div class="mt-1"><span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Đã có ảnh hiện tại</span></div>
+            {% endif %}
             <button type="button" id="clearImageBtn" class="btn btn-sm btn-outline-danger mt-2" style="display: none;" onclick="clearSelectedImage()">
-              <i class="bi bi-trash me-1"></i>Hủy chọn ảnh
+              <i class="bi bi-trash me-1"></i>Hủy chọn ảnh mới
             </button>
           </div>
         </div>
@@ -130,7 +133,7 @@
         </table>
       </div>
       <div class="mt-3 pt-3 border-top d-flex justify-content-end gap-2">
-        <a href="{% url 'catalog:product_list' %}" class="btn btn-outline-secondary">Hủy bỏ</a>
+        <a href="{% if is_edit %}{% url 'catalog:product_detail' product.id %}{% else %}{% url 'catalog:product_list' %}{% endif %}" class="btn btn-outline-secondary">Hủy bỏ</a>
         <button type="submit" class="btn btn-os-primary px-4">
           <i class="bi bi-check2-circle me-1"></i>Lưu thông tin hàng hóa
         </button>
@@ -153,6 +156,8 @@
 </datalist>
 
 <script>
+const existingImageUrl = "{% if form.instance.hinh_anh %}{{ form.instance.hinh_anh.url }}{% endif %}";
+
 document.addEventListener("DOMContentLoaded", function() {
   const fileInput = document.querySelector("input[name='hinh_anh']");
   const previewImg = document.getElementById("imagePreview");
@@ -184,11 +189,19 @@ function clearSelectedImage() {
   const placeholder = document.getElementById("imagePlaceholder");
   const clearBtn = document.getElementById("clearImageBtn");
   if (fileInput) fileInput.value = "";
-  if (previewImg) {
-    previewImg.src = "";
-    previewImg.style.display = "none";
+  if (existingImageUrl) {
+    if (previewImg) {
+      previewImg.src = existingImageUrl;
+      previewImg.style.display = "block";
+    }
+    if (placeholder) placeholder.style.display = "none";
+  } else {
+    if (previewImg) {
+      previewImg.src = "";
+      previewImg.style.display = "none";
+    }
+    if (placeholder) placeholder.style.display = "block";
   }
-  if (placeholder) placeholder.style.display = "block";
   if (clearBtn) clearBtn.style.display = "none";
 }
 

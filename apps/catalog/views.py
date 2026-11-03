@@ -191,7 +191,7 @@ def product_create_view(request):
                     min_threshold=cd.get("muc_ton_toi_thieu") or 5,
                 )
                 messages.success(request, f"Đã lưu thành công mặt hàng {product.ma_san_pham} - {product.ten_hang_hoa}.")
-                return redirect("catalog:product_list")
+                return redirect("catalog:product_detail", pk=product.pk)
             except ValidationError as exc:
                 err_msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
                 messages.error(request, err_msg)
@@ -255,7 +255,7 @@ def product_edit_view(request, pk: int):
                     min_threshold=cd.get("muc_ton_toi_thieu"),
                 )
                 messages.success(request, f"Đã lưu thành công thông tin mặt hàng {product.ma_san_pham}.")
-                return redirect("catalog:product_list")
+                return redirect("catalog:product_detail", pk=product.pk)
             except ValidationError as exc:
                 err_msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
                 messages.error(request, err_msg)
