@@ -163,3 +163,27 @@ class TestPurchasingModule:
             resp_export["Content-Type"]
             == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
+    def test_admin_create_import_receipt_auto_approve(self, client, users, supplier, sample_catalog):
+        """When Admin creates and saves an import receipt, it should auto-approve without error."""
+        client.force_login(users["admin"])
+        v_m = sample_catalog["v_m"]
+
+        post_data = {
+            "nha_cung_cap": supplier.id,
+            "ma_phieu_nhap_kho": "PNK-ADM-001",
+            "ly_do_nhap": "Admin nhập hàng",
+            "ghi_chu": "Ghi chú admin",
+            "form_action": "submit",
+            "line_variant_id": [v_m.id],
+            "line_so_luong": [5],
+            "line_don_gia": [150000],
+            "line_chiet_khau": [0],
+            "line_ghi_chu": [""],
+        }
+
+        resp = client.post(reverse("purchasing:import_create"), post_data)
+        assert resp.status_code == 302
+        receipt = PhieuNhapKho.objects.get(ma_phieu_nhap_kho="PNK-ADM-001")
+        assert receipt.trang_thai == PhieuNhapKho.Status.APPROVED
+        assert receipt.nguoi_duyet == users["admin"]

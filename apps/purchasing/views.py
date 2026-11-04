@@ -183,13 +183,21 @@ def import_create_view(request):
                         line_specs=line_specs,
                         submit_for_approval=submit_flag,
                     )
-                    messages.success(
-                        request,
-                        f"Đã lưu và phê duyệt phiếu nhập kho {receipt.ma_phieu_nhap_kho} (Tồn kho đã được cập nhật)." if (submit_flag and request.user.role == User.Role.ADMIN and approve_import_receipt(receipt_id=receipt.id, admin_user=request.user)) else f"Đã tạo phiếu nhập kho {receipt.ma_phieu_nhap_kho} ({receipt.get_trang_thai_display()}).",
-                    )
+                    if submit_flag and request.user.role == User.Role.ADMIN:
+                        approve_import_receipt(actor=request.user, receipt=receipt)
+                        messages.success(
+                            request,
+                            f"Đã lưu và phê duyệt phiếu nhập kho {receipt.ma_phieu_nhap_kho} (Tồn kho đã được cập nhật).",
+                        )
+                    else:
+                        messages.success(
+                            request,
+                            f"Đã tạo phiếu nhập kho {receipt.ma_phieu_nhap_kho} ({receipt.get_trang_thai_display()}).",
+                        )
                     return redirect("purchasing:import_detail", receipt_id=receipt.id)
                 except ValidationError as exc:
-                    messages.error(request, "; ".join(exc.messages))
+                    err_msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
+                    messages.error(request, err_msg)
     else:
         header_form = ImportReceiptHeaderForm(initial={"ma_phieu_nhap_kho": generate_next_import_code()})
 
@@ -250,10 +258,18 @@ def import_update_view(request, receipt_id: int):
                     line_specs=line_specs,
                     submit_for_approval=submit_flag,
                 )
-                messages.success(request, f"Đã cập nhật phiếu nhập kho {receipt.ma_phieu_nhap_kho}.")
+                if submit_flag and request.user.role == User.Role.ADMIN:
+                    approve_import_receipt(actor=request.user, receipt=receipt)
+                    messages.success(
+                        request,
+                        f"Đã cập nhật và phê duyệt phiếu nhập kho {receipt.ma_phieu_nhap_kho} (Tồn kho đã được cập nhật).",
+                    )
+                else:
+                    messages.success(request, f"Đã cập nhật phiếu nhập kho {receipt.ma_phieu_nhap_kho}.")
                 return redirect("purchasing:import_detail", receipt_id=receipt.id)
             except ValidationError as exc:
-                messages.error(request, "; ".join(exc.messages))
+                err_msg = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
+                messages.error(request, err_msg)
     else:
         header_form = ImportReceiptHeaderForm(
             initial={
