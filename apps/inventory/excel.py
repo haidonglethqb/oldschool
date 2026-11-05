@@ -184,15 +184,16 @@ def parse_import_excel(uploaded_file) -> dict:
         discount = Decimal("0")
         if disc_raw not in (None, ""):
             try:
-                discount = Decimal(str(disc_raw))
-                if discount < 0:
-                    row_errors.append("Chiết khấu không được âm.")
-                elif qty > 0 and unit_price >= 0 and discount > Decimal(qty) * unit_price:
-                    row_errors.append("Chiết khấu vượt quá thành tiền dòng hàng.")
+                clean_disc = str(disc_raw).replace("%", "").strip()
+                discount = Decimal(clean_disc)
+                if discount < 0 or discount > 100:
+                    row_errors.append("Chiết khấu (%) phải từ 0% đến 100%.")
             except (InvalidOperation, ValueError, TypeError):
                 row_errors.append("Chiết khấu không hợp lệ.")
 
-        line_total = max(Decimal("0"), Decimal(qty) * unit_price - discount) if not row_errors else Decimal("0")
+        gross = Decimal(qty) * unit_price
+        disc_amount = (gross * discount / Decimal("100")).quantize(Decimal("1"))
+        line_total = max(Decimal("0"), gross - disc_amount) if not row_errors else Decimal("0")
         if row_errors:
             errors.append(f"Dòng {idx}: " + " ".join(row_errors))
 

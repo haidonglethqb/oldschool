@@ -251,32 +251,93 @@ body {
   color: var(--os-brown-800);
 }
 
-/* Login Split Layout */
+/* Login Clean Layout (Figma Make) */
 .os-login-wrapper {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--os-brown-900) 0%, var(--os-brown-800) 45%, var(--os-cream-100) 100%);
+  background-color: #EFE9DF;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 2rem 1rem;
 }
 
 .os-login-card {
-  max-width: 920px;
+  max-width: 440px;
   width: 100%;
-  background: var(--os-ivory-50);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  background: #FFFFFF;
+  border-radius: 18px;
+  border: 1px solid #E5DCD2;
+  padding: 2.75rem 2.25rem 2.25rem;
+  box-shadow: 0 10px 30px rgba(61, 34, 20, 0.08);
 }
 
-.os-login-banner {
-  background: linear-gradient(160deg, var(--os-brown-900) 0%, var(--os-brown-700) 100%);
-  color: #FFFDF9;
-  padding: 2.75rem 2.25rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.os-login-logo {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: block;
+}
+
+.os-login-title {
+  color: #382013;
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: -0.2px;
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.os-login-subtitle {
+  color: #8C7364;
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.os-login-input {
+  border: 1px solid #D6CBC0;
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.os-login-input:focus {
+  border-color: #4A2511;
+  box-shadow: 0 0 0 3px rgba(74, 37, 17, 0.15);
+  outline: none;
+}
+
+.os-login-btn {
+  background-color: #382013;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.os-login-btn:hover {
+  background-color: #26150B;
+  color: #FFFFFF;
+}
+
+.os-login-notice {
+  background-color: #F8F3ED;
+  border: 1px solid #EADCCF;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  color: #725B4C;
+  font-size: 0.825rem;
+  line-height: 1.45;
+  text-align: left;
+  margin-top: 1.5rem;
 }
 
 /* Print Styles for Outbound Slip */

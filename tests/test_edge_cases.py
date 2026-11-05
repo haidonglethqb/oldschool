@@ -44,7 +44,7 @@ class TestAuditedEdgeCases:
         )
         variant = product.variants.first()
 
-        # 2. Before any approved import, cost price should fallback to 0 per DEC-07
+        # 2. Before any approved import, cost price falls back to listed price (250,000 VND)
         today = timezone.localdate()
         report_initial = build_inventory_report(
             user=admin_user,
@@ -53,7 +53,7 @@ class TestAuditedEdgeCases:
             date_to_str=str(today),
         )
         row_initial = next(r for r in report_initial["rows"] if r["variant"].id == variant.id)
-        assert row_initial["cost_price"] == Decimal("0")
+        assert row_initial["cost_price"] == Decimal("250000")
         assert row_initial["inventory_value"] == Decimal("0")
 
         # 3. Create and approve an import receipt with import price 120,000 VND

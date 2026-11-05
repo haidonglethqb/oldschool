@@ -47,13 +47,13 @@ class TestPurchasingModule:
                     variant_id=v_m.id,
                     so_luong=15,
                     don_gia=Decimal("250000"),
-                    chiet_khau=Decimal("50000"),
+                    chiet_khau=Decimal("10"),  # 10%
                 )
             ],
             submit_for_approval=True,
         )
         assert receipt.trang_thai == PhieuNhapKho.Status.PENDING_APPROVAL
-        assert receipt.tong_tien == Decimal("3700000")
+        assert receipt.tong_tien == Decimal("3375000")
 
         # Stock must NOT have increased yet
         assert TonKho.objects.get(co_so=branches["CS1"], bien_the=v_m).so_luong == initial_qty

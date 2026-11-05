@@ -79,12 +79,11 @@ def _validate_and_build_lines(line_specs: list[ImportLineSpec]) -> tuple[list[di
         if price < 0:
             raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Đơn giá nhập không được âm.")
         disc = Decimal(str(spec.chiet_khau or "0"))
-        if disc < 0:
-            raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Chiết khấu không được âm.")
+        if disc < 0 or disc > 100:
+            raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Chiết khấu (%) phải từ 0% đến 100%.")
         gross = Decimal(qty) * price
-        if disc > gross:
-            raise ValidationError(f"Dòng {idx} ({variant.ma_sku}): Chiết khấu không được vượt quá thành tiền dòng hàng.")
-        line_total = gross - disc
+        discount_amount = (gross * disc / Decimal("100")).quantize(Decimal("1"))
+        line_total = gross - discount_amount
         grand_total += line_total
         validated_lines.append(
             {

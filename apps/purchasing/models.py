@@ -152,9 +152,9 @@ class ChiTietPhieuNhapKho(models.Model):
     so_luong = models.IntegerField("Số lượng nhập")
     don_gia = models.DecimalField("Đơn giá nhập", max_digits=14, decimal_places=0)
     chiet_khau = models.DecimalField(
-        "Chiết khấu (VNĐ)",
-        max_digits=14,
-        decimal_places=0,
+        "Chiết khấu (%)",
+        max_digits=5,
+        decimal_places=2,
         default=Decimal("0"),
     )
     thanh_tien = models.DecimalField("Thành tiền", max_digits=16, decimal_places=0)
@@ -170,7 +170,7 @@ class ChiTietPhieuNhapKho(models.Model):
                 name="ct_nhap_kho_positive_qty",
             ),
             models.CheckConstraint(
-                condition=Q(don_gia__gte=0) & Q(chiet_khau__gte=0) & Q(thanh_tien__gte=0),
+                condition=Q(don_gia__gte=0) & Q(chiet_khau__gte=0) & Q(chiet_khau__lte=100) & Q(thanh_tien__gte=0),
                 name="ct_nhap_kho_nonnegative_amounts",
             ),
         ]
@@ -186,10 +186,9 @@ class ChiTietPhieuNhapKho(models.Model):
             raise ValidationError({"don_gia": "Đơn giá nhập không được âm."})
         if self.chiet_khau is None:
             self.chiet_khau = Decimal("0")
-        if self.chiet_khau < 0:
-            raise ValidationError({"chiet_khau": "Chiết khấu không được âm."})
+        if self.chiet_khau < 0 or self.chiet_khau > 100:
+            raise ValidationError({"chiet_khau": "Chiết khấu (%) phải từ 0% đến 100%."})
         if self.so_luong and self.don_gia is not None:
             gross = Decimal(self.so_luong) * self.don_gia
-            if self.chiet_khau > gross:
-                raise ValidationError({"chiet_khau": "Chiết khấu không được vượt quá tổng giá trị dòng hàng."})
-            self.thanh_tien = gross - self.chiet_khau
+            discount_amount = (gross * self.chiet_khau / Decimal("100")).quantize(Decimal("1"))
+            self.thanh_tien = gross - discount_amount

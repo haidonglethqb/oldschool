@@ -79,7 +79,7 @@
             <th style="width: 34%;">Sản phẩm / Biến thể (SKU) *</th>
             <th style="width: 12%;">Số lượng *</th>
             <th style="width: 16%;">Đơn giá nhập (VNĐ) *</th>
-            <th style="width: 14%;">Chiết khấu (VNĐ)</th>
+            <th style="width: 14%;">Chiết khấu (%)</th>
             <th style="width: 18%;">Ghi chú dòng</th>
             <th style="width: 6%;"></th>
           </tr>
@@ -99,7 +99,7 @@
             </td>
             <td><input type="number" name="line_so_luong" value="{{ row.so_luong }}" class="form-control form-control-sm line-qty-input" min="1" required></td>
             <td><input type="number" name="line_don_gia" value="{{ row.don_gia }}" class="form-control form-control-sm line-price-input" min="0" required></td>
-            <td><input type="number" name="line_chiet_khau" value="{{ row.chiet_khau|default:0 }}" class="form-control form-control-sm line-disc-input" min="0"></td>
+            <td><input type="number" name="line_chiet_khau" value="{{ row.chiet_khau|default:0 }}" class="form-control form-control-sm line-disc-input" min="0" max="100" step="any" placeholder="0%"></td>
             <td><input type="text" name="line_ghi_chu" value="{{ row.ghi_chu }}" class="form-control form-control-sm"></td>
             <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
           </tr>
@@ -115,7 +115,7 @@
             </td>
             <td><input type="number" name="line_so_luong" value="10" class="form-control form-control-sm line-qty-input" min="1" required></td>
             <td><input type="number" name="line_don_gia" value="150000" class="form-control form-control-sm line-price-input" min="0" required></td>
-            <td><input type="number" name="line_chiet_khau" value="0" class="form-control form-control-sm line-disc-input" min="0"></td>
+            <td><input type="number" name="line_chiet_khau" value="0" class="form-control form-control-sm line-disc-input" min="0" max="100" step="any" placeholder="0%"></td>
             <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm" placeholder="Ghi chú"></td>
             <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
           </tr>
@@ -147,7 +147,7 @@
     </td>
     <td><input type="number" name="line_so_luong" value="10" class="form-control form-control-sm line-qty-input" min="1" required></td>
     <td><input type="number" name="line_don_gia" value="150000" class="form-control form-control-sm line-price-input" min="0" required></td>
-    <td><input type="number" name="line_chiet_khau" value="0" class="form-control form-control-sm line-disc-input" min="0"></td>
+    <td><input type="number" name="line_chiet_khau" value="0" class="form-control form-control-sm line-disc-input" min="0" max="100" step="any" placeholder="0%"></td>
     <td><input type="text" name="line_ghi_chu" class="form-control form-control-sm"></td>
     <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
   </tr>

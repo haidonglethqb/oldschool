@@ -317,7 +317,7 @@ class Command(BaseCommand):
                 ma_phieu_nhap_kho="PNK-DEMO-002",
                 ly_do_nhap="Nhập hàng bộ sưu tập Retro mới (Đang chờ Chủ cửa hàng duyệt)",
                 line_specs=[
-                    ImportLineSpec(variant_id=variants_map["SP003-XANH-M"].id, so_luong=20, don_gia=Decimal("240000"), chiet_khau=Decimal("100000")),
+                    ImportLineSpec(variant_id=variants_map["SP003-XANH-M"].id, so_luong=20, don_gia=Decimal("240000"), chiet_khau=Decimal("10")),
                     ImportLineSpec(variant_id=variants_map["SP005-KEM-L"].id, so_luong=25, don_gia=Decimal("130000")),
                 ],
                 submit_for_approval=True,

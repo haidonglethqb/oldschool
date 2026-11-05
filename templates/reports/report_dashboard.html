@@ -13,21 +13,6 @@
     <a href="?date_from={{ filters.date_from }}&date_to={{ filters.date_to }}&q={{ filters.q }}&category={{ filters.category }}&color={{ filters.color }}&size={{ filters.size }}&stock_status={{ filters.stock_status }}&tab={{ filters.tab }}&export=excel" class="btn btn-sm btn-success">
       <i class="bi bi-file-earmark-excel-fill me-1"></i>Xuất file Excel
     </a>
-    </a>
-    <form method="post" action="{% url 'reports:report_save_snapshot' %}" class="d-inline">
-      {% csrf_token %}
-      <input type="hidden" name="date_from" value="{{ filters.date_from }}">
-      <input type="hidden" name="date_to" value="{{ filters.date_to }}">
-      <input type="hidden" name="q" value="{{ filters.q }}">
-      <input type="hidden" name="category" value="{{ filters.category }}">
-      <input type="hidden" name="color" value="{{ filters.color }}">
-      <input type="hidden" name="size" value="{{ filters.size }}">
-      <input type="hidden" name="stock_status" value="{{ filters.stock_status }}">
-      <input type="hidden" name="tab" value="{{ filters.tab }}">
-      <button type="submit" class="btn btn-sm btn-os-tan">
-        <i class="bi bi-camera me-1"></i>Lưu bản chụp báo cáo
-      </button>
-    </form>
   </div>
 </div>
 

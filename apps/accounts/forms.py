@@ -8,7 +8,7 @@ class LoginForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control os-input",
-                "placeholder": "Nhập tên đăng nhập...",
+                "placeholder": "Nhập tên đăng nhập",
                 "autocomplete": "username",
             }
         ),
@@ -18,7 +18,7 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "form-control os-input",
-                "placeholder": "Nhập mật khẩu...",
+                "placeholder": "Nhập mật khẩu",
                 "autocomplete": "current-password",
             }
         ),

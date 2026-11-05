@@ -341,7 +341,7 @@ def import_export_excel_view(request, receipt_id: int):
         .prefetch_related("lines", "lines__bien_the", "lines__bien_the__san_pham"),
         pk=receipt_id,
     )
-    headers = ["STT", "Mã SKU", "Tên hàng hóa", "Màu / Size", "ĐVT", "Số lượng", "Đơn giá (VNĐ)", "Chiết khấu (VNĐ)", "Thành tiền (VNĐ)", "Ghi chú"]
+    headers = ["STT", "Mã SKU", "Tên hàng hóa", "Màu / Size", "ĐVT", "Số lượng", "Đơn giá (VNĐ)", "Chiết khấu (%)", "Thành tiền (VNĐ)", "Ghi chú"]
     rows = []
     for idx, line in enumerate(receipt.lines.all(), start=1):
         rows.append([
@@ -352,7 +352,7 @@ def import_export_excel_view(request, receipt_id: int):
             line.bien_the.san_pham.don_vi_tinh,
             line.so_luong,
             int(line.don_gia),
-            int(line.chiet_khau),
+            f"{float(line.chiet_khau):g}%",
             int(line.thanh_tien),
             line.ghi_chu,
         ])
