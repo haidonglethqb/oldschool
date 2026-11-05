@@ -126,7 +126,7 @@ def build_inventory_report(
     in_transit_agg = in_transit_qs.values("bien_the_id").annotate(transit_qty=Sum("so_luong_xuat"))
     in_transit_map = {row["bien_the_id"]: int(row["transit_qty"] or 0) for row in in_transit_agg}
 
-    # Average cost per DEC-07: weighted average unit import price from APPROVED receipts
+    # Average cost: multi-tier fallback (SKU average -> Product average -> Listed unit price)
     approved_import_lines = (
         ChiTietPhieuNhapKho.objects.filter(
             bien_the_id__in=variant_ids,
@@ -144,6 +144,24 @@ def build_inventory_report(
         amt = item["total_amount"] or Decimal("0")
         if qty > 0:
             avg_cost_map[item["bien_the_id"]] = (amt / Decimal(qty)).quantize(Decimal("1"))
+
+    product_cost_lines = (
+        ChiTietPhieuNhapKho.objects.filter(
+            bien_the__san_pham_id__in=[v.san_pham_id for v in variants],
+            phieu_nhap_kho__trang_thai=PhieuNhapKho.Status.APPROVED,
+        )
+        .values("bien_the__san_pham_id")
+        .annotate(
+            total_qty=Sum("so_luong"),
+            total_amount=Sum("thanh_tien"),
+        )
+    )
+    product_avg_cost_map: dict[int, Decimal] = {}
+    for item in product_cost_lines:
+        qty = item["total_qty"] or 0
+        amt = item["total_amount"] or Decimal("0")
+        if qty > 0:
+            product_avg_cost_map[item["bien_the__san_pham_id"]] = (amt / Decimal(qty)).quantize(Decimal("1"))
 
     rows = []
     totals = {
@@ -197,9 +215,18 @@ def build_inventory_report(
             status_label = "Còn hàng"
             badge_class = "badge-in-stock"
 
-        cost_price = avg_cost_map.get(vid, Decimal("0"))
+        # Multi-tier cost price fallback:
+        # 1. Exact SKU import unit cost from approved receipts
+        cost_price = avg_cost_map.get(vid)
+        # 2. Average import unit cost of same product from approved receipts
+        if not cost_price or cost_price <= 0:
+            cost_price = product_avg_cost_map.get(v.san_pham_id)
+        # 3. Listed retail/variant unit price as ultimate non-zero fallback
+        if not cost_price or cost_price <= 0:
+            cost_price = v.don_gia or v.san_pham.don_gia_niem_yet or Decimal("0")
+
         selling_price = v.don_gia
-        unit_price = cost_price  # gia_von per DEC-07
+        unit_price = cost_price
         inv_value = Decimal(max(0, closing_qty)) * unit_price
         sales_rev = Decimal(sale_out_qty) * selling_price
 

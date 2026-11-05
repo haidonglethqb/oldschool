@@ -14,8 +14,8 @@
   <!-- Top Brand Navigation (Figma Design) -->
   <nav class="navbar navbar-expand-lg os-navbar sticky-top">
     <div class="container-fluid">
-      <a class="os-brand me-4" href="{% url 'catalog:product_list' %}">
-        <span class="os-brand-badge">OLD SCHOOL</span>
+      <a class="os-brand me-4 d-flex align-items-center" href="{% url 'catalog:product_list' %}">
+        <img src="{% static 'images/logo.png' %}" alt="Logo Old School" class="rounded-circle me-2 shadow-sm" style="width: 38px; height: 38px; object-fit: cover; background: #fff; border: 2px solid var(--os-tan-300);">
         <span class="d-none d-sm-inline">Quản lý Kho & Chuỗi Cung Ứng</span>
       </a>
       <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#osMainNav">

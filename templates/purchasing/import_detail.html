@@ -140,7 +140,7 @@
           <th>ĐVT</th>
           <th class="text-center">Số lượng nhập</th>
           <th class="text-end">Đơn giá nhập</th>
-          <th class="text-end">Chiết khấu (VNĐ)</th>
+          <th class="text-end">Chiết khấu (%)</th>
           <th class="text-end">Thành tiền</th>
           <th>Ghi chú</th>
         </tr>
@@ -155,7 +155,7 @@
           <td>{{ line.bien_the.san_pham.don_vi_tinh }}</td>
           <td class="text-center fw-bold">{{ line.so_luong }}</td>
           <td class="text-end">{{ line.don_gia|intcomma }} đ</td>
-          <td class="text-end">{{ line.chiet_khau|intcomma }} đ</td>
+          <td class="text-end">{{ line.chiet_khau|floatformat:"-2" }}%</td>
           <td class="text-end fw-bold">{{ line.thanh_tien|intcomma }} đ</td>
           <td class="small text-muted">{{ line.ghi_chu }}</td>
         </tr>
