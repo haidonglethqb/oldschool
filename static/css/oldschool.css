@@ -255,6 +255,8 @@ body {
 .os-login-wrapper {
   min-height: 100vh;
   background-color: #EFE9DF;
+  background-image: radial-gradient(#D6CBC0 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -268,17 +270,21 @@ body {
   background: #FFFFFF;
   border-radius: 18px;
   border: 1px solid #E5DCD2;
-  padding: 2.75rem 2.25rem 2.25rem;
-  box-shadow: 0 10px 30px rgba(61, 34, 20, 0.08);
+  padding: 2.5rem 2.25rem 2rem;
+  box-shadow: 0 12px 35px rgba(61, 34, 20, 0.08);
 }
 
 .os-login-logo {
   width: 110px;
   height: 110px;
+  max-width: 110px;
+  max-height: 110px;
   object-fit: contain;
   border-radius: 50%;
   margin: 0 auto;
   display: block;
+  box-shadow: 0 4px 15px rgba(56, 32, 19, 0.1);
+  background-color: #FFFFFF;
 }
 
 .os-login-title {
