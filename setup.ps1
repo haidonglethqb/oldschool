@@ -223,6 +223,12 @@ Write-Host ""
 
 if (-not $NoServer) {
     Write-Host "[6/6] Dang mo trinh duyet va khoi dong Web Server tai http://127.0.0.1:8000/ (Nhan Ctrl+C de dung)..." -ForegroundColor Green
+    try {
+        $portBusy = Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue
+        if ($portBusy) {
+            Write-Host "  -> Luu y: Cong 8000 dang duoc su dung boi tien trinh khac (PID: $($portBusy[0].OwningProcess))." -ForegroundColor Yellow
+        }
+    } catch {}
     Start-Process "http://127.0.0.1:8000/"
     & $VenvPython manage.py runserver 8000
 } else {
