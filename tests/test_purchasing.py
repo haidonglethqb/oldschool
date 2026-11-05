@@ -95,7 +95,7 @@ class TestPurchasingModule:
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.append(["Mã SKU", "Số lượng", "Đơn giá", "Chiết khấu", "Ghi chú"])
-        ws.append(["SP001-DEN-M", 12, 260000, 20000, "Lô nhập Excel"])
+        ws.append(["SP001-DEN-M", 12, 260000, 10, "Lô nhập Excel"])
         stream = BytesIO()
         wb.save(stream)
         stream.seek(0)
