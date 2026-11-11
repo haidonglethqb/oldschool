@@ -14,13 +14,21 @@ from apps.stocktakes.models import ChiTietKiemKe
 from apps.transfers.models import ChiTietPhieuDieuChuyen
 
 
+def _to_ascii_upper(text: str) -> str:
+    """Normalize Vietnamese/Unicode text to uppercase ASCII for SKU generation."""
+    import unicodedata
+
+    normalized = unicodedata.normalize("NFKD", (text or "").replace("đ", "d").replace("Đ", "D"))
+    ascii_text = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return ascii_text.upper()
+
+
 def generate_sku(ma_san_pham: str, mau_sac: str, kich_co: str) -> str:
     import re
-    from text_unidecode import unidecode
 
-    clean_prod = re.sub(r"[^A-Z0-9]", "", unidecode(ma_san_pham).upper())
-    clean_color = re.sub(r"[^A-Z0-9]", "", unidecode(mau_sac).upper())[:6] or "STD"
-    clean_size = re.sub(r"[^A-Z0-9]", "", unidecode(kich_co).upper())[:4] or "FS"
+    clean_prod = re.sub(r"[^A-Z0-9]", "", _to_ascii_upper(ma_san_pham))
+    clean_color = re.sub(r"[^A-Z0-9]", "", _to_ascii_upper(mau_sac))[:6] or "STD"
+    clean_size = re.sub(r"[^A-Z0-9]", "", _to_ascii_upper(kich_co))[:4] or "FS"
     return f"{clean_prod}-{clean_color}-{clean_size}"
 
 

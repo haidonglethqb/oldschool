@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load l10n %}
 {% block title %}Phiếu điều chuyển {{ transfer.ma_phieu_dieu_chuyen }} | Old School{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -76,7 +77,7 @@
             <td class="text-center fw-bold">{{ line.source_available_stock }}</td>
             <td class="text-center">{{ line.so_luong_yeu_cau }}</td>
             <td>
-              <input type="number" name="dispatch_qty_{{ line.id }}" value="{{ line.so_luong_yeu_cau }}" min="1" max="{{ line.so_luong_yeu_cau }}" class="form-control form-control-sm text-center" required>
+              <input type="number" name="dispatch_qty_{{ line.id|unlocalize }}" value="{{ line.so_luong_yeu_cau|unlocalize }}" min="1" max="{{ line.so_luong_yeu_cau|unlocalize }}" class="form-control form-control-sm text-center" required>
             </td>
           </tr>
           {% endfor %}
@@ -119,7 +120,7 @@
             <td class="text-center">{{ line.so_luong_yeu_cau }}</td>
             <td class="text-center fw-bold">{{ line.so_luong_xuat }}</td>
             <td>
-              <input type="number" name="receive_qty_{{ line.id }}" value="{{ line.so_luong_xuat }}" min="0" max="{{ line.so_luong_xuat }}" class="form-control form-control-sm text-center" required>
+              <input type="number" name="receive_qty_{{ line.id|unlocalize }}" value="{{ line.so_luong_xuat|unlocalize }}" min="0" max="{{ line.so_luong_xuat|unlocalize }}" class="form-control form-control-sm text-center" required>
             </td>
           </tr>
           {% endfor %}

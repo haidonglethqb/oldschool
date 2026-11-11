@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load l10n %}
 {% block title %}Tạo yêu cầu điều chuyển hàng | Old School{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -106,7 +107,7 @@
                 {% endfor %}
               </select>
             </td>
-            <td><input type="number" name="line_so_luong" value="{{ row.so_luong }}" min="1" class="form-control form-control-sm" required></td>
+            <td><input type="number" name="line_so_luong" value="{{ row.so_luong|unlocalize }}" min="1" class="form-control form-control-sm" required></td>
             <td><input type="text" name="line_ghi_chu" value="{{ row.ghi_chu }}" class="form-control form-control-sm" placeholder="Ghi chú"></td>
             <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
           </tr>

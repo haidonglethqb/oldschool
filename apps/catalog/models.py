@@ -21,7 +21,7 @@ class SanPham(models.Model):
         decimal_places=0,
         default=Decimal("0"),
     )
-    hinh_anh = models.ImageField("Hình ảnh", upload_to="products/", null=True, blank=True)
+    hinh_anh = models.ImageField("Hình ảnh", upload_to="products/", max_length=255, null=True, blank=True)
     ghi_chu = models.TextField("Mô tả / Ghi chú", blank=True, default="")
     trang_thai = models.CharField(
         "Trạng thái kinh doanh",

@@ -1,4 +1,8 @@
+from pathlib import Path
+import re
+import uuid
 from django import forms
+from django.core.files.uploadedfile import UploadedFile
 from apps.catalog.models import SanPham
 
 
@@ -30,7 +34,7 @@ class ProductForm(forms.ModelForm):
             "don_vi_tinh": forms.TextInput(attrs={"class": "form-control os-input", "placeholder": "VD: Cái"}),
             "don_gia_niem_yet": forms.NumberInput(attrs={"class": "form-control os-input", "min": "0"}),
             "trang_thai": forms.Select(attrs={"class": "form-select os-input"}),
-            "hinh_anh": forms.ClearableFileInput(attrs={"class": "form-control os-input"}),
+            "hinh_anh": forms.ClearableFileInput(attrs={"class": "form-control os-input", "accept": "image/*"}),
             "ghi_chu": forms.Textarea(
                 attrs={
                     "class": "form-control os-input",
@@ -39,3 +43,13 @@ class ProductForm(forms.ModelForm):
                 }
             ),
         }
+
+    def clean_hinh_anh(self):
+        image = self.cleaned_data.get("hinh_anh")
+        if isinstance(image, UploadedFile) and image.name:
+            parsed = Path(image.name)
+            ext = parsed.suffix.lower()[:10]
+            stem = re.sub(r"[^A-Za-z0-9._-]+", "_", parsed.stem).strip("._-") or "product"
+            if len(f"products/{image.name}") > 180 or len(image.name) > 120:
+                image.name = f"{stem[:60]}_{uuid.uuid4().hex[:8]}{ext}"
+        return image

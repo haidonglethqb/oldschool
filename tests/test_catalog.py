@@ -137,3 +137,160 @@ class TestCatalogModule:
         )
         prod.refresh_from_db()
         assert not prod.hinh_anh
+
+    def test_product_edit_view_image_upload_unlocalized_prices_and_clear(
+        self, client, users, sample_catalog, settings, tmp_path
+    ):
+        """Regression: product_edit_view renders unlocalized numeric values and persists uploaded/replaced/cleared images."""
+        import re
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from apps.catalog.models import BienThe
+
+        settings.MEDIA_ROOT = str(tmp_path)
+        client.force_login(users["admin"])
+        prod = sample_catalog["product"]
+
+        # Add a >= 1,000,000 variant to verify multi-dot localization does not break HTML/POST
+        BienThe.objects.create(
+            san_pham=prod,
+            ma_sku="SP001-BE-XL",
+            mau_sac="Be",
+            kich_co="XL",
+            don_gia=Decimal("1250000"),
+            trang_thai=BienThe.Status.ACTIVE,
+        )
+
+        edit_url = reverse("catalog:product_edit", args=[prod.id])
+        resp_get = client.get(edit_url)
+        assert resp_get.status_code == 200
+        html = resp_get.content.decode("utf-8")
+
+        rendered_prices = re.findall(r'name="variant_price\[\]" value="([^"]*)"', html)
+        assert "450000" in rendered_prices
+        assert "1250000" in rendered_prices
+        assert "450.000" not in rendered_prices
+        assert "1.250.000" not in rendered_prices
+
+        small_gif = (
+            b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00"
+            b"\xff\xff\xff\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00"
+            b"\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b"
+        )
+        variants = list(prod.variants.all())
+        post_base = {
+            "ma_san_pham": prod.ma_san_pham,
+            "ten_hang_hoa": prod.ten_hang_hoa,
+            "nhom_hang": prod.nhom_hang,
+            "don_vi_tinh": prod.don_vi_tinh,
+            "don_gia_niem_yet": "450000",
+            "muc_ton_toi_thieu": "5",
+            "trang_thai": prod.trang_thai,
+            "ghi_chu": prod.ghi_chu,
+            "variant_id[]": [str(v.id) for v in variants],
+            "variant_sku[]": [v.ma_sku for v in variants],
+            "variant_color[]": [v.mau_sac for v in variants],
+            "variant_size[]": [v.kich_co for v in variants],
+            "variant_price[]": [str(v.don_gia) for v in variants],
+            "variant_threshold[]": ["5" for _ in variants],
+        }
+
+        # 1. Upload image via HTTP POST
+        img_1 = SimpleUploadedFile("bomber_oldschool.gif", small_gif, content_type="image/gif")
+        resp_post = client.post(edit_url, {**post_base, "hinh_anh": img_1})
+        assert resp_post.status_code == 302
+        assert resp_post.url == reverse("catalog:product_detail", args=[prod.id])
+
+        prod.refresh_from_db()
+        assert prod.hinh_anh
+        assert "bomber_oldschool" in prod.hinh_anh.name
+        assert (tmp_path / prod.hinh_anh.name).exists()
+        assert BienThe.objects.get(ma_sku="SP001-DEN-M").don_gia == Decimal("450000")
+        assert BienThe.objects.get(ma_sku="SP001-BE-XL").don_gia == Decimal("1250000")
+
+        # Detail and list views render the uploaded image URL
+        assert prod.hinh_anh.url in client.get(reverse("catalog:product_detail", args=[prod.id])).content.decode("utf-8")
+        assert prod.hinh_anh.url in client.get(reverse("catalog:product_list")).content.decode("utf-8")
+
+        # 2. Replace with a very long filename (> 130 chars)
+        long_name = ("anh_san_pham_ao_khoac_bomber_oldschool_" * 4) + ".gif"
+        img_long = SimpleUploadedFile(long_name, small_gif, content_type="image/gif")
+        resp_replace = client.post(edit_url, {**post_base, "hinh_anh": img_long})
+        assert resp_replace.status_code == 302
+        prod.refresh_from_db()
+        assert prod.hinh_anh
+        assert (tmp_path / prod.hinh_anh.name).exists()
+
+        # 3. Clear image via ClearableFileInput checkbox
+        resp_clear = client.post(edit_url, {**post_base, "hinh_anh-clear": "on"})
+        assert resp_clear.status_code == 302
+        prod.refresh_from_db()
+        assert not prod.hinh_anh
+
+    def test_product_edit_view_error_states_and_rollback_badge(self, client, users, sample_catalog, settings, tmp_path):
+        """Failed upload or atomic rollback shows field error and does not render fake saved-image badge."""
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        settings.MEDIA_ROOT = str(tmp_path)
+        client.force_login(users["admin"])
+        prod = sample_catalog["product"]
+        edit_url = reverse("catalog:product_edit", args=[prod.id])
+        variants = list(prod.variants.all())
+
+        # Invalid image file should re-render with field error on hinh_anh
+        bad_file = SimpleUploadedFile("not_an_image.txt", b"hello", content_type="text/plain")
+        resp_bad = client.post(
+            edit_url,
+            {
+                "ma_san_pham": prod.ma_san_pham,
+                "ten_hang_hoa": prod.ten_hang_hoa,
+                "nhom_hang": prod.nhom_hang,
+                "don_vi_tinh": prod.don_vi_tinh,
+                "don_gia_niem_yet": "450000",
+                "muc_ton_toi_thieu": "5",
+                "trang_thai": prod.trang_thai,
+                "ghi_chu": prod.ghi_chu,
+                "hinh_anh": bad_file,
+                "variant_id[]": [str(v.id) for v in variants],
+                "variant_sku[]": [v.ma_sku for v in variants],
+                "variant_color[]": [v.mau_sac for v in variants],
+                "variant_size[]": [v.kich_co for v in variants],
+                "variant_price[]": [str(v.don_gia) for v in variants],
+                "variant_threshold[]": ["5" for _ in variants],
+            },
+        )
+        assert resp_bad.status_code == 200
+        bad_html = resp_bad.content.decode("utf-8")
+        assert "Đã có ảnh hiện tại" not in bad_html
+        assert "text-danger" in bad_html
+
+        # Valid image + variant ValidationError triggers rollback and must NOT show fake saved badge
+        small_gif = (
+            b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00"
+            b"\xff\xff\xff\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00"
+            b"\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b"
+        )
+        good_img = SimpleUploadedFile("rollback_test.gif", small_gif, content_type="image/gif")
+        resp_rollback = client.post(
+            edit_url,
+            {
+                "ma_san_pham": prod.ma_san_pham,
+                "ten_hang_hoa": prod.ten_hang_hoa,
+                "nhom_hang": prod.nhom_hang,
+                "don_vi_tinh": prod.don_vi_tinh,
+                "don_gia_niem_yet": "450000",
+                "muc_ton_toi_thieu": "5",
+                "trang_thai": prod.trang_thai,
+                "ghi_chu": prod.ghi_chu,
+                "hinh_anh": good_img,
+                "variant_id[]": [str(v.id) for v in variants],
+                "variant_sku[]": [v.ma_sku for v in variants],
+                "variant_color[]": [v.mau_sac for v in variants],
+                "variant_size[]": [v.kich_co for v in variants],
+                "variant_price[]": ["-100" for _ in variants],
+                "variant_threshold[]": ["5" for _ in variants],
+            },
+        )
+        assert resp_rollback.status_code == 200
+        prod.refresh_from_db()
+        assert not prod.hinh_anh
+        assert "Đã có ảnh hiện tại" not in resp_rollback.content.decode("utf-8")
